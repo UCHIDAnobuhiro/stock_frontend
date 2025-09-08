@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Stock App</string>
+    <string name="app_header_text">株価表示</string>
+
+    <!--ログイン-->
+    <string name="login">ログイン</string>
+    <string name="password">パスワード</string>
+    <string name="hide">隠す</string>
+    <string name="show">表示</string>
+    <string name="mail">メールアドレス</string>
+    <string name="logout">ログアウト</string>
+
+</resources>
