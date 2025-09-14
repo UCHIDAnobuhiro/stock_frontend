@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.stock.ui.screen.LoginScreen
 import com.example.stock.ui.screen.StockListScreen
 import com.example.stock.viewmodel.AuthViewModel
+import com.example.stock.viewmodel.SymbolViewModel
 
 // Routesは、画面遷移の識別子です。
 object Routes {
@@ -23,6 +24,7 @@ object Routes {
 @Composable
 fun AppNavGraph(
     authViewModel: AuthViewModel,
+    symbolViewModel: SymbolViewModel
 ) {
     val navController = rememberNavController()
 
@@ -45,6 +47,7 @@ fun AppNavGraph(
         composable(Routes.STOCK) {
             StockListScreen(
                 navController,
+                symbolViewModel,
                 onLogout = {
                     // ログアウト処理
                     authViewModel.logout()

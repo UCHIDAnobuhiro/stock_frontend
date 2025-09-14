@@ -58,4 +58,6 @@ object ApiClient {
      * Retrofitを使用してインスタンスを作成
      */
     val authApi: AuthApi = retrofit.create(AuthApi::class.java)
+
+    val stockApi: StockApi = retrofit.create(StockApi::class.java)
 }
