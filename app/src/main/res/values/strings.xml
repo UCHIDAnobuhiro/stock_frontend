@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Stock App</string>
-    <string name="app_header_text">株価表示</string>
+    <string name="app_header_text">銘柄リスト</string>
 
     <!--ログイン-->
     <string name="login">ログイン</string>
