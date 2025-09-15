@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     // OkHttp
     implementation(libs.okhttp)
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     // ViewModelテスト関連
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
