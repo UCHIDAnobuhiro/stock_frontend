@@ -1,5 +1,6 @@
 package com.example.stock.ui.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -51,7 +52,10 @@ fun StockListScreen(
                     Row (
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 12.dp),
+                            .padding(vertical = 12.dp)
+                            .clickable {
+                                navController.navigate("chart/${stock.code}")
+                            },
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(text = stock.name)

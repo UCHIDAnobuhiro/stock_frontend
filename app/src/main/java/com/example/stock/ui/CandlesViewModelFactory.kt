@@ -3,16 +3,17 @@ package com.example.stock.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.stock.data.repository.StockRepository
-import com.example.stock.viewmodel.SymbolViewModel
+import com.example.stock.viewmodel.CandlesViewModel
 
-class SymbolViewModelFactory(
+class CandlesViewModelFactory(
     private val repo: StockRepository
 ) : ViewModelProvider.Factory {
+
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(SymbolViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(CandlesViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return SymbolViewModel(repo) as T
+            return CandlesViewModel(repo) as T
         }
-        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
