@@ -4,6 +4,8 @@ import android.graphics.Paint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -13,9 +15,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.stock.ui.component.StockListHeader
 import com.example.stock.viewmodel.CandlesViewModel
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.CandleStickChart
@@ -40,7 +44,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 @Composable
 fun ChartScreen(
     code: String,
-    vm: CandlesViewModel
+    vm: CandlesViewModel,
+    onLogout: () -> Unit
 ) {
     val candles by vm.candles.collectAsStateWithLifecycle()
 
@@ -54,156 +59,172 @@ fun ChartScreen(
     var candleChartRef by remember { mutableStateOf<CandleStickChart?>(null) }
     var volumeChartRef by remember { mutableStateOf<BarChart?>(null) }
 
-    Column(Modifier.fillMaxSize()){
-        var synced by remember { mutableStateOf(false) }
-        LaunchedEffect(code) { synced = false }
-        if (!synced && candleChartRef != null && volumeChartRef != null) {
-            SideEffect {
-                syncCharts(candleChartRef!!, volumeChartRef!!)
-                synced = true
+    Scaffold(
+        topBar = {
+            StockListHeader(
+                onLogout = onLogout
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp)
+        ) {
+            Column(Modifier.fillMaxSize()) {
+                var synced by remember { mutableStateOf(false) }
+                LaunchedEffect(code) { synced = false }
+                if (!synced && candleChartRef != null && volumeChartRef != null) {
+                    SideEffect {
+                        syncCharts(candleChartRef!!, volumeChartRef!!)
+                        synced = true
+                    }
+                }
+                AndroidView(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(3f),
+                    factory = { ctx ->
+                        CandleStickChart(ctx).apply {
+                            description.isEnabled = false
+                            setDrawGridBackground(false)
+                            setPinchZoom(true)
+                            isDoubleTapToZoomEnabled = false
+
+                            axisLeft.isEnabled = false
+
+                            axisRight.apply {
+                                isEnabled = true
+                                setDrawGridLines(true)
+                                setLabelCount(5, false)
+                                spaceTop = 10f
+                            }
+
+                            xAxis.isEnabled = false
+                            legend.isEnabled = false
+
+                            setViewPortOffsets(20f, 20f, 60f, 10f)
+                            candleChartRef = this
+                        }
+                    },
+                    update = { chart ->
+                        val entries = dataAsc.mapIndexed { i, c ->
+                            CandleEntry(
+                                i.toFloat(),
+                                c.high.toFloat(),
+                                c.low.toFloat(),
+                                c.open.toFloat(),
+                                c.close.toFloat()
+                            )
+                        }
+
+                        if (entries.isEmpty()) {
+                            chart.clear()
+                            chart.setNoDataText("Loading…")
+                            chart.invalidate()
+                            return@AndroidView
+                        }
+
+                        val set = CandleDataSet(entries, "Price").apply {
+                            setDrawValues(false)
+                            shadowColorSameAsCandle = true
+                            decreasingColor = "#e74c3c".toColorInt()   // 赤
+                            decreasingPaintStyle = Paint.Style.FILL
+                            increasingColor = "#2ecc71".toColorInt()   // 緑
+                            increasingPaintStyle = Paint.Style.FILL
+                            neutralColor = "#95a5a6".toColorInt()      // グレー
+                            barSpace = 0.2f
+                        }
+                        chart.data = CandleData(set)
+                        chart.isAutoScaleMinMaxEnabled = true
+                        chart.notifyDataSetChanged()
+
+                        val count = entries.size
+                        if (count > 20) {
+                            chart.setVisibleXRangeMaximum(60f)
+                            chart.moveViewToX(chart.data.xMax - 60f)
+                        } else {
+                            chart.moveViewToX(chart.data.xMax)
+                        }
+
+                        chart.invalidate()
+                    }
+                )
+
+                AndroidView(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1.2f),
+                    factory = { ctx ->
+                        BarChart(ctx).apply {
+                            description.isEnabled = false
+                            setDrawGridBackground(false)
+                            setPinchZoom(true)
+                            isDoubleTapToZoomEnabled = false
+
+                            axisLeft.isEnabled = false
+                            axisRight.apply {
+                                isEnabled = true
+                                axisMinimum = 0f
+                                setDrawGridLines(false)
+                                setLabelCount(5, true)
+                            }
+
+                            xAxis.apply {
+                                position = XAxis.XAxisPosition.BOTTOM
+                                setDrawGridLines(false)
+                                granularity = 1f
+                                valueFormatter = object : ValueFormatter() {
+                                    override fun getFormattedValue(value: Float): String {
+                                        val i = value.toInt()
+                                        return if (i in labels.indices) labels[i] else ""
+                                    }
+                                }
+                            }
+                            legend.isEnabled = false
+                            // 上下の描画領域を揃える（左余白を確保）
+                            setViewPortOffsets(20f, 10f, 60f, 30f)
+                            volumeChartRef = this
+                        }
+                    },
+                    update = { chart ->
+                        val volEntries = dataAsc.mapIndexed { i, c ->
+                            BarEntry(i.toFloat(), c.volume.toFloat())
+                        }
+
+                        if (volEntries.isEmpty()) {
+                            chart.clear()
+                            chart.setNoDataText("Loading…")
+                            chart.invalidate()
+                            return@AndroidView
+                        }
+
+                        val set = BarDataSet(volEntries, "Volume").apply {
+                            setDrawValues(false)
+                            axisDependency = YAxis.AxisDependency.RIGHT
+                            color = "#3498db".toColorInt()
+                        }
+                        chart.data = BarData(set).apply { barWidth = 0.8f }
+                        chart.notifyDataSetChanged()
+
+                        val visibleCount = 60f
+                        val count = volEntries.size
+                        if (count > visibleCount) {
+                            chart.setVisibleXRangeMaximum(visibleCount)
+                            chart.moveViewToX(chart.data.xMax - visibleCount) // 右端に最新
+                        } else {
+                            chart.moveViewToX(chart.data.xMax) // データが少ない時
+                        }
+
+                        chart.invalidate()
+
+                    }
+                )
             }
         }
-        AndroidView(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(3f),
-            factory = {ctx ->
-                CandleStickChart(ctx).apply {
-                    description.isEnabled = false
-                    setDrawGridBackground(false)
-                    setPinchZoom(true)
-                    isDoubleTapToZoomEnabled = false
-
-                    axisLeft.isEnabled = false
-
-                    axisRight.apply {
-                        isEnabled = true
-                        setDrawGridLines(true)
-                        setLabelCount(5, false)
-                        spaceTop = 10f
-                    }
-
-                    xAxis.isEnabled = false
-                    legend.isEnabled = false
-
-                    setViewPortOffsets(20f, 20f, 60f, 10f)
-                    candleChartRef = this
-                }
-            },
-            update = { chart ->
-                val entries = dataAsc.mapIndexed { i, c ->
-                    CandleEntry(
-                        i.toFloat(),
-                        c.high.toFloat(),
-                        c.low.toFloat(),
-                        c.open.toFloat(),
-                        c.close.toFloat()
-                    )
-                }
-
-                if (entries.isEmpty()) {
-                    chart.clear()
-                    chart.setNoDataText("Loading…")
-                    chart.invalidate()
-                    return@AndroidView
-                }
-
-                val set = CandleDataSet(entries, "Price").apply {
-                    setDrawValues(false)
-                    shadowColorSameAsCandle = true
-                    decreasingColor = "#e74c3c".toColorInt()   // 赤
-                    decreasingPaintStyle = Paint.Style.FILL
-                    increasingColor = "#2ecc71".toColorInt()   // 緑
-                    increasingPaintStyle = Paint.Style.FILL
-                    neutralColor = "#95a5a6".toColorInt()      // グレー
-                    barSpace = 0.2f
-                }
-                chart.data = CandleData(set)
-                chart.isAutoScaleMinMaxEnabled = true
-                chart.notifyDataSetChanged()
-
-                val count = entries.size
-                if (count > 20) {
-                    chart.setVisibleXRangeMaximum(60f)
-                    chart.moveViewToX(chart.data.xMax - 60f)
-                } else {
-                    chart.moveViewToX(chart.data.xMax)
-                }
-
-                chart.invalidate()
-            }
-        )
-
-        AndroidView(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1.2f),
-            factory = { ctx ->
-                BarChart(ctx).apply {
-                    description.isEnabled = false
-                    setDrawGridBackground(false)
-                    setPinchZoom(true)
-                    isDoubleTapToZoomEnabled = false
-
-                    axisLeft.isEnabled = false
-                    axisRight.apply {
-                        isEnabled = true
-                        axisMinimum = 0f
-                        setDrawGridLines(false)
-                        setLabelCount(5, true)
-                    }
-
-                    xAxis.apply {
-                        position = XAxis.XAxisPosition.BOTTOM
-                        setDrawGridLines(false)
-                        granularity = 1f
-                        valueFormatter = object : ValueFormatter() {
-                            override fun getFormattedValue(value: Float): String {
-                                val i = value.toInt()
-                                return if (i in labels.indices) labels[i] else ""
-                            }
-                        }
-                    }
-                    legend.isEnabled = false
-                    // 上下の描画領域を揃える（左余白を確保）
-                    setViewPortOffsets(20f, 10f, 60f, 30f)
-                    volumeChartRef = this
-                }
-            },
-            update = { chart ->
-                val volEntries = dataAsc.mapIndexed { i, c ->
-                    BarEntry(i.toFloat(), c.volume.toFloat())
-                }
-
-                if (volEntries.isEmpty()) {
-                    chart.clear()
-                    chart.setNoDataText("Loading…")
-                    chart.invalidate()
-                    return@AndroidView
-                }
-
-                val set = BarDataSet(volEntries, "Volume").apply {
-                    setDrawValues(false)
-                    axisDependency = YAxis.AxisDependency.RIGHT
-                    color = "#3498db".toColorInt()
-                }
-                chart.data = BarData(set).apply { barWidth = 0.8f }
-                chart.notifyDataSetChanged()
-
-                val visibleCount = 60f
-                val count = volEntries.size
-                if (count > visibleCount) {
-                    chart.setVisibleXRangeMaximum(visibleCount)
-                    chart.moveViewToX(chart.data.xMax - visibleCount) // 右端に最新
-                } else {
-                    chart.moveViewToX(chart.data.xMax) // データが少ない時
-                }
-
-                chart.invalidate()
-
-            }
-        )
     }
+
 }
 
 /** 上下チャートのズーム/スクロール/ハイライトを同期 */
@@ -216,17 +237,34 @@ private fun syncCharts(
         override fun onChartScale(me: android.view.MotionEvent?, scaleX: Float, scaleY: Float) {
             volume.viewPortHandler.refresh(candle.viewPortHandler.matrixTouch, volume, true)
         }
+
         override fun onChartTranslate(me: android.view.MotionEvent?, dX: Float, dY: Float) {
             volume.viewPortHandler.refresh(candle.viewPortHandler.matrixTouch, volume, true)
         }
-        override fun onChartGestureEnd(me: android.view.MotionEvent?, lastPerformedGesture: ChartTouchListener.ChartGesture?) {
+
+        override fun onChartGestureEnd(
+            me: android.view.MotionEvent?,
+            lastPerformedGesture: ChartTouchListener.ChartGesture?
+        ) {
             volume.viewPortHandler.refresh(candle.viewPortHandler.matrixTouch, volume, true)
         }
-        override fun onChartGestureStart(me: android.view.MotionEvent?, lastPerformedGesture: ChartTouchListener.ChartGesture?) {}
+
+        override fun onChartGestureStart(
+            me: android.view.MotionEvent?,
+            lastPerformedGesture: ChartTouchListener.ChartGesture?
+        ) {
+        }
+
         override fun onChartLongPressed(me: android.view.MotionEvent?) {}
         override fun onChartDoubleTapped(me: android.view.MotionEvent?) {}
         override fun onChartSingleTapped(me: android.view.MotionEvent?) {}
-        override fun onChartFling(me1: android.view.MotionEvent?, me2: android.view.MotionEvent?, velocityX: Float, velocityY: Float) {}
+        override fun onChartFling(
+            me1: android.view.MotionEvent?,
+            me2: android.view.MotionEvent?,
+            velocityX: Float,
+            velocityY: Float
+        ) {
+        }
     }
     candle.onChartGestureListener = syncListener
 
@@ -235,17 +273,34 @@ private fun syncCharts(
         override fun onChartScale(me: android.view.MotionEvent?, scaleX: Float, scaleY: Float) {
             candle.viewPortHandler.refresh(volume.viewPortHandler.matrixTouch, candle, true)
         }
+
         override fun onChartTranslate(me: android.view.MotionEvent?, dX: Float, dY: Float) {
             candle.viewPortHandler.refresh(volume.viewPortHandler.matrixTouch, candle, true)
         }
-        override fun onChartGestureEnd(me: android.view.MotionEvent?, lastPerformedGesture: ChartTouchListener.ChartGesture?) {
+
+        override fun onChartGestureEnd(
+            me: android.view.MotionEvent?,
+            lastPerformedGesture: ChartTouchListener.ChartGesture?
+        ) {
             candle.viewPortHandler.refresh(volume.viewPortHandler.matrixTouch, candle, true)
         }
-        override fun onChartGestureStart(me: android.view.MotionEvent?, lastPerformedGesture: ChartTouchListener.ChartGesture?) {}
+
+        override fun onChartGestureStart(
+            me: android.view.MotionEvent?,
+            lastPerformedGesture: ChartTouchListener.ChartGesture?
+        ) {
+        }
+
         override fun onChartLongPressed(me: android.view.MotionEvent?) {}
         override fun onChartDoubleTapped(me: android.view.MotionEvent?) {}
         override fun onChartSingleTapped(me: android.view.MotionEvent?) {}
-        override fun onChartFling(me1: android.view.MotionEvent?, me2: android.view.MotionEvent?, velocityX: Float, velocityY: Float) {}
+        override fun onChartFling(
+            me1: android.view.MotionEvent?,
+            me2: android.view.MotionEvent?,
+            velocityX: Float,
+            velocityY: Float
+        ) {
+        }
     }
     volume.onChartGestureListener = syncListener2
 
@@ -271,6 +326,7 @@ private fun syncCharts(
                 isSyncing.set(false)
             }
         }
+
         override fun onNothingSelected() {
             if (!isSyncing.compareAndSet(false, true)) return
             try {
@@ -294,6 +350,7 @@ private fun syncCharts(
                 isSyncing.set(false)
             }
         }
+
         override fun onNothingSelected() {
             if (!isSyncing.compareAndSet(false, true)) return
             try {

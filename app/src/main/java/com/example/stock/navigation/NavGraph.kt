@@ -62,7 +62,14 @@ fun AppNavGraph(
         }
         composable("chart/{code}") { backStackEntry ->
             val code = backStackEntry.arguments?.getString("code") ?: return@composable
-            ChartScreen(code, candlesViewModel)
+            ChartScreen(code,
+                candlesViewModel,
+                onLogout = {
+                    authViewModel.logout()
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                })
         }
     }
 }
