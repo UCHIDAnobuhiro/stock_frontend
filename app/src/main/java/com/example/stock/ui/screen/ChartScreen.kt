@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.stock.viewmodel.CandlesViewModel
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.CandleStickChart
+import com.github.mikephil.charting.charts.Chart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.BarData
@@ -33,6 +34,7 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.ChartTouchListener
 import com.github.mikephil.charting.listener.OnChartGestureListener
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import java.util.concurrent.atomic.AtomicBoolean
 
 
 @Composable
@@ -78,7 +80,7 @@ fun ChartScreen(
                         isEnabled = true
                         setDrawGridLines(true)
                         setLabelCount(5, false)
-                        axisRight.spaceTop = 10f
+                        spaceTop = 10f
                     }
 
                     xAxis.isEnabled = false
@@ -247,32 +249,59 @@ private fun syncCharts(
     }
     volume.onChartGestureListener = syncListener2
 
+
+    val isSyncing = AtomicBoolean(false)
+
+    fun sameXHighlighted(chart: Chart<*>?, x: Float): Boolean {
+        val cur = chart?.highlighted?.firstOrNull() ?: return false
+        return cur.x == x
+    }
+
     // ハイライトも同期（任意）
     candle.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
         override fun onValueSelected(e: Entry?, h: Highlight?) {
-            val volData = volume.data
-            if (h != null && volData != null && volData.entryCount > 0) {
-                val x = h.x.toInt()
-                val max = volData.entryCount
-                if (x in 0 until max) {
-                    volume.highlightValue(h.x, 0)
-                }
+            if (h == null) return
+            val data = volume.data ?: return
+            if (data.entryCount == 0) return
+            if (sameXHighlighted(volume, h.x)) return
+            if (!isSyncing.compareAndSet(false, true)) return
+            try {
+                volume.highlightValue(h.x, 0)
+            } finally {
+                isSyncing.set(false)
             }
         }
-        override fun onNothingSelected() { volume.highlightValues(null) }
-
+        override fun onNothingSelected() {
+            if (!isSyncing.compareAndSet(false, true)) return
+            try {
+                volume.highlightValues(null)
+            } finally {
+                isSyncing.set(false)
+            }
+        }
     })
+
     volume.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
         override fun onValueSelected(e: Entry?, h: Highlight?) {
-            val canData = candle.data
-            if (h != null && canData != null && canData.entryCount > 0) {
-                val x = h.x.toInt()
-                val max = canData.entryCount
-                if (x in 0 until max) {
-                    candle.highlightValue(h.x, 0)
-                }
+            if (h == null) return
+            val data = candle.data ?: return
+            if (data.entryCount == 0) return
+            if (sameXHighlighted(candle, h.x)) return
+            if (!isSyncing.compareAndSet(false, true)) return
+            try {
+                candle.highlightValue(h.x, 0)
+            } finally {
+                isSyncing.set(false)
             }
         }
-        override fun onNothingSelected() { candle.highlightValues(null) }
+        override fun onNothingSelected() {
+            if (!isSyncing.compareAndSet(false, true)) return
+            try {
+                candle.highlightValues(null)
+            } finally {
+                isSyncing.set(false)
+            }
+        }
     })
+
 }
