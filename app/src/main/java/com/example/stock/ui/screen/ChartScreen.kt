@@ -15,11 +15,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.stock.ui.component.StockListHeader
+import androidx.navigation.NavController
+import com.example.stock.R
+import com.example.stock.ui.component.CommonHeader
 import com.example.stock.viewmodel.CandlesViewModel
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.CandleStickChart
@@ -43,6 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 @Composable
 fun ChartScreen(
+    navController: NavController,
     code: String,
     vm: CandlesViewModel,
     onLogout: () -> Unit
@@ -61,7 +65,9 @@ fun ChartScreen(
 
     Scaffold(
         topBar = {
-            StockListHeader(
+            CommonHeader(
+                titleText = stringResource(R.string.app_header_candle_chart),
+                onBack = { navController.popBackStack() },
                 onLogout = onLogout
             )
         }

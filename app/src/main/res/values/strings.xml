@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Stock App</string>
-    <string name="app_header_text">銘柄リスト</string>
+    <string name="app_header_stock_list">銘柄リスト</string>
+    <string name="app_header_candle_chart">株価チャート</string>
+    <string name="back_btn_text">戻る</string>
+
 
     <!--ログイン-->
     <string name="login">ログイン</string>
