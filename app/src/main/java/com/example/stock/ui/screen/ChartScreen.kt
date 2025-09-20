@@ -196,13 +196,13 @@ fun ChartScreen(
 
                         chart.axisRight.apply {
                             setDrawGridLines(false)
+                            setDrawLimitLinesBehindData(true)
                             removeAllLimitLines()
-                            // この時点で mEntries が“実際に振られた目盛り”になっている
                             mEntries?.forEach { v ->
                                 val ll =
                                     LimitLine(v).apply {
                                         lineWidth = 1f
-                                        lineColor = "#E5E7EB".toColorInt()   // 薄いグレー
+                                        lineColor = "#E5E7EB".toColorInt()
                                     }
                                 addLimitLine(ll)
                             }
@@ -218,6 +218,8 @@ fun ChartScreen(
 
                         val stride = 10
                         chart.xAxis.apply {
+                            setDrawGridLines(false)
+                            setDrawLimitLinesBehindData(true)
                             removeAllLimitLines()
                             for (i in 0 until entries.size step stride) {
                                 val ll =
@@ -313,6 +315,7 @@ fun ChartScreen(
                         chart.notifyDataSetChanged()
                         chart.axisRight.apply {
                             setDrawGridLines(false)
+                            setDrawLimitLinesBehindData(true)
                             removeAllLimitLines()
                             mEntries?.forEach { v ->
                                 val ll =
@@ -335,6 +338,8 @@ fun ChartScreen(
 
                         val stride = 10
                         chart.xAxis.apply {
+                            setDrawGridLines(false)
+                            setDrawLimitLinesBehindData(true)
                             removeAllLimitLines()
                             for (i in 0 until volEntries.size step stride) {
                                 val ll =
