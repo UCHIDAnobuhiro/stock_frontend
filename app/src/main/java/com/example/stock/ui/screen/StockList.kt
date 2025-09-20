@@ -58,7 +58,7 @@ fun StockListScreen(
                             .fillMaxWidth()
                             .padding(vertical = 12.dp)
                             .clickable {
-                                navController.navigate("chart/${stock.code}")
+                                navController.navigate("chart/${stock.name}/${stock.code}")
                             },
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {

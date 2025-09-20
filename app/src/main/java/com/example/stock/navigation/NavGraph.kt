@@ -60,10 +60,12 @@ fun AppNavGraph(
                 }
             )
         }
-        composable("chart/{code}") { backStackEntry ->
+        composable("chart/{name}/{code}") { backStackEntry ->
+            val name = backStackEntry.arguments?.getString("name") ?: return@composable
             val code = backStackEntry.arguments?.getString("code") ?: return@composable
             ChartScreen(
                 navController,
+                name,
                 code,
                 candlesViewModel,
                 onLogout = {
