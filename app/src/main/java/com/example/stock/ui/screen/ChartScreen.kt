@@ -49,8 +49,9 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.ChartTouchListener
 import com.github.mikephil.charting.listener.OnChartGestureListener
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
-
+import kotlin.math.pow
 
 @Composable
 fun ChartScreen(
@@ -140,7 +141,7 @@ fun ChartScreen(
                             xAxis.isEnabled = false
                             legend.isEnabled = false
 
-                            setViewPortOffsets(20f, 20f, 60f, 10f)
+                            setViewPortOffsets(20f, 20f, 70f, 10f)
                             candleChartRef = this
                         }
                     },
@@ -244,7 +245,7 @@ fun ChartScreen(
                             }
                             legend.isEnabled = false
                             // 上下の描画領域を揃える（左余白を確保）
-                            setViewPortOffsets(20f, 10f, 60f, 30f)
+                            setViewPortOffsets(20f, 10f, 70f, 30f)
                             volumeChartRef = this
                         }
                     },
@@ -267,10 +268,26 @@ fun ChartScreen(
                         }
                         chart.data = BarData(set).apply { barWidth = 0.8f }
 
-                        val maxVol = (dataAsc.maxOf { it.volume }).toFloat()
-                        chart.axisRight.axisMinimum = 0f
-                        chart.axisRight.axisMaximum = maxVol * 1.1f  // 10%マージン
-                        chart.isScaleYEnabled = false
+                        val vols = volEntries.map { it.y }
+                        val dataMax = vols.maxOrNull() ?: 0f
+
+                        val labelCount = 5
+                        val min = 0f
+
+// 0データ対策
+                        val rawStep = if (dataMax <= 0f) 1f else (dataMax - min) / (labelCount - 1)
+                        val step = niceStep(rawStep)
+                        val axisMax = (min + step * (labelCount - 1)).coerceAtLeast(dataMax)
+
+                        chart.axisRight.apply {
+                            axisMinimum = min
+                            axisMaximum = axisMax
+                            setLabelCount(labelCount, true)
+                            valueFormatter = object : ValueFormatter() {
+                                override fun getFormattedValue(value: Float): String =
+                                    formatCompact(value)
+                            }
+                        }
 
                         chart.notifyDataSetChanged()
                         chart.axisRight.apply {
@@ -439,4 +456,44 @@ private fun syncCharts(
         }
     })
 
+}
+
+// K / M 表記（小数1桁まで）
+private fun formatCompact(value: Float): String {
+    return when {
+        value >= 1_000_000 -> {
+            val millions = value / 1_000_000
+            if (millions % 1f == 0f) {
+                String.format(Locale.US, "%.0fM", millions) // 整数なら小数点なし
+            } else {
+                String.format(Locale.US, "%.1fM", millions) // それ以外は小数1桁
+            }
+        }
+
+        value >= 1_000 -> {
+            val thousands = value / 1_000
+            if (thousands % 1f == 0f) {
+                String.format(Locale.US, "%.0fK", thousands)
+            } else {
+                String.format(Locale.US, "%.1fK", thousands)
+            }
+        }
+
+        else -> value.toLong().toString()
+    }
+}
+
+private fun niceStep(step: Float): Float {
+    if (step <= 0f) return 1f
+    val exp = kotlin.math.floor(kotlin.math.log10(step.toDouble())).toInt()
+    val base = 10.0.pow(exp).toFloat()
+    val f = step / base
+    val nf = when {
+        f <= 1f -> 1f
+        f <= 2f -> 2f
+        f <= 2.5f -> 2.5f
+        f <= 5f -> 5f
+        else -> 10f
+    }
+    return nf * base
 }
