@@ -173,8 +173,32 @@ fun ChartScreen(
                             barSpace = 0.2f
                         }
                         chart.data = CandleData(set)
-                        chart.isAutoScaleMinMaxEnabled = true
+
+                        val minLow = dataAsc.minOf { it.low }.toFloat()
+                        val maxHigh = dataAsc.maxOf { it.high }.toFloat()
+                        val pad = (maxHigh - minLow) * 0.05f  // 5%マージン
+                        chart.axisRight.axisMinimum = (minLow - pad)
+                        chart.axisRight.axisMaximum = (maxHigh + pad)
+
+                        chart.isAutoScaleMinMaxEnabled = false
+                        chart.isScaleYEnabled = false
                         chart.notifyDataSetChanged()
+
+                        chart.axisRight.apply {
+                            setDrawGridLines(false)
+                            removeAllLimitLines()
+                            // この時点で mEntries が“実際に振られた目盛り”になっている
+                            mEntries?.forEach { v ->
+                                val ll =
+                                    com.github.mikephil.charting.components.LimitLine(v).apply {
+                                        lineWidth = 1f
+                                        // 好みの色/スタイル
+                                        lineColor = "#E5E7EB".toColorInt()   // 薄いグレー
+                                        // enableDashedLine(8f, 6f, 0f)      // 破線にしたければ
+                                    }
+                                addLimitLine(ll)
+                            }
+                        }
 
                         val count = entries.size
                         if (count > 20) {
@@ -242,7 +266,25 @@ fun ChartScreen(
                             color = "#3498db".toColorInt()
                         }
                         chart.data = BarData(set).apply { barWidth = 0.8f }
+
+                        val maxVol = (dataAsc.maxOf { it.volume }).toFloat()
+                        chart.axisRight.axisMinimum = 0f
+                        chart.axisRight.axisMaximum = maxVol * 1.1f  // 10%マージン
+                        chart.isScaleYEnabled = false
+
                         chart.notifyDataSetChanged()
+                        chart.axisRight.apply {
+                            setDrawGridLines(false)
+                            removeAllLimitLines()
+                            mEntries?.forEach { v ->
+                                val ll =
+                                    com.github.mikephil.charting.components.LimitLine(v).apply {
+                                        lineWidth = 1f
+                                        lineColor = "#E5E7EB".toColorInt()
+                                    }
+                                addLimitLine(ll)
+                            }
+                        }
 
                         val visibleCount = 60f
                         val count = volEntries.size
