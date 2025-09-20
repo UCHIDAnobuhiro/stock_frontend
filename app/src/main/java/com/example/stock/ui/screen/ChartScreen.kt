@@ -35,6 +35,7 @@ import com.example.stock.viewmodel.CandlesViewModel
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.CandleStickChart
 import com.github.mikephil.charting.charts.Chart
+import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.BarData
@@ -199,11 +200,9 @@ fun ChartScreen(
                             // この時点で mEntries が“実際に振られた目盛り”になっている
                             mEntries?.forEach { v ->
                                 val ll =
-                                    com.github.mikephil.charting.components.LimitLine(v).apply {
+                                    LimitLine(v).apply {
                                         lineWidth = 1f
-                                        // 好みの色/スタイル
                                         lineColor = "#E5E7EB".toColorInt()   // 薄いグレー
-                                        // enableDashedLine(8f, 6f, 0f)      // 破線にしたければ
                                     }
                                 addLimitLine(ll)
                             }
@@ -222,7 +221,7 @@ fun ChartScreen(
                             removeAllLimitLines()
                             for (i in 0 until entries.size step stride) {
                                 val ll =
-                                    com.github.mikephil.charting.components.LimitLine(i.toFloat())
+                                    LimitLine(i.toFloat())
                                         .apply {
                                             lineWidth = 1f
                                             lineColor = "#E5E7EB".toColorInt()
@@ -317,7 +316,7 @@ fun ChartScreen(
                             removeAllLimitLines()
                             mEntries?.forEach { v ->
                                 val ll =
-                                    com.github.mikephil.charting.components.LimitLine(v).apply {
+                                    LimitLine(v).apply {
                                         lineWidth = 1f
                                         lineColor = "#E5E7EB".toColorInt()
                                     }
@@ -339,7 +338,7 @@ fun ChartScreen(
                             removeAllLimitLines()
                             for (i in 0 until volEntries.size step stride) {
                                 val ll =
-                                    com.github.mikephil.charting.components.LimitLine(i.toFloat())
+                                    LimitLine(i.toFloat())
                                         .apply {
                                             lineWidth = 1f
                                             lineColor = "#E5E7EB".toColorInt()
