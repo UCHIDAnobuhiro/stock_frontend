@@ -138,7 +138,15 @@ fun ChartScreen(
                                 spaceTop = 10f
                             }
 
-                            xAxis.isEnabled = false
+                            xAxis.apply {
+                                isEnabled = true
+                                setDrawLabels(false)
+                                setDrawAxisLine(false)
+                                setDrawGridLines(false)
+                                granularity = 1f
+                                position = XAxis.XAxisPosition.BOTTOM
+                            }
+
                             legend.isEnabled = false
 
                             setViewPortOffsets(20f, 20f, 70f, 10f)
@@ -209,6 +217,21 @@ fun ChartScreen(
                             chart.moveViewToX(chart.data.xMax)
                         }
 
+                        val stride = 10
+                        chart.xAxis.apply {
+                            removeAllLimitLines()
+                            for (i in 0 until entries.size step stride) {
+                                val ll =
+                                    com.github.mikephil.charting.components.LimitLine(i.toFloat())
+                                        .apply {
+                                            lineWidth = 1f
+                                            lineColor = "#E5E7EB".toColorInt()
+                                        }
+                                addLimitLine(ll)
+                            }
+                        }
+                        chart.xAxis.axisMinimum = -0.5f
+                        chart.xAxis.axisMaximum = chart.data.xMax + 0.5f
                         chart.invalidate()
                     }
                 )
@@ -245,7 +268,7 @@ fun ChartScreen(
                             }
                             legend.isEnabled = false
                             // 上下の描画領域を揃える（左余白を確保）
-                            setViewPortOffsets(20f, 10f, 70f, 30f)
+                            setViewPortOffsets(20f, 10f, 70f, 100f)
                             volumeChartRef = this
                         }
                     },
@@ -274,7 +297,6 @@ fun ChartScreen(
                         val labelCount = 5
                         val min = 0f
 
-// 0データ対策
                         val rawStep = if (dataMax <= 0f) 1f else (dataMax - min) / (labelCount - 1)
                         val step = niceStep(rawStep)
                         val axisMax = (min + step * (labelCount - 1)).coerceAtLeast(dataMax)
@@ -312,8 +334,38 @@ fun ChartScreen(
                             chart.moveViewToX(chart.data.xMax) // データが少ない時
                         }
 
-                        chart.invalidate()
+                        val stride = 10
+                        chart.xAxis.apply {
+                            removeAllLimitLines()
+                            for (i in 0 until volEntries.size step stride) {
+                                val ll =
+                                    com.github.mikephil.charting.components.LimitLine(i.toFloat())
+                                        .apply {
+                                            lineWidth = 1f
+                                            lineColor = "#E5E7EB".toColorInt()
+                                        }
+                                addLimitLine(ll)
+                            }
 
+                            valueFormatter = object : ValueFormatter() {
+                                override fun getFormattedValue(value: Float): String {
+                                    val i = kotlin.math.round(value).toInt()
+                                    return if (i in labels.indices && i % 10 == 0) labels[i].replace(
+                                        '-',
+                                        '/'
+                                    ) else ""
+                                }
+                            }
+                            setDrawLabels(true)
+                            granularity = 1f
+                            isGranularityEnabled = true
+                            setAvoidFirstLastClipping(true)
+                            textSize = 9f
+                            labelRotationAngle = -28f
+                        }
+                        chart.xAxis.axisMinimum = -0.5f
+                        chart.xAxis.axisMaximum = chart.data.xMax + 0.5f
+                        chart.invalidate()
                     }
                 )
             }
