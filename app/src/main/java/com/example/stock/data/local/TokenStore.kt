@@ -2,11 +2,14 @@ package com.example.stock.data.local
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.stock.data.local.TokenStoreKeys.TOKEN
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import java.io.IOException
 
 /**
  * アプリケーションの [Context] に対して、JWT トークンを保存するための DataStore を提供する拡張プロパティ。
@@ -28,13 +31,19 @@ object TokenStoreKeys {
  * @property context アプリケーションコンテキスト。DataStore にアクセスするために使用される。
  */
 class TokenStore(private val context: Context) {
-    val tokenFlow: Flow<String?> = context.dataStore.data.map { it[TOKEN] }
+    private val appContext = context.applicationContext
+
+    val tokenFlow: Flow<String?> = appContext.dataStore.data
+        .catch { e ->
+            if (e is IOException) emit(emptyPreferences()) else throw e
+        }
+        .map { prefs -> prefs[TokenStoreKeys.TOKEN] }
 
     suspend fun save(token: String) {
-        context.dataStore.edit { it[TOKEN] = token }
+        appContext.dataStore.edit { it[TOKEN] = token }
     }
 
     suspend fun clear() {
-        context.dataStore.edit { it.remove(TOKEN) }
+        appContext.dataStore.edit { it.remove(TOKEN) }
     }
 }

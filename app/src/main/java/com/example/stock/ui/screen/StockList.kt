@@ -1,5 +1,6 @@
 package com.example.stock.ui.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,9 +17,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.stock.ui.component.StockListHeader
+import com.example.stock.R
+import com.example.stock.ui.component.MainHeader
 import com.example.stock.viewmodel.SymbolViewModel
 
 
@@ -29,13 +32,15 @@ import com.example.stock.viewmodel.SymbolViewModel
 fun StockListScreen(
     navController: NavController,
     vm: SymbolViewModel,
-    onLogout: () -> Unit, ) {
+    onLogout: () -> Unit,
+) {
     val stocks by vm.symbols.collectAsState()
     LaunchedEffect(Unit) { vm.load() }
 
     Scaffold(
         topBar = {
-            StockListHeader(
+            MainHeader(
+                titleText = stringResource(R.string.app_header_stock_list),
                 onLogout = onLogout
             )
         }
@@ -48,10 +53,13 @@ fun StockListScreen(
         ) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(stocks) { stock ->
-                    Row (
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 12.dp),
+                            .padding(vertical = 12.dp)
+                            .clickable {
+                                navController.navigate("chart/${stock.name}/${stock.code}")
+                            },
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(text = stock.name)

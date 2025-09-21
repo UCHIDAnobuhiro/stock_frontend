@@ -4,9 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.stock.ui.screen.ChartScreen
 import com.example.stock.ui.screen.LoginScreen
 import com.example.stock.ui.screen.StockListScreen
 import com.example.stock.viewmodel.AuthViewModel
+import com.example.stock.viewmodel.CandlesViewModel
 import com.example.stock.viewmodel.SymbolViewModel
 
 // Routesは、画面遷移の識別子です。
@@ -24,7 +26,8 @@ object Routes {
 @Composable
 fun AppNavGraph(
     authViewModel: AuthViewModel,
-    symbolViewModel: SymbolViewModel
+    symbolViewModel: SymbolViewModel,
+    candlesViewModel: CandlesViewModel
 ) {
     val navController = rememberNavController()
 
@@ -56,6 +59,21 @@ fun AppNavGraph(
                     }
                 }
             )
+        }
+        composable("chart/{name}/{code}") { backStackEntry ->
+            val name = backStackEntry.arguments?.getString("name") ?: return@composable
+            val code = backStackEntry.arguments?.getString("code") ?: return@composable
+            ChartScreen(
+                navController,
+                name,
+                code,
+                candlesViewModel,
+                onLogout = {
+                    authViewModel.logout()
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                })
         }
     }
 }
