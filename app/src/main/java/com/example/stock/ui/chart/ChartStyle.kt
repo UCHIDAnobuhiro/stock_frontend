@@ -310,28 +310,62 @@ fun makeDateAxisFormatter(
 /**
  * ローソク足チャートの右Y軸をセットアップする。
  *
- * @param chart 対象のチャート
- * @param lows  各足の安値リスト
- * @param highs 各足の高値リスト
- * @param padRatio 上下に余白を追加する比率（デフォルトは 5%）
+ * - 安値・高値リストから軸範囲を計算し、上下に余白を追加する
+ * - 軸最小値／最大値は必ず 5 の倍数に丸められる（マイナス値は禁止）
+ * - ラベル数は固定（デフォルト 5 本）
+ * - 目盛り間隔（granularity）は 5 の倍数になるように調整される
+ * - 値フォーマットは整数表示（小数点なし）
  *
- * 最小値/最大値を求め、その範囲に余白を加えて axisMinimum / axisMaximum に設定する。
+ * @param chart 対象のローソク足チャート
+ * @param lows 各足の安値リスト
+ * @param highs 各足の高値リスト
+ * @param padRatio 上下に追加する余白の比率（デフォルトは [ChartTokens.Dimens.Y_PAD_RATIO]）
+ * @param labelCount Y 軸ラベルの数（デフォルトは [ChartTokens.Dimens.Y_LABEL_COUNT]）
  */
 fun setupRightAxisForCandle(
     chart: CandleStickChart,
     lows: List<Double>,
     highs: List<Double>,
-    padRatio: Float = ChartTokens.Dimens.Y_PAD_RATIO
+    padRatio: Float = ChartTokens.Dimens.Y_PAD_RATIO,
+    labelCount: Int = ChartTokens.Dimens.Y_LABEL_COUNT
 ) {
     if (lows.isEmpty() || highs.isEmpty()) return
 
     val minLow = lows.minOrNull()!!.toFloat()
     val maxHigh = highs.maxOrNull()!!.toFloat()
-    val pad = (maxHigh - minLow) * padRatio
+
+    // レンジと余白を計算
+    val rawRange = (maxHigh - minLow).takeIf { it > 0f } ?: (maxHigh * 0.01f).coerceAtLeast(0.01f)
+    val pad = rawRange * padRatio
+
+    // 軸の候補値(マイナスは0で止める)
+    val rawMin = (minLow - pad).coerceAtLeast(0f) // マイナス禁止
+    val rawMax = maxHigh + pad
+
+    // ステップ幅を5の倍数に切りあげ
+    val targetStep = (rawMax - rawMin) / (labelCount - 1)
+    var step = (kotlin.math.ceil(targetStep / 5f) * 5f).coerceAtLeast(5f)
+
+    val axisMin = kotlin.math.floor(rawMin / 5f) * 5f
+    var axisMax = axisMin + step * (labelCount - 1)
+
+    while (axisMax < rawMax) {
+        step += 5f
+        axisMax = axisMin + step * (labelCount - 1)
+    }
 
     chart.axisRight.apply {
-        axisMinimum = minLow - pad
-        axisMaximum = maxHigh + pad
+        axisMinimum = axisMin
+        axisMaximum = axisMax
+
+        setLabelCount(labelCount, true)
+
+        granularity = step
+        isGranularityEnabled = true
+
+        valueFormatter = object : ValueFormatter() {
+            override fun getFormattedValue(value: Float): String = value.toInt().toString()
+        }
     }
 }
 
@@ -365,34 +399,62 @@ fun setupRightAxisForVolume(
 }
 
 /**
- * 右Y軸の目盛り位置に合わせて補助線（LimitLine）を追加し、薄いグリッド線として描画する。
+ * 右/左Y軸の現在の範囲とラベル設定から補助線(LimitLine)を再生成する。
  *
- * - 標準のグリッド描画を無効化し、代わりに LimitLine で線を引く
- * - 内部配列 [YAxis.mEntries] を利用して現在の目盛り値を取得（ライブラリ依存の実装）
- * - 失敗した場合はフォールバックとして通常のグリッド線を有効化
- *
- * @param lineWidth 補助線の太さ（デフォルト 1f）
- * @param lineColor 補助線の色（デフォルト [ChartPalette.Grid]）
+ * - mEntries を使わず axisMinimum/axisMaximum を参照
+ * - labelCount と granularity（有効なら）を尊重
+ * - stepOverride を渡すと任意の刻みで固定可能（例：出来高側に niceStep(rawStep) を適用したい時）
+ * - 端の浮動小数誤差を吸収して重複/欠落を防ぐ
  */
-fun YAxis.refreshGridLimitLines(
+fun YAxis.refreshGridLimitLinesFromAxis(
+    labelCountOverride: Int? = null,
+    stepOverride: Float? = null,
     lineWidth: Float = 1f,
     @ColorInt lineColor: Int = ChartPalette.Grid
 ) {
+    // 標準グリッドは切り、LimitLine を背面で描画
     setDrawGridLines(false)
     setDrawLimitLinesBehindData(true)
     removeAllLimitLines()
 
-    try {
-        val entries = this.mEntries ?: return
-        entries.forEach { v ->
+    val min = axisMinimum
+    val max = axisMaximum
+    if (!min.isFinite() || !max.isFinite() || max <= min) return
+
+    val labels = (labelCountOverride ?: this.labelCount).coerceAtLeast(2)
+    // 刻み幅の決定: 優先度 = stepOverride > granularity(有効時) > 均等割
+    val step = when {
+        stepOverride != null && stepOverride > 0f -> stepOverride
+        isGranularityEnabled && granularity > 0f -> granularity
+        else -> (max - min) / (labels - 1)
+    }.coerceAtLeast(1e-6f)
+
+    // min から step ごとに生成。labelCountOverride を使う場合は件数優先、
+    // 使わない場合は min..max を越えないように生成。
+    val eps = (max - min) * 1e-6f
+    if (labelCountOverride != null) {
+        var v = min
+        repeat(labels) {
             addLimitLine(
                 LimitLine(v).apply {
                     this.lineWidth = lineWidth
                     this.lineColor = lineColor
                 }
             )
+            v += step
         }
-    } catch (_: Throwable) {
-        setDrawGridLines(true)
+    } else {
+        var v = min
+        var guard = 0
+        while (v <= max + eps && guard < 1000) {
+            addLimitLine(
+                LimitLine(v).apply {
+                    this.lineWidth = lineWidth
+                    this.lineColor = lineColor
+                }
+            )
+            v += step
+            guard++
+        }
     }
 }

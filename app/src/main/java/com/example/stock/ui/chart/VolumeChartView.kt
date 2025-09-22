@@ -22,15 +22,22 @@ fun VolumeChartView(
             }
         },
         update = { chart ->
+            chart.fitScreen()
             if (entries.isEmpty()) {
                 showLoading(chart, chart.context); return@AndroidView
             }
             updateOrCreateBarData(chart, entries)
+            // X軸
             setupXAxisCommon(chart, entries.size)
             chart.xAxis.valueFormatter = makeDateAxisFormatter(labels)
             chart.xAxis.labelRotationAngle = ChartTokens.Dimens.X_LABEL_ROTATION
+            // Y軸
             setupRightAxisForVolume(chart, entries)
-            chart.axisRight.refreshGridLimitLines()
+            // データ更新を通知
+            chart.notifyDataSetChanged()
+            chart.axisRight.refreshGridLimitLinesFromAxis()
+
+            chart.highlightValues(null)
             chart.invalidate()
         }
     )

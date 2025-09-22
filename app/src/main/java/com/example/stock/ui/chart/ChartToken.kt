@@ -5,9 +5,9 @@ object ChartTokens {
     object Dimens {
         // ロウソク足チャートの余白
         const val CANDLE_LEFT = 20f
-        const val CANDLE_TOP = 10f
+        const val CANDLE_TOP = 20f
         const val CANDLE_RIGHT = 70f
-        const val CANDLE_BOTTOM = 10f
+        const val CANDLE_BOTTOM = 20f
 
         // 出来高チャートの余白
         const val VOLUME_LEFT = 20f
