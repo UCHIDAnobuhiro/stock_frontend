@@ -23,15 +23,22 @@ fun CandleChartView(
             }
         },
         update = { chart ->
+            chart.fitScreen()
             if (entries.isEmpty()) {
                 showLoading(chart, chart.context); return@AndroidView
             }
             updateOrCreateCandleData(chart, entries)
+            // X軸
             setupXAxisCommon(chart, entries.size)
+            // Y軸
             setupRightAxisForCandle(chart, lows, highs)
-            chart.axisRight.refreshGridLimitLines()
+            // データ更新を通知
+            chart.notifyDataSetChanged()
+            chart.axisRight.refreshGridLimitLinesFromAxis()
             chart.isAutoScaleMinMaxEnabled = false
             chart.isScaleYEnabled = false
+
+            chart.highlightValues(null)
             chart.invalidate()
         }
     )

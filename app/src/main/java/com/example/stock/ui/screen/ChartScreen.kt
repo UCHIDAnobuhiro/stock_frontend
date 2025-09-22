@@ -30,6 +30,7 @@ import com.example.stock.ui.chart.CandleChartView
 import com.example.stock.ui.chart.SyncChartsOnce
 import com.example.stock.ui.chart.VolumeChartView
 import com.example.stock.ui.component.CommonHeader
+import com.example.stock.ui.component.IntervalDropDown
 import com.example.stock.viewmodel.CandlesViewModel
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.CandleStickChart
@@ -48,8 +49,9 @@ fun ChartScreen(
 
     val dataAsc = remember(candles) { candles.sortedBy { it.time } }
     val labels = remember(dataAsc) { dataAsc.map { it.time } }
+    var interval by remember { mutableStateOf("1day") }
 
-    LaunchedEffect(code) { vm.load(code, interval = "1day", outputsize = 200) }
+    LaunchedEffect(code, interval) { vm.load(code, interval = interval, outputsize = 200) }
     DisposableEffect(Unit) { onDispose { vm.clear() } }
 
     // チャート参照を保持
@@ -92,6 +94,12 @@ fun ChartScreen(
                     style = MaterialTheme.typography.titleMedium
                 )
             }
+
+            IntervalDropDown(
+                selected = interval,
+                onSelected = { interval = it }
+            )
+
             Column(Modifier.fillMaxSize()) {
                 // 同期
                 SyncChartsOnce(candleChartRef, volumeChartRef)
@@ -100,7 +108,7 @@ fun ChartScreen(
                 CandleChartView(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(3f),
+                        .weight(3f, fill = true),
                     entries = dataAsc.mapIndexed { i, c ->
                         CandleEntry(
                             i.toFloat(),
@@ -119,7 +127,7 @@ fun ChartScreen(
                 VolumeChartView(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1.2f),
+                        .weight(1.2f, fill = true),
                     entries = dataAsc.mapIndexed { i, c ->
                         BarEntry(
                             i.toFloat(),
