@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,11 +21,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.stock.R
 import com.example.stock.ui.component.MainHeader
+import com.example.stock.ui.theme.Spacing
 import com.example.stock.viewmodel.SymbolViewModel
 
 
@@ -61,7 +61,7 @@ fun StockListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+                .padding(Spacing.Screen)
         ) {
             // 銘柄リスト表示
             LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -74,13 +74,13 @@ fun StockListScreen(
                                 navController.navigate("chart/${stock.name}/${stock.code}")
                             }
                             .background(Color.Transparent)
-                            .padding(vertical = 18.dp),
+                            .padding(vertical = Spacing.ListItemVertical),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         // 銘柄名
-                        Text(text = stock.name, fontSize = 18.sp)
+                        Text(text = stock.name, style = MaterialTheme.typography.bodyLarge)
                         // 銘柄コード
-                        Text(text = stock.code, fontSize = 18.sp)
+                        Text(text = stock.code, style = MaterialTheme.typography.bodyLarge)
                     }
                     // 区切り線
                     HorizontalDivider()

@@ -28,8 +28,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 import com.example.stock.R
+import com.example.stock.ui.theme.Sizes
+import com.example.stock.ui.theme.Spacing
 import com.example.stock.viewmodel.AuthViewModel
 
 /**
@@ -60,12 +61,12 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(Spacing.ScreenLarge),
         verticalArrangement = Arrangement.Center
     ) {
         // タイトル
         Text(stringResource(R.string.login), style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(Spacing.ScreenLarge))
 
         // メールアドレス入力欄
         OutlinedTextField(
@@ -76,7 +77,7 @@ fun LoginScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Spacing.GapSm))
 
         // パスワード入力欄（表示切替アイコン付き）
         OutlinedTextField(
@@ -104,11 +105,11 @@ fun LoginScreen(
 
         // エラー表示
         if (ui.error != null) {
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Spacing.GapSm))
             Text(ui.error!!, color = MaterialTheme.colorScheme.error)
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(Spacing.GapMd))
 
         // ログインボタン（進捗インジケータ付き）
         Button(
@@ -117,8 +118,8 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             if (ui.isLoading) CircularProgressIndicator(
-                strokeWidth = 2.dp,
-                modifier = Modifier.size(20.dp)
+                strokeWidth = Sizes.Border,
+                modifier = Modifier.size(Sizes.IconSm)
             )
             else Text(stringResource(R.string.login))
         }
