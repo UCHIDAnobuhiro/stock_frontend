@@ -11,6 +11,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.example.stock.R
+import com.example.stock.ui.util.rememberClickGuard
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -20,10 +21,14 @@ fun CommonHeader(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
+    val canClick = rememberClickGuard()
+
     TopAppBar(
         title = { Text(titleText) },
         navigationIcon = {
-            IconButton(onClick = onBack) {
+            IconButton(
+                onClick = { if (canClick()) onBack() },
+            ) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.back_btn_text)
