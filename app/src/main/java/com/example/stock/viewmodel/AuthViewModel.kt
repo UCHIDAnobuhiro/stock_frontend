@@ -3,6 +3,7 @@ package com.example.stock.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stock.data.repository.AuthRepository
+import com.example.stock.ui.state.LoginUiState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,24 +13,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
 import java.io.IOException
-
-
-/**
- * ログイン画面の状態を保持するデータクラス。
- *
- * @property email 入力されたメールアドレス
- * @property password 入力されたパスワード
- * @property isPasswordVisible パスワード表示/非表示フラグ
- * @property isLoading ログイン処理中かどうか
- * @property error エラーメッセージ（null の場合はエラーなし）
- */
-data class LoginUiState(
-    val email: String = "",
-    val password: String = "",
-    val isPasswordVisible: Boolean = false,
-    val isLoading: Boolean = false,
-    val error: String? = null,
-)
 
 /**
  * ログイン処理およびログイン画面の状態を管理する [ViewModel]。
