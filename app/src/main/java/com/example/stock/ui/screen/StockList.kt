@@ -25,6 +25,7 @@ import androidx.navigation.NavController
 import com.example.stock.R
 import com.example.stock.ui.component.MainHeader
 import com.example.stock.ui.theme.Spacing
+import com.example.stock.ui.theme.Thickness
 import com.example.stock.viewmodel.SymbolViewModel
 
 
@@ -83,7 +84,7 @@ fun StockListScreen(
                         Text(text = stock.code, style = MaterialTheme.typography.bodyLarge)
                     }
                     // 区切り線
-                    HorizontalDivider()
+                    HorizontalDivider(thickness = Thickness.Divider)
                 }
             }
         }
