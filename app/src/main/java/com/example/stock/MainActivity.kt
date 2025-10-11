@@ -10,6 +10,7 @@ import com.example.stock.navigation.AppNavGraph
 import com.example.stock.ui.factory.AuthViewModelFactory
 import com.example.stock.ui.factory.CandlesViewModelFactory
 import com.example.stock.ui.factory.SymbolViewModelFactory
+import com.example.stock.ui.theme.StockTheme
 import com.example.stock.viewmodel.AuthViewModel
 import com.example.stock.viewmodel.CandlesViewModel
 import com.example.stock.viewmodel.SymbolViewModel
@@ -54,7 +55,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             // アプリのナビゲーションをセットアップ
-            AppNavGraph(authVm, symbolVm, candlesVm)
+            StockTheme {
+                AppNavGraph(authVm, symbolVm, candlesVm)
+            }
         }
     }
 }
