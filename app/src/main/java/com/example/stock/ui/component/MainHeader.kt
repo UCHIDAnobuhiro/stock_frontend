@@ -11,6 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.example.stock.R
 
+/**
+ * アプリ共通のトップバー（ヘッダー）。
+ *
+ * タイトルとログアウトボタンを表示する。
+ *
+ * @param titleText ヘッダーに表示するタイトル文字列
+ * @param onLogout ログアウトボタン押下時のコールバック
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainHeader(
@@ -18,8 +26,9 @@ fun MainHeader(
     onLogout: () -> Unit
 ) {
     TopAppBar(
-        title = { Text(titleText) },
+        title = { Text(titleText) }, // タイトル表示
         actions = {
+            // ログアウトボタン（アイコン）
             IconButton(onClick = onLogout) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ExitToApp,
