@@ -1,5 +1,6 @@
 package com.example.stock.ui.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,8 +18,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.stock.R
 import com.example.stock.ui.component.MainHeader
@@ -56,14 +59,15 @@ fun StockListScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 12.dp)
                             .clickable {
                                 navController.navigate("chart/${stock.name}/${stock.code}")
-                            },
+                            }
+                            .background(Color.Transparent)
+                            .padding(vertical = 18.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = stock.name)
-                        Text(text = stock.code)
+                        Text(text = stock.name, fontSize = 18.sp)
+                        Text(text = stock.code, fontSize = 18.sp)
                     }
                     HorizontalDivider()
                 }
