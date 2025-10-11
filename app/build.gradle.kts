@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.10"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.20"
 }
 
 android {
@@ -62,7 +62,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     // OkHttp
     implementation(libs.okhttp)
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation(libs.mpandroidchart)
     // ViewModelテスト関連
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
