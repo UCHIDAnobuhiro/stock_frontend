@@ -29,7 +29,14 @@ import com.example.stock.viewmodel.SymbolViewModel
 
 
 /**
- * @param navController ナビゲーション操作を行うためのコントローラ。
+ * 銘柄リスト画面。
+ *
+ * APIから取得した銘柄一覧をリスト表示し、
+ * タップでチャート画面へ遷移できる。
+ *
+ * @param navController ナビゲーション操作用コントローラ
+ * @param vm 銘柄リスト取得用ViewModel
+ * @param onLogout ログアウト時のコールバック
  */
 @Composable
 fun StockListScreen(
@@ -37,7 +44,9 @@ fun StockListScreen(
     vm: SymbolViewModel,
     onLogout: () -> Unit,
 ) {
+    // 銘柄リストのStateFlowを購読
     val stocks by vm.symbols.collectAsState()
+    // 初回表示時にリスト取得
     LaunchedEffect(Unit) { vm.load() }
 
     Scaffold(
@@ -54,11 +63,13 @@ fun StockListScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
+            // 銘柄リスト表示
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(stocks) { stock ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            // タップでチャート画面へ遷移
                             .clickable {
                                 navController.navigate("chart/${stock.name}/${stock.code}")
                             }
@@ -66,9 +77,12 @@ fun StockListScreen(
                             .padding(vertical = 18.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
+                        // 銘柄名
                         Text(text = stock.name, fontSize = 18.sp)
+                        // 銘柄コード
                         Text(text = stock.code, fontSize = 18.sp)
                     }
+                    // 区切り線
                     HorizontalDivider()
                 }
             }

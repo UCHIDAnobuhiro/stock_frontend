@@ -32,6 +32,15 @@ import androidx.compose.ui.unit.dp
 import com.example.stock.R
 import com.example.stock.viewmodel.AuthViewModel
 
+/**
+ * ログイン画面。
+ *
+ * メールアドレス・パスワード入力、パスワード表示切替、
+ * ログインボタン、エラー表示、進捗インジケータなどを提供する。
+ *
+ * @param viewModel 認証用ViewModel
+ * @param onLoggedIn ログイン成功時のコールバック
+ */
 @Composable
 fun LoginScreen(
     viewModel: AuthViewModel,
@@ -39,7 +48,7 @@ fun LoginScreen(
 ) {
     val ui by viewModel.ui.collectAsState()
 
-    // 成功時に画面遷移（1回だけ）
+    // ログイン成功時に画面遷移（1回だけ）
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             if (event is AuthViewModel.UiEvent.LoggedIn) {
@@ -54,9 +63,11 @@ fun LoginScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
     ) {
+        // タイトル
         Text(stringResource(R.string.login), style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(24.dp))
 
+        // メールアドレス入力欄
         OutlinedTextField(
             value = ui.email,
             onValueChange = viewModel::onEmailChange,
@@ -67,6 +78,7 @@ fun LoginScreen(
         )
         Spacer(Modifier.height(12.dp))
 
+        // パスワード入力欄（表示切替アイコン付き）
         OutlinedTextField(
             value = ui.password,
             onValueChange = viewModel::onPasswordChange,
@@ -90,6 +102,7 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
+        // エラー表示
         if (ui.error != null) {
             Spacer(Modifier.height(12.dp))
             Text(ui.error!!, color = MaterialTheme.colorScheme.error)
@@ -97,6 +110,7 @@ fun LoginScreen(
 
         Spacer(Modifier.height(20.dp))
 
+        // ログインボタン（進捗インジケータ付き）
         Button(
             onClick = viewModel::login,
             enabled = !ui.isLoading,
