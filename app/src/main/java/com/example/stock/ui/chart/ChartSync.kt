@@ -18,6 +18,9 @@ import java.util.concurrent.atomic.AtomicBoolean
  * - ズーム/スクロール同期（相互）
  * - ハイライト同期（相互）
  * - 慣性スクロールを無効化して遅延やカクつきを防止
+ *
+ * @param candle ローソク足チャート
+ * @param volume 出来高チャート
  */
 fun attachSynchronizedPair(
     candle: CandleStickChart,
@@ -30,6 +33,10 @@ fun attachSynchronizedPair(
     // --- viewport(ズーム/スクロール) 同期用のロック ---
     val vpLock = AtomicBoolean(false)
 
+    /**
+     * fromのviewport（ズーム・スクロール状態）をtoに反映する。
+     * 同期中はロックし、無限ループを防止。
+     */
     fun syncViewport(from: Chart<*>, to: Chart<*>) {
         if (!vpLock.compareAndSet(false, true)) return
         try {
@@ -89,14 +96,18 @@ fun attachSynchronizedPair(
     }
     volume.onChartGestureListener = volumeToCandleGesture
 
-    // --- ハイライト同期 ---
+    // --- ハイライト同期用のロック ---
     val hlLock = AtomicBoolean(false)
 
+    /**
+     * 指定したチャートで現在ハイライトされているX値が一致するか判定。
+     */
     fun sameXHighlighted(chart: Chart<*>?, x: Float): Boolean {
         val cur = chart?.highlighted?.firstOrNull() ?: return false
         return cur.x == x
     }
 
+    // ローソク足チャートで値選択時、出来高チャートも同じXをハイライト
     candle.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
         override fun onValueSelected(e: Entry?, h: Highlight?) {
             if (h == null) return
@@ -120,6 +131,7 @@ fun attachSynchronizedPair(
         }
     })
 
+    // 出来高チャートで値選択時、ローソク足チャートも同じXをハイライト
     volume.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
         override fun onValueSelected(e: Entry?, h: Highlight?) {
             if (h == null) return
