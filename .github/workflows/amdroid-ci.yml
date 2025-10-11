@@ -1,0 +1,65 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-and-lint:
+    name: Unit tests & Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      # プロジェクトの同期（依存解決）
+      - name: Prepare
+        run: ./gradlew --no-daemon --stacktrace help
+
+      # Lint（Material3/Compose使いでも通常OK）
+      - name: Run Android Lint
+        run: ./gradlew --no-daemon lint
+
+      # Kotlinユニットテスト（モジュール名に合わせて調整: app→your module）
+      - name: Run unit tests
+        run: ./gradlew --no-daemon testDebugUnitTest
+
+      # 失敗時にレポートを取っておく
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-report
+          path: |
+            **/build/reports/tests/**/*
+            **/build/test-results/**/*
+          if-no-files-found: ignore
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: |
+            **/build/reports/lint-results*.* # html, xml
+          if-no-files-found: ignore
