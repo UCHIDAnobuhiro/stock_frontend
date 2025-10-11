@@ -7,10 +7,10 @@ object Spacing {
     val Screen = 16.dp
     val ScreenLarge = 24.dp
 
-    val GapXs = 8.dp
+    // val GapXs = 8.dp
     val GapSm = 12.dp
     val GapMd = 20.dp
-    val GapLg = 24.dp
+    // val GapLg = 24.dp
 
     val ListItemVertical = 18.dp
 }
