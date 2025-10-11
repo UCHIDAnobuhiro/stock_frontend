@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.stock.R
@@ -31,6 +30,8 @@ import com.example.stock.ui.chart.SyncChartsOnce
 import com.example.stock.ui.chart.VolumeChartView
 import com.example.stock.ui.component.CommonHeader
 import com.example.stock.ui.component.IntervalDropDown
+import com.example.stock.ui.theme.Sizes
+import com.example.stock.ui.theme.Spacing
 import com.example.stock.viewmodel.CandlesViewModel
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.CandleStickChart
@@ -89,18 +90,18 @@ fun ChartScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+                .padding(Spacing.Screen)
         ) {
             // 銘柄名・コード表示
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .border(
-                        width = 1.dp,
+                        width = Sizes.Border,
                         color = colorResource(R.color.border),
-                        shape = RoundedCornerShape(4.dp)
+                        shape = RoundedCornerShape(Sizes.CornerSm)
                     )
-                    .padding(16.dp),
+                    .padding(Spacing.Screen),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
