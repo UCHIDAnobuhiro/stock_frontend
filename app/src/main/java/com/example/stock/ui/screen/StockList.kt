@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.stock.R
 import com.example.stock.ui.component.MainHeader
@@ -62,11 +63,11 @@ fun StockListScreen(
                                 navController.navigate("chart/${stock.name}/${stock.code}")
                             }
                             .background(Color.Transparent)
-                            .padding(vertical = 12.dp),
+                            .padding(vertical = 18.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = stock.name)
-                        Text(text = stock.code)
+                        Text(text = stock.name, fontSize = 18.sp)
+                        Text(text = stock.code, fontSize = 18.sp)
                     }
                     HorizontalDivider()
                 }
