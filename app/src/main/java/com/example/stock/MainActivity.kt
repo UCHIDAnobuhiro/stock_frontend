@@ -7,9 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.example.stock.data.repository.StockRepository
 import com.example.stock.navigation.AppNavGraph
-import com.example.stock.ui.AuthViewModelFactory
-import com.example.stock.ui.CandlesViewModelFactory
-import com.example.stock.ui.SymbolViewModelFactory
+import com.example.stock.ui.factory.AuthViewModelFactory
+import com.example.stock.ui.factory.CandlesViewModelFactory
+import com.example.stock.ui.factory.SymbolViewModelFactory
 import com.example.stock.viewmodel.AuthViewModel
 import com.example.stock.viewmodel.CandlesViewModel
 import com.example.stock.viewmodel.SymbolViewModel
@@ -26,11 +26,12 @@ class MainActivity : ComponentActivity() {
     private val candlesVm by viewModels<CandlesViewModel> {
         CandlesViewModelFactory(stockRepo)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AppNavGraph(authVm,symbolVm, candlesVm)
+            AppNavGraph(authVm, symbolVm, candlesVm)
         }
     }
 }
