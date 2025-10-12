@@ -1,5 +1,6 @@
 package com.example.stock.data.network
 
+import com.example.stock.config.ApiConfig
 import com.example.stock.data.auth.InMemoryTokenProvider
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -31,9 +32,6 @@ object ApiClient {
         .build()
 
 
-    /** エミュレータから見たローカルホストのIPアドレス */
-    private const val BASE_URL = "http://10.0.2.2:8080/"
-
     /**
      * Jsonの設定:
      * - `ignoreUnknownKeys`: キーが未知のJSONのプロパティを無視する
@@ -48,7 +46,7 @@ object ApiClient {
      * - Kotlinx Serializationのコンバータを追加
      */
     val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(ApiConfig.BASE_URL)
         .client(client)
         .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
         .build()
