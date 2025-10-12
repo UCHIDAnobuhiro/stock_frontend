@@ -34,7 +34,6 @@ fun VolumeChartView(
             }
         },
         update = { chart ->
-            chart.fitScreen() // ズーム・スクロール状態をリセット
             if (entries.isEmpty()) {
                 showLoading(chart, chart.context); return@AndroidView // データが無ければローディング表示
             }
