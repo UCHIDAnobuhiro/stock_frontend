@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,70 +59,74 @@ fun LoginScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(Spacing.ScreenLarge),
-        verticalArrangement = Arrangement.Center
+    Surface(
+        modifier = Modifier.fillMaxSize(),
     ) {
-        // タイトル
-        Text(stringResource(R.string.login), style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(Spacing.ScreenLarge))
-
-        // メールアドレス入力欄
-        OutlinedTextField(
-            value = ui.email,
-            onValueChange = viewModel::onEmailChange,
-            label = { Text(stringResource(R.string.mail)) },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(Modifier.height(Spacing.GapSm))
-
-        // パスワード入力欄（表示切替アイコン付き）
-        OutlinedTextField(
-            value = ui.password,
-            onValueChange = viewModel::onPasswordChange,
-            label = { Text(stringResource(R.string.password)) },
-            singleLine = true,
-            visualTransformation = if (ui.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                IconButton(onClick = viewModel::togglePassword) {
-                    Icon(
-                        imageVector = if (ui.isPasswordVisible) {
-                            Icons.Default.Visibility
-                        } else {
-                            Icons.Default.VisibilityOff
-                        },
-                        contentDescription = if (ui.isPasswordVisible) stringResource(R.string.hide) else stringResource(
-                            R.string.show
-                        )
-                    )
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // エラー表示
-        if (ui.error != null) {
-            Spacer(Modifier.height(Spacing.GapSm))
-            Text(ui.error!!, color = MaterialTheme.colorScheme.error)
-        }
-
-        Spacer(Modifier.height(Spacing.GapMd))
-
-        // ログインボタン（進捗インジケータ付き）
-        Button(
-            onClick = viewModel::login,
-            enabled = !ui.isLoading,
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(Spacing.ScreenLarge),
+            verticalArrangement = Arrangement.Center
         ) {
-            if (ui.isLoading) CircularProgressIndicator(
-                strokeWidth = Sizes.Border,
-                modifier = Modifier.size(Sizes.IconSm)
+            // タイトル
+            Text(stringResource(R.string.login), style = MaterialTheme.typography.headlineMedium)
+            Spacer(Modifier.height(Spacing.ScreenLarge))
+
+            // メールアドレス入力欄
+            OutlinedTextField(
+                value = ui.email,
+                onValueChange = viewModel::onEmailChange,
+                label = { Text(stringResource(R.string.mail)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier.fillMaxWidth()
             )
-            else Text(stringResource(R.string.login))
+            Spacer(Modifier.height(Spacing.GapSm))
+
+            // パスワード入力欄（表示切替アイコン付き）
+            OutlinedTextField(
+                value = ui.password,
+                onValueChange = viewModel::onPasswordChange,
+                label = { Text(stringResource(R.string.password)) },
+                singleLine = true,
+                visualTransformation = if (ui.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = viewModel::togglePassword) {
+                        Icon(
+                            imageVector = if (ui.isPasswordVisible) {
+                                Icons.Default.Visibility
+                            } else {
+                                Icons.Default.VisibilityOff
+                            },
+                            contentDescription = if (ui.isPasswordVisible) stringResource(R.string.hide) else stringResource(
+                                R.string.show
+                            )
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // エラー表示
+            if (ui.error != null) {
+                Spacer(Modifier.height(Spacing.GapSm))
+                Text(ui.error!!, color = MaterialTheme.colorScheme.error)
+            }
+
+            Spacer(Modifier.height(Spacing.GapMd))
+
+            // ログインボタン（進捗インジケータ付き）
+            Button(
+                onClick = viewModel::login,
+                enabled = !ui.isLoading,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (ui.isLoading) CircularProgressIndicator(
+                    strokeWidth = Sizes.Border,
+                    modifier = Modifier.size(Sizes.IconSm)
+                )
+                else Text(stringResource(R.string.login))
+            }
         }
     }
 }
