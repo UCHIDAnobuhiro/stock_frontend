@@ -27,6 +27,16 @@ object ChartPalette {
     val CandleDown = "#E74C3C".toColorInt()
     val CandleNeutral = "#95A5A6".toColorInt()
     val VolumeBar = "#3498DB".toColorInt()
+
+    fun labelColor(context: Context): Int {
+        val night = context.resources.configuration.uiMode and
+                android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        return if (night == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
+            "#FFFFFF".toColorInt()   // ダーク時は白
+        } else {
+            "#000000".toColorInt()   // ライト時は黒
+        }
+    }
 }
 
 /**
@@ -54,6 +64,7 @@ fun CandleStickChart.applyCandleDefaults() = apply {
         setDrawAxisLine(false)
         setDrawGridLines(false)
         granularity = 1f
+        textColor = ChartPalette.labelColor(context)
     }
 
     // Y軸の設定
@@ -62,6 +73,7 @@ fun CandleStickChart.applyCandleDefaults() = apply {
         isEnabled = true
         setDrawGridLines(true)
         setLabelCount(5, false)
+        textColor = ChartPalette.labelColor(context)
     }
 
     // 凡例と余白
@@ -96,6 +108,7 @@ fun BarChart.applyVolumeDefaults() = apply {
         position = XAxis.XAxisPosition.BOTTOM
         setDrawGridLines(false)
         granularity = 1f
+        textColor = ChartPalette.labelColor(context)
     }
 
     // Y軸の設定
@@ -105,6 +118,7 @@ fun BarChart.applyVolumeDefaults() = apply {
         axisMinimum = 0f
         setDrawGridLines(false)
         setLabelCount(5, true)
+        textColor = ChartPalette.labelColor(context)
     }
 
     // 凡例と余白
@@ -116,7 +130,6 @@ fun BarChart.applyVolumeDefaults() = apply {
         ChartTokens.Dimens.VOLUME_BOTTOM
     )
 }
-
 
 /**
  * チャートがまだデータを持っていないときに「Loading...」表示を行う。
