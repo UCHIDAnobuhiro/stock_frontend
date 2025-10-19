@@ -6,6 +6,10 @@
 米国株式のローソク足チャートを日足・週足・月足で直感的に閲覧できるアプリです。  
 Kotlin・Jetpack Compose・MVVM アーキテクチャを採用し、**ログイン認証機能**と**株価表示機能**を実装しています。
 
+<p align="center">
+  <video src="https://github.com/user-attachments/assets/fd6fcc0c-c268-4e54-8930-1a236458c454" width="70%" controls></video>
+</p>
+
 ---
 
 ## ⚙️ 主な機能
