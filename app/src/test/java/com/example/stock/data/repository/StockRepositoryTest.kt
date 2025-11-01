@@ -9,8 +9,8 @@ import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
@@ -20,46 +20,37 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class StockRepositoryTest {
 
-    private val dispatcher = StandardTestDispatcher()
+    private val scheduler = TestCoroutineScheduler()
+    private val dispatcher = StandardTestDispatcher(scheduler)
+
     private lateinit var stockApi: StockApi
     private lateinit var repo: StockRepository
 
     @Before
     fun setup() {
+        Dispatchers.setMain(dispatcher)
         stockApi = mockk()
         repo = StockRepository(stockApi = stockApi, io = dispatcher)
     }
 
     @Test
-    fun `fetchSymbols updates symbols flow with API data`() = runTest {
-        val dispatcher = StandardTestDispatcher(testScheduler)
-
-        Dispatchers.setMain(dispatcher)
-
-        val repo = StockRepository(stockApi = stockApi, io = dispatcher)
-
-        val mockSymbols = listOf(
-            SymbolItem(code = "AAPL", name = "Apple Inc."),
-            SymbolItem(code = "GOOG", name = "Alphabet Inc.")
+    fun `fetchSymbols should return symbols from api`() = runTest(scheduler) {
+        val expected = listOf(
+            SymbolItem("AAPL", "Apple Inc."),
+            SymbolItem("GOOG", "Alphabet Inc.")
         )
-        coEvery { stockApi.getSymbols() } returns mockSymbols
+        coEvery { stockApi.getSymbols() } returns expected
 
-        repo.fetchSymbols()
-        advanceUntilIdle()
+        // when
+        val result = repo.fetchSymbols()
 
+        // then
+        assertEquals(expected, result)
         coVerify(exactly = 1) { stockApi.getSymbols() }
-        assertEquals(mockSymbols, repo.symbols.value)
-
-        Dispatchers.resetMain()
     }
 
     @Test
-    fun `fetchCandles updates candles flow with API data`() = runTest {
-        val dispatcher = StandardTestDispatcher(testScheduler)
-        Dispatchers.setMain(dispatcher)
-
-        val repo = StockRepository(stockApi = stockApi, io = dispatcher)
-
+    fun `fetchCandles updates candles flow with API data`() = runTest(scheduler) {
         val mockCandles = listOf(
             CandleDto(
                 time = "2024-01-01",
@@ -86,16 +77,10 @@ class StockRepositoryTest {
         coVerify(exactly = 1) { stockApi.getCandles("AAPL", "1day", 200) }
         assertEquals(mockCandles, repo.candles.value)
 
-        Dispatchers.resetMain()
     }
 
     @Test
-    fun `clearCandles empties the candles flow`() = runTest {
-        val dispatcher = StandardTestDispatcher(testScheduler)
-        Dispatchers.setMain(dispatcher)
-
-        val repo = StockRepository(stockApi = stockApi, io = dispatcher)
-
+    fun `clearCandles empties the candles flow`() = runTest(scheduler) {
         // 事前に値をセット
         val initial = listOf(CandleDto("2024-01-01", 100.00, 110.00, 90.00, 105.00, 1000))
         coEvery { stockApi.getCandles(any(), any(), any()) } returns initial
@@ -105,23 +90,15 @@ class StockRepositoryTest {
         // 実行
         repo.clearCandles()
         assertEquals(emptyList<CandleDto>(), repo.candles.value)
-
-        Dispatchers.resetMain()
     }
 
     @Test
-    fun `fetchCandles uses default params`() = runTest {
-        val dispatcher = StandardTestDispatcher(testScheduler)
-        Dispatchers.setMain(dispatcher)
-        val repo = StockRepository(stockApi = stockApi, io = dispatcher)
-
+    fun `fetchCandles uses default params`() = runTest(scheduler) {
         coEvery { stockApi.getCandles(any(), any(), any()) } returns emptyList()
 
         repo.fetchCandles("MSFT")
         advanceUntilIdle()
 
         coVerify(exactly = 1) { stockApi.getCandles("MSFT", "1day", 200) }
-
-        Dispatchers.resetMain()
     }
 }
