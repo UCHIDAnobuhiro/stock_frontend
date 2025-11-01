@@ -114,6 +114,7 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
     fun logout() {
         viewModelScope.launch {
             repo.logout()
+            _ui.update { it.copy(email = "", password = "") }
         }
     }
 }
