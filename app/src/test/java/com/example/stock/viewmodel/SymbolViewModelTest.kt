@@ -2,80 +2,99 @@ package com.example.stock.viewmodel
 
 import com.example.stock.data.model.SymbolItem
 import com.example.stock.data.repository.StockRepository
+import com.example.stock.util.MainDispatcherRule
+import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import org.junit.After
-import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SymbolViewModelTest {
+    @get:Rule
+    val mainRule = MainDispatcherRule()
 
     private lateinit var repo: StockRepository
     private lateinit var vm: SymbolViewModel
 
-    // Repositoryから差し込むテスト用のFlow
-    private lateinit var symbolsFlow: MutableStateFlow<List<SymbolItem>>
-
     @Before
-    fun setUp() {
-        repo = mockk(relaxed = true)
-        symbolsFlow = MutableStateFlow(emptyList())
-        every { repo.symbols } returns symbolsFlow
-    }
-
-    @After
-    fun tearDown() {
-        // 念のため毎テスト後にMainを元に戻す
-        runCatching { Dispatchers.resetMain() }
+    fun setup() {
+        repo = mockk()
+        vm = SymbolViewModel(repo)
     }
 
     @Test
-    fun `symbols is passthrough of repository flow`() = runTest {
-        // runTestのtestSchedulerを使ってMainを差し替え
-        val dispatcher = StandardTestDispatcher(testScheduler)
-        Dispatchers.setMain(dispatcher)
+    fun `load success - updates symbols and clears error`() =
+        runTest(mainRule.scheduler) {
+            // given
+            val expected = listOf(
+                SymbolItem("AAPL", "Apple Inc."),
+                SymbolItem("GOOG", "Alphabet Inc.")
+            )
+            coEvery { repo.fetchSymbols() } returns expected
 
-        vm = SymbolViewModel(repo)
+            // when
+            vm.load()
 
-        val s1 = listOf(SymbolItem(code = "AAPL", name = "Apple Inc."))
-        val s2 = listOf(
-            SymbolItem(code = "AAPL", name = "Apple Inc."),
-            SymbolItem(code = "GOOG", name = "Alphabet Inc.")
-        )
+            // 完了まで進める
+            advanceUntilIdle()
 
-        symbolsFlow.value = s1
-        assertEquals(s1, vm.symbols.value)
-
-        symbolsFlow.value = s2
-        assertEquals(s2, vm.symbols.value)
-    }
+            // 成功状態を検証
+            val state = vm.ui.value
+            assertThat(state.isLoading).isFalse()
+            assertThat(state.error).isNull()
+            assertThat(state.symbols).isEqualTo(expected)
+            coVerify(exactly = 1) { repo.fetchSymbols() }
+        }
 
     @Test
-    fun `load triggers repository fetchSymbols`() = runTest {
-        val dispatcher = StandardTestDispatcher(testScheduler)
-        Dispatchers.setMain(dispatcher)
+    fun `load failure - sets error and keeps symbols unchanged`() =
+        runTest(mainRule.scheduler) {
+            // given
+            coEvery { repo.fetchSymbols() } throws IOException("Network down")
 
-        vm = SymbolViewModel(repo)
+            // when
+            vm.load()
 
-        coEvery { repo.fetchSymbols() } returns Unit
+            // 完了まで進める
+            advanceUntilIdle()
+
+            val state = vm.ui.value
+            assertThat(state.isLoading).isFalse()
+            assertThat(state.symbols).isEqualTo(emptyList<SymbolItem>())
+            assertThat(state.error).isEqualTo("Network down")
+
+            coVerify(exactly = 1) { repo.fetchSymbols() }
+        }
+
+    @Test
+    fun `load clears previous error on new request start`() = runTest(mainRule.scheduler) {
+        // まず失敗させてエラー状態にする
+        coEvery { repo.fetchSymbols() } throws IOException("first failure")
+        vm.load()
+        advanceUntilIdle()
+        assertThat(vm.ui.value.error).isEqualTo("first failure")
+
+        // 次は成功させる
+        val expected = listOf(SymbolItem("MSFT", "Microsoft"))
+        coEvery { repo.fetchSymbols() } returns expected
 
         vm.load()
 
-        // viewModelScope.launch を完了させる
-        advanceUntilIdle()
+        // リクエスト開始時に error がクリアされること
+        runCurrent()
+        assertThat(vm.ui.value.error).isNull()
 
-        coVerify(exactly = 1) { repo.fetchSymbols() }
+        advanceUntilIdle()
+        assertThat(vm.ui.value.symbols).isEqualTo(expected)
+        assertThat(vm.ui.value.isLoading).isFalse()
     }
+
 }

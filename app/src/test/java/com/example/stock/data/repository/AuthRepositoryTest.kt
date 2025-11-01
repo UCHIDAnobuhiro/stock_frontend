@@ -13,6 +13,7 @@ import io.mockk.mockk
 import io.mockk.runs
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -24,7 +25,8 @@ class AuthRepositoryTest {
     private val tokenStore: TokenStore = mockk(relaxed = true)
     private val tokenProvider: TokenProvider = mockk(relaxed = true)
 
-    private val testDispatcher = StandardTestDispatcher()
+    private val scheduler = TestCoroutineScheduler()
+    private val testDispatcher = StandardTestDispatcher(scheduler)
 
     private lateinit var repo: AuthRepository
 
@@ -40,7 +42,7 @@ class AuthRepositoryTest {
 
     @Test
     fun `login success - updates provider, saves token, returns response`() =
-        runTest(testDispatcher) {
+        runTest(scheduler) {
             val email = "test@example.com"
             val password = "password"
             val response = LoginResponse(token = "token_123")
@@ -58,7 +60,7 @@ class AuthRepositoryTest {
 
     @Test(expected = IOException::class)
     fun `login fails when token store save throws - provider remains updated in current impl`() =
-        runTest(testDispatcher) {
+        runTest(scheduler) {
             // 現在の実装では save が失敗すると例外が伝播し、ロールバックはしない
             val email = "test@example.com"
             val pass = "password"
@@ -77,7 +79,7 @@ class AuthRepositoryTest {
         }
 
     @Test
-    fun `logout - clears provider and store`() = runTest(testDispatcher) {
+    fun `logout - clears provider and store`() = runTest(scheduler) {
         // given
         coEvery { tokenProvider.clear() } just runs
         coEvery { tokenStore.clear() } just runs
