@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -46,7 +46,7 @@ fun StockListScreen(
     onLogout: () -> Unit,
 ) {
     // 銘柄リストのStateFlowを購読
-    val stocks by vm.symbols.collectAsState()
+    val state by vm.ui.collectAsState()
     // 初回表示時にリスト取得
     LaunchedEffect(Unit) { vm.load() }
 
@@ -66,7 +66,10 @@ fun StockListScreen(
         ) {
             // 銘柄リスト表示
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(stocks) { stock ->
+                itemsIndexed(
+                    state.symbols,
+                    key = { _, item -> item.code }
+                ) { index, stock ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -83,8 +86,9 @@ fun StockListScreen(
                         // 銘柄コード
                         Text(text = stock.code, style = MaterialTheme.typography.bodyLarge)
                     }
-                    // 区切り線
-                    HorizontalDivider(thickness = Thickness.Divider)
+                    if (index < state.symbols.lastIndex) {
+                        HorizontalDivider(thickness = Thickness.Divider)
+                    }
                 }
             }
         }

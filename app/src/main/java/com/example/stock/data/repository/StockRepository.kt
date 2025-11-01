@@ -32,10 +32,15 @@ class StockRepository(
     val candles: StateFlow<List<CandleDto>> = _candles
 
     /**
-     * 銘柄リストをAPIから取得し、StateFlowに反映する。
+     * 銘柄リストを API から取得する。
+     *
+     * - ネットワーク通信は IO スレッドで実行される
+     * - データは StateFlow には反映せず、呼び出し元（ViewModel など）に List として返す
+     *
+     * @return API から取得した銘柄リスト
      */
-    suspend fun fetchSymbols() = withContext(io) {
-        _symbols.value = stockApi.getSymbols()
+    suspend fun fetchSymbols(): List<SymbolItem> = withContext(io) {
+        stockApi.getSymbols()
     }
 
     /**
