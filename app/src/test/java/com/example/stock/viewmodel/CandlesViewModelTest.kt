@@ -2,7 +2,7 @@ package com.example.stock.viewmodel
 
 import com.example.stock.data.network.CandleDto
 import com.example.stock.data.repository.StockRepository
-import com.example.stock.util.ResetMainDispatcherRule
+import com.example.stock.util.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -21,7 +21,7 @@ import org.junit.Test
 class CandlesViewModelTest {
 
     @get:Rule
-    val resetMainRule = ResetMainDispatcherRule()
+    val mainRule = MainDispatcherRule()
 
     private lateinit var repo: StockRepository
     private lateinit var vm: CandlesViewModel
@@ -41,10 +41,9 @@ class CandlesViewModelTest {
     }
 
     @Test
-    fun `candles is passthrough of repository flow`() = runTest {
-        // ダミー CandleDto（フィールド不明なため relaxed mock を使用）
-        val c1 = mockk<CandleDto>(relaxed = true)
-        val c2 = mockk<CandleDto>(relaxed = true)
+    fun `candles is passthrough of repository flow`() = runTest(mainRule.scheduler) {
+        val c1 = CandleDto("t1", 1.0, 2.0, 0.5, 1.5, 100)
+        val c2 = CandleDto("t2", 1.2, 2.2, 0.7, 1.7, 120)
 
         // repo 側の Flow を更新 → ViewModel 側に反映されるはず
         candlesFlow.value = listOf(c1)
@@ -55,7 +54,7 @@ class CandlesViewModelTest {
     }
 
     @Test
-    fun `load calls fetchCandles with defaults`() = runTest {
+    fun `load calls fetchCandles with defaults`() = runTest(mainRule.scheduler) {
         // fetchCandles はサスペンド関数想定
         coEvery { repo.fetchCandles(any(), any(), any()) } returns Unit
 
@@ -66,7 +65,7 @@ class CandlesViewModelTest {
     }
 
     @Test
-    fun `load calls fetchCandles with explicit params`() = runTest {
+    fun `load calls fetchCandles with explicit params`() = runTest(mainRule.scheduler) {
         coEvery { repo.fetchCandles(any(), any(), any()) } returns Unit
 
         vm.load(code = "GOOG", interval = "1h", outputsize = 500)
@@ -76,7 +75,7 @@ class CandlesViewModelTest {
     }
 
     @Test
-    fun `clear calls repository clearCandles`() = runTest {
+    fun `clear calls repository clearCandles`() = runTest(mainRule.scheduler) {
         vm.clear()
         verify(exactly = 1) { repo.clearCandles() }
     }
