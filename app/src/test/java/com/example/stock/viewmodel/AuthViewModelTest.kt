@@ -2,7 +2,7 @@ package com.example.stock.viewmodel
 
 import com.example.stock.data.model.LoginResponse
 import com.example.stock.data.repository.AuthRepository
-import com.example.stock.util.ResetMainDispatcherRule
+import com.example.stock.util.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -30,9 +30,7 @@ import java.io.IOException
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class AuthViewModelTest {
     @get:Rule
-    val resetMain = ResetMainDispatcherRule()
-
-    private val testDispatcher get() = resetMain.dispatcher
+    val mainRule = MainDispatcherRule()
 
     private lateinit var repository: AuthRepository
     private lateinit var viewModel: AuthViewModel
@@ -55,7 +53,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `onEmailChange updates state and clears error`() = runTest(testDispatcher) {
+    fun `onEmailChange updates state and clears error`() = runTest(mainRule.scheduler) {
         // まずエラーを発生させる（空入力で login）
         viewModel.onEmailChange("")
         viewModel.onPasswordChange("")
@@ -74,7 +72,7 @@ class AuthViewModelTest {
 
 
     @Test
-    fun `onPasswordChange updates state and clears error`() = runTest(testDispatcher) {
+    fun `onPasswordChange updates state and clears error`() = runTest(mainRule.scheduler) {
         // まずエラーを発生させる（空入力で login）
         viewModel.onEmailChange("")
         viewModel.onPasswordChange("")
@@ -92,14 +90,14 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `togglePassword flips flag`() = runTest(testDispatcher) {
+    fun `togglePassword flips flag`() = runTest(mainRule.scheduler) {
         val before = viewModel.ui.value.isPasswordVisible
         viewModel.togglePassword()
         assertThat(viewModel.ui.value.isPasswordVisible).isEqualTo(!before)
     }
 
     @Test
-    fun `login blocks when already loading`() = runTest(testDispatcher) {
+    fun `login blocks when already loading`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password")
 
@@ -131,7 +129,7 @@ class AuthViewModelTest {
 
     @Test
     fun `login validation - blank fields sets error and does not call repository`() =
-        runTest(testDispatcher) {
+        runTest(mainRule.scheduler) {
             viewModel.onEmailChange("")
             viewModel.onPasswordChange("")
             viewModel.login()
@@ -141,7 +139,7 @@ class AuthViewModelTest {
         }
 
     @Test
-    fun `login validation - bad email blocks`() = runTest(testDispatcher) {
+    fun `login validation - bad email blocks`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("invalid-email")
         viewModel.onPasswordChange("password")
         viewModel.login()
@@ -152,7 +150,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `login success - emits LoggedIn event and clears loading`() = runTest(testDispatcher) {
+    fun `login success - emits LoggedIn event and clears loading`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password")
         coEvery {
@@ -181,7 +179,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `login failure - http 401 maps to credential message`() = runTest(testDispatcher) {
+    fun `login failure - http 401 maps to credential message`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password")
         coEvery { repository.login(any(), any()) } throws httpError(401)
@@ -195,7 +193,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `login failure - http 500 shows http code`() = runTest(testDispatcher) {
+    fun `login failure - http 500 shows http code`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password")
         coEvery { repository.login(any(), any()) } throws httpError(500)
@@ -208,7 +206,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `login failure - io maps to network message`() = runTest(testDispatcher) {
+    fun `login failure - io maps to network message`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password")
         coEvery { repository.login(any(), any()) } throws IOException("timeout")
@@ -221,7 +219,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `login failure - serialization maps to json message`() = runTest(testDispatcher) {
+    fun `login failure - serialization maps to json message`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password")
         coEvery { repository.login(any(), any()) } throws SerializationException("bad json")
@@ -234,7 +232,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `logout calls repository`() = runTest(testDispatcher) {
+    fun `logout calls repository`() = runTest(mainRule.scheduler) {
         viewModel.logout()
         advanceUntilIdle()
 
