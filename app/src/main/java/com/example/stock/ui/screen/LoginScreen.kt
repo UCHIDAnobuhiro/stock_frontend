@@ -22,13 +22,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.stock.R
 import com.example.stock.ui.theme.Sizes
 import com.example.stock.ui.theme.Spacing
@@ -48,10 +48,10 @@ fun LoginScreen(
     viewModel: AuthViewModel,
     onLoggedIn: () -> Unit,
 ) {
-    val ui by viewModel.ui.collectAsState()
+    val ui by viewModel.ui.collectAsStateWithLifecycle()
 
     // ログイン成功時に画面遷移（1回だけ）
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             if (event is AuthViewModel.UiEvent.LoggedIn) {
                 onLoggedIn()
