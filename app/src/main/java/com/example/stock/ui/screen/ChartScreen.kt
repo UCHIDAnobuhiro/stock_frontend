@@ -59,10 +59,10 @@ fun ChartScreen(
     onLogout: () -> Unit
 ) {
     // ローソク足データをStateFlowから購読
-    val candles by vm.candles.collectAsStateWithLifecycle()
+    val ui by vm.ui.collectAsStateWithLifecycle()
 
     // 日付昇順でデータを整形
-    val dataAsc = remember(candles) { candles.sortedBy { it.time } }
+    val dataAsc = remember(ui.items) { ui.items.sortedBy { it.time } }
     // ラベル（日付リスト）
     val labels = remember(dataAsc) { dataAsc.map { it.time } }
     // インターバル選択状態
