@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.stock.data.model.CandleUiState
 import com.example.stock.data.network.CandleDto
 import com.example.stock.data.repository.StockRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +13,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
-import kotlin.coroutines.CoroutineContext
 
 
 /**
@@ -49,7 +47,6 @@ data class CandleItem(
  */
 class CandlesViewModel(
     private val repo: StockRepository,
-    private val io: CoroutineContext = Dispatchers.IO
 ) : ViewModel() {
 
     private val _ui = MutableStateFlow(CandleUiState())
