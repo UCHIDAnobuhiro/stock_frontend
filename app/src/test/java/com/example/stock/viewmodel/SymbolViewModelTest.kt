@@ -7,7 +7,6 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import junit.framework.TestCase.fail
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
@@ -96,11 +95,6 @@ class SymbolViewModelTest {
         advanceUntilIdle()
         assertThat(vm.ui.value.symbols).isEqualTo(expected)
         assertThat(vm.ui.value.isLoading).isFalse()
-    }
-
-    @Test
-    fun intentionallyFails() {
-        fail("Intentional failure to verify branch protection & CI gate")
     }
 
 }
