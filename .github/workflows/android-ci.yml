@@ -3,10 +3,6 @@ name: Android CI
 on:
   pull_request:
     branches: [ main ]
-    paths-ignore:
-      - '**.md'
-      - '.github/PULL_REQUEST_TEMPLATE.md'
-      - 'docs/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -24,6 +20,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if only docs changed
+        id: docs-check
+        run: |
+          git fetch origin main
+          CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          if echo "$CHANGED_FILES" | grep -qvE '^(.*\.md|docs/|\.github/PULL_REQUEST_TEMPLATE\.md)$'; then
+            echo "code_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "code_changed=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -34,21 +46,23 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      # プロジェクトの同期（依存解決）
+      # プロジェクトの同期（依存解決）- 常に実行
       - name: Prepare
         run: ./gradlew --no-daemon --stacktrace help
 
-      # Lint（Material3/Compose使いでも通常OK）
+      # Lint（Material3/Compose使いでも通常OK）- コード変更時のみ実行
       - name: Run Android Lint
+        if: steps.docs-check.outputs.code_changed == 'true'
         run: ./gradlew --no-daemon lint
 
-      # Kotlinユニットテスト（モジュール名に合わせて調整: app→your module）
+      # Kotlinユニットテスト（モジュール名に合わせて調整: app→your module）- コード変更時のみ実行
       - name: Run unit tests
+        if: steps.docs-check.outputs.code_changed == 'true'
         run: ./gradlew --no-daemon testDebugUnitTest
 
-      # 失敗時にレポートを取っておく
+      # 失敗時にレポートを取っておく - コード変更時のみ
       - name: Upload test report
-        if: always()
+        if: always() && steps.docs-check.outputs.code_changed == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: unit-test-report
@@ -58,7 +72,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Upload lint report
-        if: always()
+        if: always() && steps.docs-check.outputs.code_changed == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: lint-report
