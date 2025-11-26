@@ -38,14 +38,6 @@ Kotlin・Jetpack Compose・MVVM アーキテクチャを採用し、**ログイ�
 
 ---
 
-### ✅ 改善ポイント（Optional）
-
-- テーマの動的切り替え（ライト / ダークモード）
-- チャートのスワイプ・ピンチズーム操作の最適化
-- バックエンド（Go / Cloud Run）との通信最適化
-
----
-
 ## 🛠️ 技術スタック（Tech Stack）
 
 ### 🧩 使用技術
@@ -166,12 +158,57 @@ app/
 
 ```bash
 # クローン
-git clone https://github.com/yourname/stock_frontend.git
+git clone https://github.com/UCHIDAnobuhiro/stock_frontend.git
 cd stock_frontend
 
 # Android Studio で開いて実行（Build Variant: debug）
 # 実行構成（Build Variant）を選択して起動
 ```
+
+### ビルド・実行コマンド
+
+```bash
+# プロジェクトのビルド
+./gradlew build
+
+# デバッグ版のビルド
+./gradlew assembleDebug
+
+# デバッグ版を接続デバイスにインストール
+./gradlew installDebug
+
+# ステージング版のビルド
+./gradlew assembleStaging
+
+# リリース版のビルド
+./gradlew assembleRelease
+```
+
+### テスト実行
+
+```bash
+# 全ユニットテストを実行
+./gradlew testDebugUnitTest
+
+# 特定のテストクラスを実行
+./gradlew testDebugUnitTest --tests "com.example.stock.viewmodel.AuthViewModelTest"
+
+# テストカバレッジを含めて実行
+./gradlew testDebugUnitTest --tests "*.AuthViewModelTest.*"
+
+# Lint チェック
+./gradlew lint
+
+# ビルドのクリーンアップ
+./gradlew clean
+```
+
+### API エンドポイント設定
+
+- **Debug ビルド**: `http://10.0.2.2:8080/` (Android エミュレータの localhost)
+- **Staging / Release ビルド**: `https://api.stockviewapp.com/`
+
+※ `BASE_URL` は `BuildConfig.BASE_URL` から取得され、ビルドバリアントごとに自動的に切り替わります。
 
 ## 🔄 CI / テスト自動化
 
