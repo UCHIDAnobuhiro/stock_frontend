@@ -5,15 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import com.example.stock.data.repository.StockRepository
+import com.example.stock.feature.stocklist.data.StockRepository
 import com.example.stock.navigation.AppNavGraph
-import com.example.stock.ui.factory.AuthViewModelFactory
-import com.example.stock.ui.factory.CandlesViewModelFactory
-import com.example.stock.ui.factory.SymbolViewModelFactory
-import com.example.stock.ui.theme.StockTheme
-import com.example.stock.viewmodel.AuthViewModel
-import com.example.stock.viewmodel.CandlesViewModel
-import com.example.stock.viewmodel.SymbolViewModel
+import com.example.stock.feature.auth.viewmodel.AuthViewModelFactory
+import com.example.stock.feature.chart.viewmodel.CandlesViewModelFactory
+import com.example.stock.feature.stocklist.viewmodel.SymbolViewModelFactory
+import com.example.stock.core.ui.theme.StockTheme
+import com.example.stock.feature.auth.viewmodel.AuthViewModel
+import com.example.stock.feature.chart.viewmodel.CandlesViewModel
+import com.example.stock.feature.stocklist.viewmodel.SymbolViewModel
 
 /**
  * アプリのエントリーポイントとなるActivity。

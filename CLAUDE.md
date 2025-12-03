@@ -122,26 +122,48 @@ GitHub Actions runs on pull requests to `main`:
 
 ## Package Structure
 
+This project uses a **feature-based** package structure where related components (data, UI, ViewModel) are grouped by feature rather than by layer. This improves modularity and makes it easier to understand and modify features independently.
+
 ```
 com.example.stock/
-├── config/          - ApiConfig (BASE_URL from BuildConfig)
-├── data/
-│   ├── auth/        - TokenProvider interface and InMemoryTokenProvider
-│   ├── local/       - TokenStore (DataStore persistence)
-│   ├── model/       - DTOs (LoginRequest/Response, SymbolItem, CandleDto) and UiState classes
-│   ├── network/     - Retrofit APIs (AuthApi, StockApi), ApiClient singleton, AuthInterceptor
-│   └── repository/  - AuthRepository, StockRepository
-├── navigation/      - AppNavGraph and Routes
-├── ui/
-│   ├── chart/       - MPAndroidChart views, sync logic, styling
-│   ├── component/   - Reusable composables (headers, dropdowns)
-│   ├── factory/     - ViewModel factories for manual DI
-│   ├── screen/      - LoginScreen, StockListScreen, ChartScreen
-│   ├── state/       - UiState data classes
-│   ├── theme/       - Material3 theme, typography, dimensions
-│   └── util/        - ClickGuard for preventing double-clicks
-└── viewmodel/       - AuthViewModel, SymbolViewModel, CandlesViewModel
+├── feature/
+│   ├── auth/                    # Authentication feature
+│   │   ├── data/                # AuthRepository, AuthApi, LoginRequest/Response DTOs
+│   │   ├── ui/                  # LoginScreen, LoginUiState
+│   │   └── viewmodel/           # AuthViewModel, AuthViewModelFactory
+│   ├── stocklist/               # Stock list feature
+│   │   ├── data/                # StockRepository (symbols), StockApi, SymbolItem DTO
+│   │   ├── ui/                  # StockListScreen, SymbolUiState
+│   │   └── viewmodel/           # SymbolViewModel, SymbolViewModelFactory
+│   └── chart/                   # Chart display feature
+│       ├── data/                # CandlesRepository, CandleDto, CandleUiState
+│       ├── ui/                  # ChartScreen, MPAndroidChart views, ChartSync
+│       └── viewmodel/           # CandlesViewModel, CandlesViewModelFactory
+├── core/
+│   ├── data/                    # Shared data components
+│   │   ├── auth/                # TokenProvider interface, InMemoryTokenProvider
+│   │   └── local/               # TokenStore (DataStore persistence)
+│   ├── network/                 # ApiClient singleton, AuthInterceptor
+│   ├── ui/
+│   │   ├── component/           # Reusable composables (headers, dropdowns)
+│   │   ├── theme/               # Material3 theme, typography, dimensions
+│   │   └── util/                # ClickGuard for preventing double-clicks
+│   └── util/                    # Shared utilities
+├── config/                      # ApiConfig (BASE_URL from BuildConfig)
+└── navigation/                  # AppNavGraph and Routes
 ```
+
+### Feature Module Organization
+
+Each feature module (`auth`, `stocklist`, `chart`) is self-contained and includes:
+- **data/**: Repository, API interface, DTOs, and domain models specific to the feature
+- **ui/**: Composable screens, UI state classes, and feature-specific UI components
+- **viewmodel/**: ViewModel and ViewModelFactory for the feature
+
+This structure makes it easy to:
+- Understand all components related to a specific feature
+- Modify or extend a feature without affecting others
+- Potentially extract features into separate modules in the future
 
 ## Key Implementation Notes
 
