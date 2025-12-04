@@ -1,8 +1,9 @@
 package com.example.stock.data.repository
 
-import com.example.stock.data.model.SymbolItem
-import com.example.stock.data.network.CandleDto
-import com.example.stock.data.network.StockApi
+import com.example.stock.feature.stocklist.data.SymbolItem
+import com.example.stock.feature.stocklist.data.CandleDto
+import com.example.stock.feature.stocklist.data.StockApi
+import com.example.stock.feature.stocklist.data.StockRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

@@ -1,7 +1,8 @@
 package com.example.stock.viewmodel
 
-import com.example.stock.data.network.CandleDto
-import com.example.stock.data.repository.StockRepository
+import com.example.stock.feature.stocklist.data.CandleDto
+import com.example.stock.feature.stocklist.data.StockRepository
+import com.example.stock.feature.chart.viewmodel.CandlesViewModel
 import com.example.stock.util.MainDispatcherRule
 import io.mockk.Runs
 import io.mockk.coEvery

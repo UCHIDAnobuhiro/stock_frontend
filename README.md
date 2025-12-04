@@ -124,27 +124,51 @@ Kotlin・Jetpack Compose・MVVM アーキテクチャを採用し、**ログイ�
 
 ## 📂 ディレクトリ構成（Directory Structure）
 
+このプロジェクトは**機能ベース（Feature-based）**のパッケージ構成を採用しています。
+関連するコンポーネント（data、UI、ViewModel）を機能ごとにグループ化することで、モジュール性と保守性を向上させています。
+
 ```text
 app/
 └── src/main/java/com/example/stock/
-    ├── config/               # 設定・定数
-    ├── data/                 # データ層
-    │   ├── auth/             # 認証
-    │   ├── local/            # ローカルデータ
-    │   ├── model/            # モデル・DTO
-    │   ├── network/          # API通信
-    │   └── repository/       # リポジトリ
-    ├── navigation/           # 画面遷移
-    ├── ui/                   # UI層（Jetpack Compose）
-    │   ├── chart/            # チャート描画
-    │   ├── component/        # 共通UI
-    │   ├── factory/          # UI補助・Preview
-    │   ├── screen/           # 各画面
-    │   ├── state/            # UI状態
-    │   ├── theme/            # テーマ設定
-    │   └── util/             # UIユーティリティ
-    └── viewmodel/            # ViewModel層
+    ├── feature/              # 機能モジュール（Feature modules）
+    │   ├── auth/             # 認証機能
+    │   │   ├── data/         # AuthRepository, AuthApi, LoginRequest/Response
+    │   │   ├── ui/           # LoginScreen, LoginUiState
+    │   │   └── viewmodel/    # AuthViewModel, AuthViewModelFactory
+    │   ├── stocklist/        # 銘柄一覧機能
+    │   │   ├── data/         # StockRepository, StockApi, SymbolItem
+    │   │   ├── ui/           # StockListScreen, SymbolUiState
+    │   │   └── viewmodel/    # SymbolViewModel, SymbolViewModelFactory
+    │   └── chart/            # チャート表示機能
+    │       ├── data/         # CandleDto, CandleUiState
+    │       ├── ui/           # ChartScreen, MPAndroidChart views, ChartSync
+    │       └── viewmodel/    # CandlesViewModel, CandlesViewModelFactory
+    ├── core/                 # 共通コンポーネント（Core components）
+    │   ├── data/             # 共有データコンポーネント
+    │   │   ├── auth/         # TokenProvider, InMemoryTokenProvider
+    │   │   └── local/        # TokenStore (DataStore)
+    │   ├── network/          # ApiClient, AuthInterceptor
+    │   └── ui/               # 共通UI
+    │       ├── component/    # 再利用可能なComposable
+    │       ├── theme/        # Material3テーマ、タイポグラフィ
+    │       └── util/         # ClickGuardなどのユーティリティ
+    ├── config/               # ApiConfig（BASE_URL設定）
+    └── navigation/           # AppNavGraph、Routes
 ```
+
+### 📦 機能モジュールの構成
+
+各機能モジュール（`auth`、`stocklist`、`chart`）は以下の要素で構成されます：
+
+- **data/** - Repository、API インターフェース、DTO、ドメインモデル
+- **ui/** - Composable 画面、UI 状態クラス、機能固有の UI コンポーネント
+- **viewmodel/** - ViewModel と ViewModelFactory
+
+この構造により、以下のメリットが得られます：
+
+- 特定の機能に関連する全てのコンポーネントを容易に理解できる
+- 機能の変更や拡張が他の機能に影響を与えにくい
+- 将来的に個別モジュールへの分離が容易
 
 ## ⚙️ 環境構築（Setup）
 
@@ -191,7 +215,7 @@ cd stock_frontend
 ./gradlew testDebugUnitTest
 
 # 特定のテストクラスを実行
-./gradlew testDebugUnitTest --tests "com.example.stock.viewmodel.AuthViewModelTest"
+./gradlew testDebugUnitTest --tests "com.example.stock.feature.auth.viewmodel.AuthViewModelTest"
 
 # テストカバレッジを含めて実行
 ./gradlew testDebugUnitTest --tests "*.AuthViewModelTest.*"
