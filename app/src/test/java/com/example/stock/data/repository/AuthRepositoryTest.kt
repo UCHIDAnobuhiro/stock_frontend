@@ -1,10 +1,11 @@
 package com.example.stock.data.repository
 
-import com.example.stock.data.auth.TokenProvider
-import com.example.stock.data.local.TokenStore
-import com.example.stock.data.model.LoginRequest
-import com.example.stock.data.model.LoginResponse
-import com.example.stock.data.network.AuthApi
+import com.example.stock.core.data.auth.TokenProvider
+import com.example.stock.core.data.local.TokenStore
+import com.example.stock.feature.auth.data.LoginRequest
+import com.example.stock.feature.auth.data.LoginResponse
+import com.example.stock.feature.auth.data.AuthApi
+import com.example.stock.feature.auth.data.AuthRepository
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.coVerify

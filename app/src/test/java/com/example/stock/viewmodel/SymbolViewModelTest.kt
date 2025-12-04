@@ -1,7 +1,8 @@
 package com.example.stock.viewmodel
 
-import com.example.stock.data.model.SymbolItem
-import com.example.stock.data.repository.StockRepository
+import com.example.stock.feature.stocklist.data.SymbolItem
+import com.example.stock.feature.stocklist.data.StockRepository
+import com.example.stock.feature.stocklist.viewmodel.SymbolViewModel
 import com.example.stock.util.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
