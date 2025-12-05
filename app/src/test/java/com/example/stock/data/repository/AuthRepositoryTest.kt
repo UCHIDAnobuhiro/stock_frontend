@@ -2,9 +2,9 @@ package com.example.stock.data.repository
 
 import com.example.stock.core.data.auth.TokenProvider
 import com.example.stock.core.data.local.TokenStore
-import com.example.stock.feature.auth.data.LoginRequest
-import com.example.stock.feature.auth.data.LoginResponse
 import com.example.stock.feature.auth.data.remote.AuthApi
+import com.example.stock.feature.auth.data.remote.LoginRequest
+import com.example.stock.feature.auth.data.remote.LoginResponse
 import com.example.stock.feature.auth.data.repository.AuthRepository
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery

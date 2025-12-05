@@ -1,4 +1,4 @@
-package com.example.stock.feature.auth.data
+package com.example.stock.feature.auth.data.remote
 
 import kotlinx.serialization.Serializable
 
