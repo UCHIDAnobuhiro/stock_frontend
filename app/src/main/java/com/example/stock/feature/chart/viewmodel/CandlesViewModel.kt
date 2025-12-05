@@ -3,8 +3,8 @@ package com.example.stock.feature.chart.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stock.feature.chart.data.CandleUiState
-import com.example.stock.feature.stocklist.data.CandleDto
-import com.example.stock.feature.stocklist.data.StockRepository
+import com.example.stock.feature.stocklist.data.remote.CandleDto
+import com.example.stock.feature.stocklist.data.repository.StockRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

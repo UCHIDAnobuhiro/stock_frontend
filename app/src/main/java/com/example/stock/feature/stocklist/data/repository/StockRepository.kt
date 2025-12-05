@@ -1,6 +1,9 @@
-package com.example.stock.feature.stocklist.data
+package com.example.stock.feature.stocklist.data.repository
 
 import com.example.stock.core.network.ApiClient
+import com.example.stock.feature.stocklist.data.remote.StockApi
+import com.example.stock.feature.stocklist.data.remote.SymbolItem
+import com.example.stock.feature.stocklist.data.remote.CandleDto
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

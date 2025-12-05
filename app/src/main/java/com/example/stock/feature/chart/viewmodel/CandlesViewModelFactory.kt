@@ -2,7 +2,7 @@ package com.example.stock.feature.chart.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.stock.feature.stocklist.data.StockRepository
+import com.example.stock.feature.stocklist.data.repository.StockRepository
 
 /**
  * CandlesViewModelのインスタンス生成用Factoryクラス。

@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import com.example.stock.feature.stocklist.data.StockRepository
+import com.example.stock.feature.stocklist.data.repository.StockRepository
 import com.example.stock.navigation.AppNavGraph
 import com.example.stock.feature.auth.viewmodel.AuthViewModelFactory
 import com.example.stock.feature.chart.viewmodel.CandlesViewModelFactory

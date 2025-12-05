@@ -2,7 +2,7 @@ package com.example.stock.feature.stocklist.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.stock.feature.stocklist.data.StockRepository
+import com.example.stock.feature.stocklist.data.repository.StockRepository
 
 /**
  * SymbolViewModelのインスタンス生成用Factoryクラス。

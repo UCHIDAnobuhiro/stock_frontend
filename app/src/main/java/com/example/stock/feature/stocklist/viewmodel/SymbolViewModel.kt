@@ -2,8 +2,8 @@ package com.example.stock.feature.stocklist.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.stock.feature.stocklist.data.SymbolUiState
-import com.example.stock.feature.stocklist.data.StockRepository
+import com.example.stock.feature.stocklist.data.repository.StockRepository
+import com.example.stock.feature.stocklist.ui.SymbolUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
