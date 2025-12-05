@@ -2,7 +2,7 @@ package com.example.stock.viewmodel
 
 import com.example.stock.feature.auth.data.remote.LoginResponse
 import com.example.stock.feature.auth.data.repository.AuthRepository
-import com.example.stock.feature.auth.viewmodel.AuthViewModel
+import com.example.stock.feature.auth.viewmodel.LoginViewModel
 import com.example.stock.util.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
@@ -29,17 +29,17 @@ import retrofit2.Response
 import java.io.IOException
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-class AuthViewModelTest {
+class LoginViewModelTest {
     @get:Rule
     val mainRule = MainDispatcherRule()
 
     private lateinit var repository: AuthRepository
-    private lateinit var viewModel: AuthViewModel
+    private lateinit var viewModel: LoginViewModel
 
     @Before
     fun setUp() {
         repository = mockk(relaxed = true)
-        viewModel = AuthViewModel(repository)
+        viewModel = LoginViewModel(repository)
     }
 
     @After
@@ -83,7 +83,7 @@ class AuthViewModelTest {
         assertThat(viewModel.ui.value.error)
             .isEqualTo("Please enter email address and password")
 
-        // onEmailChangeで修正 → エラーがクリアされることを確認
+        // onPasswordChangeで修正 → エラーがクリアされることを確認
         viewModel.onPasswordChange("secret123")
 
         assertThat(viewModel.ui.value.password).isEqualTo("secret123")
@@ -162,7 +162,7 @@ class AuthViewModelTest {
         } returns LoginResponse("token123")
 
         // イベントを待ち受け
-        var received: AuthViewModel.UiEvent? = null
+        var received: LoginViewModel.UiEvent? = null
         val job: Job = launch {
             received = viewModel.events.first()
         }
@@ -172,7 +172,7 @@ class AuthViewModelTest {
 
         assertThat(viewModel.ui.value.isLoading).isFalse()
         assertThat(viewModel.ui.value.error).isNull()
-        assertThat(received).isEqualTo(AuthViewModel.UiEvent.LoggedIn)
+        assertThat(received).isEqualTo(LoginViewModel.UiEvent.LoggedIn)
 
         job.cancelAndJoin()
 

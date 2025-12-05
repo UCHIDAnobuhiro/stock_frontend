@@ -8,21 +8,21 @@ import com.example.stock.core.network.ApiClient
 import com.example.stock.feature.auth.data.repository.AuthRepository
 
 /**
- * Factory class for creating AuthViewModel instances.
+ * Factory class for creating SignupViewModel instances.
  * Enables dependency injection (AuthRepository) when passed to ViewModelProvider.
  *
  * @constructor
  * @param context Context used to access application context
  * @property appContext Application context
  */
-class AuthViewModelFactory(context: Context) : ViewModelProvider.Factory {
+class SignupViewModelFactory(context: Context) : ViewModelProvider.Factory {
     private val appContext = context.applicationContext
 
     /**
      * Creates an instance of ViewModel.
      *
      * @param modelClass The class of ViewModel to create
-     * @return AuthViewModel instance
+     * @return SignupViewModel instance
      * @throws IllegalArgumentException If unsupported ViewModel class is provided
      */
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -32,6 +32,6 @@ class AuthViewModelFactory(context: Context) : ViewModelProvider.Factory {
             tokenProvider = ApiClient.tokenProvider
         )
         @Suppress("UNCHECKED_CAST")
-        return AuthViewModel(repo) as T
+        return SignupViewModel(repo) as T
     }
 }

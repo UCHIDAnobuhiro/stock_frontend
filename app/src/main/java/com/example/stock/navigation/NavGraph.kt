@@ -6,7 +6,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.stock.feature.auth.ui.login.LoginScreen
 import com.example.stock.feature.auth.ui.signup.SignupScreen
-import com.example.stock.feature.auth.viewmodel.AuthViewModel
+import com.example.stock.feature.auth.viewmodel.LoginViewModel
+import com.example.stock.feature.auth.viewmodel.SignupViewModel
 import com.example.stock.feature.chart.ui.ChartScreen
 import com.example.stock.feature.chart.viewmodel.CandlesViewModel
 import com.example.stock.feature.stocklist.ui.StockListScreen
@@ -22,12 +23,14 @@ object Routes {
 /**
  * Composable that defines the navigation graph for the entire application.
  *
- * @param authViewModel [AuthViewModel] that manages login authentication state.
+ * @param loginViewModel [LoginViewModel] that manages login authentication state.
+ * @param signupViewModel [SignupViewModel] that manages signup authentication state.
  *
  */
 @Composable
 fun AppNavGraph(
-    authViewModel: AuthViewModel,
+    loginViewModel: LoginViewModel,
+    signupViewModel: SignupViewModel,
     symbolViewModel: SymbolViewModel,
     candlesViewModel: CandlesViewModel
 ) {
@@ -39,7 +42,7 @@ fun AppNavGraph(
     ) {
         composable(Routes.LOGIN) {
             LoginScreen(
-                authViewModel,
+                loginViewModel,
                 onLoggedIn = {
                     // Navigate to stock list screen on successful login and clear the back stack so user cannot return to login
                     navController.navigate(Routes.STOCK) {
@@ -54,7 +57,7 @@ fun AppNavGraph(
         }
         composable(Routes.SIGNUP) {
             SignupScreen(
-                authViewModel,
+                signupViewModel,
                 onSignedUp = {
                     // Navigate back to login screen on successful signup
                     navController.popBackStack()
@@ -70,7 +73,7 @@ fun AppNavGraph(
                 symbolViewModel,
                 onLogout = {
                     // Perform logout process
-                    authViewModel.logout()
+                    loginViewModel.logout()
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(0) { inclusive = true }
                     }
@@ -86,7 +89,7 @@ fun AppNavGraph(
                 code,
                 candlesViewModel,
                 onLogout = {
-                    authViewModel.logout()
+                    loginViewModel.logout()
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(0) { inclusive = true }
                     }
