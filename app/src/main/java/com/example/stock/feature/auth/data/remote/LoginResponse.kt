@@ -3,9 +3,9 @@ package com.example.stock.feature.auth.data.remote
 import kotlinx.serialization.Serializable
 
 /**
- * ログインレスポンスを表すデータクラス
+ * Data class representing a login response
  *
- * @property token JWTのトークン
+ * @property token JWT authentication token
  */
 @Serializable
 data class LoginResponse(

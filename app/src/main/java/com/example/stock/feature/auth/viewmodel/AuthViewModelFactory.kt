@@ -8,22 +8,22 @@ import com.example.stock.core.network.ApiClient
 import com.example.stock.feature.auth.data.repository.AuthRepository
 
 /**
- * AuthViewModelのインスタンス生成用Factoryクラス。
- * ViewModelProviderに渡して利用することで、依存性（AuthRepository）を注入できる。
+ * Factory class for creating AuthViewModel instances.
+ * Enables dependency injection (AuthRepository) when passed to ViewModelProvider.
  *
  * @constructor
- * @param context Context アプリケーションコンテキストを利用するための引数
- * @property appContext アプリケーションコンテキスト
+ * @param context Context used to access application context
+ * @property appContext Application context
  */
 class AuthViewModelFactory(context: Context) : ViewModelProvider.Factory {
     private val appContext = context.applicationContext
 
     /**
-     * ViewModelのインスタンスを生成する。
+     * Creates an instance of ViewModel.
      *
-     * @param modelClass 生成するViewModelのクラス
-     * @return AuthViewModelのインスタンス
-     * @throws IllegalArgumentException 未対応のViewModelクラスの場合
+     * @param modelClass The class of ViewModel to create
+     * @return AuthViewModel instance
+     * @throws IllegalArgumentException If unsupported ViewModel class is provided
      */
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         val repo = AuthRepository(

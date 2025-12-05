@@ -10,15 +10,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * 認証・トークン管理を担当するリポジトリ。
+ * Repository responsible for authentication and token management.
  *
- * - ログイン時にAPIを呼び出し、トークンをメモリと永続ストアに保存
- * - ログアウト時にトークンをクリア
+ * - Calls API during login and saves tokens to memory and persistent storage
+ * - Clears tokens during logout
  *
- * @property api 認証API
- * @property tokenStore トークン永続化ストア
- * @property tokenProvider メモリ上のトークン管理
- * @property io IOスレッド用ディスパッチャ
+ * @property api Authentication API
+ * @property tokenStore Persistent token storage
+ * @property tokenProvider In-memory token manager
+ * @property io Dispatcher for IO operations
  */
 class AuthRepository(
     private val api: AuthApi,
@@ -27,19 +27,19 @@ class AuthRepository(
     private val io: CoroutineDispatcher = Dispatchers.IO
 ) {
     /**
-     * ログイン処理。
+     * Handles login process.
      *
-     * @param email メールアドレス
-     * @param password パスワード
-     * @return 認証レスポンス（トークン等）
+     * @param email Email address
+     * @param password Password
+     * @return Authentication response containing token
      *
-     * APIで認証し、トークンをメモリと永続ストアに保存する。
+     * Authenticates via API and saves token to both memory and persistent storage.
      */
     suspend fun login(email: String, password: String): LoginResponse {
         val res = api.login(LoginRequest(email, password))
-        // メモリに反映（即時に Authorization を付与できる）
+        // Update in-memory token (enables immediate Authorization header)
         tokenProvider.update(res.token)
-        // 永続化（再起動後も使える）
+        // Persist to storage (survives app restart)
         withContext(io) {
             tokenStore.save(res.token)
         }
@@ -47,9 +47,9 @@ class AuthRepository(
     }
 
     /**
-     * ログアウト処理。
+     * Handles logout process.
      *
-     * メモリと永続ストア両方のトークンをクリアする。
+     * Clears tokens from both memory and persistent storage.
      */
     suspend fun logout() {
         tokenProvider.clear()

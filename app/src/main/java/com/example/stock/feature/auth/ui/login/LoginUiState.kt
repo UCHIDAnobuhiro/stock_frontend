@@ -1,13 +1,13 @@
 package com.example.stock.feature.auth.ui.login
 
 /**
- * ログイン画面の状態を保持するデータクラス。
+ * Data class holding the state of the login screen.
  *
- * @property email 入力されたメールアドレス
- * @property password 入力されたパスワード
- * @property isPasswordVisible パスワード表示/非表示フラグ
- * @property isLoading ログイン処理中かどうか
- * @property error エラーメッセージ（null の場合はエラーなし）
+ * @property email Entered email address
+ * @property password Entered password
+ * @property isPasswordVisible Flag for password visibility toggle
+ * @property isLoading Whether login process is in progress
+ * @property error Error message (null if no error)
  */
 data class LoginUiState(
     val email: String = "",

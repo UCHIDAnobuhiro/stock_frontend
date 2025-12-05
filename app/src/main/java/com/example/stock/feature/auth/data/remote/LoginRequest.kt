@@ -3,10 +3,10 @@ package com.example.stock.feature.auth.data.remote
 import kotlinx.serialization.Serializable
 
 /**
- * ログインリクエストを表すデータクラス
+ * Data class representing a login request
  *
- * @property email ログインするユーザー名
- * @property password ログインするユーザーのパスワード
+ * @property email User email address
+ * @property password User password
  */
 @Serializable
 data class LoginRequest(

@@ -4,16 +4,16 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 /**
- * 認証APIとの通信を定義するRetrofitインターフェース。
+ * Retrofit interface defining authentication API communication.
  *
- * ログインリクエストを送信し、認証トークン等を含むレスポンスを受け取る。
+ * Sends login requests and receives responses containing authentication tokens.
  */
 interface AuthApi {
     /**
-     * ログインAPIを呼び出す。
+     * Calls the login API endpoint.
      *
-     * @param body ログインリクエスト（メールアドレス・パスワード等）
-     * @return 認証結果（トークン等）
+     * @param body Login request containing email and password
+     * @return Authentication result containing token
      */
     @POST("login")
     suspend fun login(@Body body: LoginRequest): LoginResponse

@@ -15,13 +15,13 @@ import retrofit2.HttpException
 import java.io.IOException
 
 /**
- * ログイン処理およびログイン画面の状態を管理する [ViewModel]。
+ * Manages login processing and login screen state for [ViewModel].
  *
- * - 入力値の検証
- * - [AuthRepository] を利用したログイン処理
- * - [LoginUiState] の更新
+ * - Validates input values
+ * - Performs login processing using [AuthRepository]
+ * - Updates [LoginUiState]
  *
- * @param repo 認証リポジトリ。ログインAPIを呼び出す責務を持つ。
+ * @param repo Authentication repository responsible for calling the login API.
  */
 class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
 
@@ -36,36 +36,36 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
     val events = _events.asSharedFlow()
 
     /**
-     * メールアドレス入力変更時に状態を更新する。
-     * @param email 入力されたメールアドレス
+     * Updates state when email input changes.
+     * @param email The entered email address
      */
     fun onEmailChange(email: String) {
         _ui.update { it.copy(email = email, error = null) }
     }
 
     /**
-     * パスワード入力変更時に状態を更新する。
-     * @param password 入力されたパスワード
+     * Updates state when password input changes.
+     * @param password The entered password
      */
     fun onPasswordChange(password: String) {
         _ui.update { it.copy(password = password, error = null) }
     }
 
     /**
-     * パスワードの表示/非表示を切り替える。
+     * Toggles password visibility on/off.
      */
     fun togglePassword() {
         _ui.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
     }
 
     /**
-     * ログイン処理を実行する。
+     * Executes the login process.
      *
-     * 入力チェック後、[AuthRepository] を通じてログインを行い、
-     * 成功/失敗に応じて [LoginUiState] を更新する。
+     * After validating inputs, performs login via [AuthRepository],
+     * and updates [LoginUiState] based on success/failure.
      */
     fun login() {
-        // 連打防止
+        // Prevent multiple rapid clicks
         if (_ui.value.isLoading) return
 
         val (email, password) = _ui.value.let { it.email to it.password }
@@ -75,7 +75,7 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
             return
         }
 
-        // 非同期でログイン処理
+        // Perform login asynchronously
         viewModelScope.launch {
             _ui.update { it.copy(isLoading = true, error = null) }
             runCatching { repo.login(email, password) }
@@ -83,11 +83,11 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
                 .onFailure { e ->
                     val msg = when (e) {
                         is HttpException ->
-                            if (e.code() == 401) "メールアドレスまたはパスワードが間違っています" else "HTTPエラー: ${e.code()}"
+                            if (e.code() == 401) "Email address or password is incorrect" else "HTTP error: ${e.code()}"
 
-                        is IOException -> "通信エラー: ネットワークを確認してください"
-                        is SerializationException -> "JSONエラー: レスポンス形式が不正です"
-                        else -> "不明なエラー: ${e.message}"
+                        is IOException -> "Network error: Please check your connection"
+                        is SerializationException -> "JSON error: Invalid response format"
+                        else -> "Unknown error: ${e.message}"
                     }
                     _ui.update { it.copy(error = msg) }
                 }
@@ -96,20 +96,20 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
     }
 
     /**
-     * validationチェック
+     * Performs validation check
      *
-     * @param email 入力されたメールアドレス
-     * @param password 入力されたパスワード
+     * @param email The entered email address
+     * @param password The entered password
      */
     private fun validate(email: String, password: String): String? = when {
-        email.isBlank() || password.isBlank() -> "メールアドレスとパスワードを入力してください"
-        !email.contains("@") -> "メールアドレスの形式が不正です"
-        password.length < 8 -> "パスワードは8文字以上"
+        email.isBlank() || password.isBlank() -> "Please enter email address and password"
+        !email.contains("@") -> "Invalid email address format"
+        password.length < 8 -> "Password must be at least 8 characters"
         else -> null
     }
 
     /**
-     * ログアウト処理を実行
+     * Executes logout processing
      */
     fun logout() {
         viewModelScope.launch {
