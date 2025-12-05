@@ -5,6 +5,8 @@ import com.example.stock.core.data.local.TokenStore
 import com.example.stock.feature.auth.data.remote.AuthApi
 import com.example.stock.feature.auth.data.remote.LoginRequest
 import com.example.stock.feature.auth.data.remote.LoginResponse
+import com.example.stock.feature.auth.data.remote.SignupRequest
+import com.example.stock.feature.auth.data.remote.SignupResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -44,6 +46,19 @@ class AuthRepository(
             tokenStore.save(res.token)
         }
         return res
+    }
+
+    /**
+     * Handles signup process.
+     *
+     * @param email Email address
+     * @param password Password
+     * @return Authentication response containing message
+     *
+     * Registers new user via API.
+     */
+    suspend fun signup(email: String, password: String): SignupResponse {
+        return api.signup(SignupRequest(email, password))
     }
 
     /**

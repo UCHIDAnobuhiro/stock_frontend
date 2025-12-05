@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.stock.feature.auth.ui.login.LoginScreen
+import com.example.stock.feature.auth.ui.signup.SignupScreen
 import com.example.stock.feature.auth.viewmodel.AuthViewModel
 import com.example.stock.feature.chart.ui.ChartScreen
 import com.example.stock.feature.chart.viewmodel.CandlesViewModel
@@ -14,6 +15,7 @@ import com.example.stock.feature.stocklist.viewmodel.SymbolViewModel
 // Routes are identifiers for screen navigation.
 object Routes {
     const val LOGIN = "login"
+    const val SIGNUP = "signup"
     const val STOCK = "stock"
 }
 
@@ -44,6 +46,21 @@ fun AppNavGraph(
                         popUpTo(Routes.LOGIN) { inclusive = true }
                         launchSingleTop = true
                     }
+                },
+                onNavigateToSignup = {
+                    navController.navigate(Routes.SIGNUP)
+                }
+            )
+        }
+        composable(Routes.SIGNUP) {
+            SignupScreen(
+                authViewModel,
+                onSignedUp = {
+                    // Navigate back to login screen on successful signup
+                    navController.popBackStack()
+                },
+                onNavigateToLogin = {
+                    navController.popBackStack()
                 }
             )
         }
