@@ -16,45 +16,45 @@ import com.example.stock.feature.chart.viewmodel.CandlesViewModel
 import com.example.stock.feature.stocklist.viewmodel.SymbolViewModel
 
 /**
- * アプリのエントリーポイントとなるActivity。
- * 各ViewModelの初期化と、ナビゲーショングラフのセットアップを行う。
+ * Activity that serves as the application entry point.
+ * Initializes each ViewModel and sets up the navigation graph.
  */
 class MainActivity : ComponentActivity() {
     /**
-     * 株価データ取得用リポジトリ。必要時に初期化される。
+     * Repository for fetching stock price data. Initialized lazily when needed.
      */
     private val stockRepo by lazy { StockRepository() }
 
     /**
-     * 認証関連のViewModel。
+     * ViewModel for managing authentication.
      */
     private val authVm by viewModels<AuthViewModel> {
         AuthViewModelFactory(applicationContext)
     }
 
     /**
-     * 銘柄リスト管理用のViewModel。
+     * ViewModel for managing the stock symbol list.
      */
     private val symbolVm by viewModels<SymbolViewModel> {
         SymbolViewModelFactory(stockRepo)
     }
 
     /**
-     * ローソク足データ管理用のViewModel。
+     * ViewModel for managing candlestick chart data.
      */
     private val candlesVm by viewModels<CandlesViewModel> {
         CandlesViewModelFactory(stockRepo)
     }
 
     /**
-     * Activity生成時の初期化処理。
-     * ナビゲーショングラフをセットし、UIを構築する。
+     * Initialization processing when the Activity is created.
+     * Sets up the navigation graph and builds the UI.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            // アプリのナビゲーションをセットアップ
+            // Set up the application navigation
             StockTheme {
                 AppNavGraph(authVm, symbolVm, candlesVm)
             }

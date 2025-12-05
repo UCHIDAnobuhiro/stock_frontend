@@ -5,29 +5,29 @@ import okhttp3.Interceptor
 import okhttp3.Response
 
 /**
- * 認証トークンをリクエストヘッダーに付与するOkHttpインターセプター。
+ * OkHttp interceptor that adds authentication tokens to request headers.
  *
- * TokenProviderから取得したトークンが存在する場合、
- * Authorizationヘッダー（Bearer認証）を自動的に追加する。
- * トークンが無い場合はヘッダーを追加しない。
+ * If a token is obtained from TokenProvider, automatically adds an
+ * Authorization header (Bearer authentication).
+ * If no token exists, no header is added.
  *
- * @property provider トークン取得用のTokenProvider
+ * @property provider TokenProvider for token retrieval
  */
 class AuthInterceptor(private val provider: TokenProvider) : Interceptor {
     /**
-     * リクエストにAuthorizationヘッダーを付与して次のチェーンへ進める。
+     * Adds an Authorization header to the request and proceeds to the next chain.
      *
-     * @param chain OkHttpのリクエストチェーン
-     * @return レスポンス
+     * @param chain OkHttp request chain
+     * @return Response
      */
     override fun intercept(chain: Interceptor.Chain): Response {
-        val t = provider.getToken() // トークンを取得
+        val t = provider.getToken() // Retrieve token
         val req = if (!t.isNullOrBlank()) {
-            // トークンがあればAuthorizationヘッダーを追加
+            // If token exists, add Authorization header
             chain.request().newBuilder()
                 .addHeader("Authorization", "Bearer $t")
                 .build()
-        } else chain.request() // トークンが無ければそのまま
+        } else chain.request() // If no token, use request as is
         return chain.proceed(req)
     }
 }

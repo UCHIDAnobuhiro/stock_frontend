@@ -2,7 +2,7 @@ package com.example.stock.core.ui.theme
 
 import androidx.compose.ui.unit.dp
 
-/** 余白（間隔） */
+/** Spacing (gaps) */
 object Spacing {
     val Screen = 16.dp
     val ScreenLarge = 24.dp
@@ -15,14 +15,14 @@ object Spacing {
     val ListItemVertical = 18.dp
 }
 
-/** コンポーネントのサイズや太さ */
+/** Component sizes and thickness */
 object Sizes {
     val IconSm = 20.dp
     val Border = 1.dp
     val CornerSm = 4.dp
 }
 
-/** 線の太さなど */
+/** Line thickness and similar */
 object Thickness {
     val Divider = 1.dp
 }

@@ -8,9 +8,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
 /**
- * ボタン連打防止のためのComposableユーティリティ。
+ * Composable utility to prevent rapid button clicks.
  *
- * 使用例：
+ * Usage example:
  * val canClick = rememberClickGuard()
  * if (canClick()) { onClick() }
  */
