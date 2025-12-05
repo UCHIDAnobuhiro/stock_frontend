@@ -1,4 +1,4 @@
-package com.example.stock.feature.auth.ui
+package com.example.stock.feature.auth.ui.login
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

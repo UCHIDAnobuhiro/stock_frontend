@@ -1,4 +1,4 @@
-package com.example.stock.feature.auth.ui
+package com.example.stock.feature.auth.ui.login
 
 /**
  * ログイン画面の状態を保持するデータクラス。

@@ -1,7 +1,7 @@
 package com.example.stock.viewmodel
 
 import com.example.stock.feature.auth.data.LoginResponse
-import com.example.stock.feature.auth.data.AuthRepository
+import com.example.stock.feature.auth.data.repository.AuthRepository
 import com.example.stock.feature.auth.viewmodel.AuthViewModel
 import com.example.stock.util.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat

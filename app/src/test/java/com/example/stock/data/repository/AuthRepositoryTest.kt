@@ -4,8 +4,8 @@ import com.example.stock.core.data.auth.TokenProvider
 import com.example.stock.core.data.local.TokenStore
 import com.example.stock.feature.auth.data.LoginRequest
 import com.example.stock.feature.auth.data.LoginResponse
-import com.example.stock.feature.auth.data.AuthApi
-import com.example.stock.feature.auth.data.AuthRepository
+import com.example.stock.feature.auth.data.remote.AuthApi
+import com.example.stock.feature.auth.data.repository.AuthRepository
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.coVerify

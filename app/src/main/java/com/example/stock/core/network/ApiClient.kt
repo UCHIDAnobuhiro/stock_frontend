@@ -2,7 +2,7 @@ package com.example.stock.core.network
 
 import com.example.stock.config.ApiConfig
 import com.example.stock.core.data.auth.InMemoryTokenProvider
-import com.example.stock.feature.auth.data.AuthApi
+import com.example.stock.feature.auth.data.remote.AuthApi
 import com.example.stock.feature.stocklist.data.StockApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.ExperimentalSerializationApi

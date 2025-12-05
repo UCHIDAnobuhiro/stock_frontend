@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.stock.core.data.local.TokenStore
 import com.example.stock.core.network.ApiClient
-import com.example.stock.feature.auth.data.AuthRepository
+import com.example.stock.feature.auth.data.repository.AuthRepository
 
 /**
  * AuthViewModelのインスタンス生成用Factoryクラス。

@@ -1,4 +1,7 @@
-package com.example.stock.feature.auth.data
+package com.example.stock.feature.auth.data.remote
+
+import com.example.stock.feature.auth.data.LoginRequest
+import com.example.stock.feature.auth.data.LoginResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 

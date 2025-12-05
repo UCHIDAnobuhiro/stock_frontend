@@ -1,7 +1,10 @@
-package com.example.stock.feature.auth.data
+package com.example.stock.feature.auth.data.repository
 
 import com.example.stock.core.data.auth.TokenProvider
 import com.example.stock.core.data.local.TokenStore
+import com.example.stock.feature.auth.data.LoginRequest
+import com.example.stock.feature.auth.data.LoginResponse
+import com.example.stock.feature.auth.data.remote.AuthApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
