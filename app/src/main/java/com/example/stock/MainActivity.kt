@@ -7,11 +7,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.example.stock.feature.stocklist.data.repository.StockRepository
 import com.example.stock.navigation.AppNavGraph
-import com.example.stock.feature.auth.viewmodel.AuthViewModelFactory
+import com.example.stock.feature.auth.viewmodel.LoginViewModelFactory
+import com.example.stock.feature.auth.viewmodel.SignupViewModelFactory
 import com.example.stock.feature.chart.viewmodel.CandlesViewModelFactory
 import com.example.stock.feature.stocklist.viewmodel.SymbolViewModelFactory
 import com.example.stock.core.ui.theme.StockTheme
-import com.example.stock.feature.auth.viewmodel.AuthViewModel
+import com.example.stock.feature.auth.viewmodel.LoginViewModel
+import com.example.stock.feature.auth.viewmodel.SignupViewModel
 import com.example.stock.feature.chart.viewmodel.CandlesViewModel
 import com.example.stock.feature.stocklist.viewmodel.SymbolViewModel
 
@@ -26,10 +28,17 @@ class MainActivity : ComponentActivity() {
     private val stockRepo by lazy { StockRepository() }
 
     /**
-     * ViewModel for managing authentication.
+     * ViewModel for managing login authentication.
      */
-    private val authVm by viewModels<AuthViewModel> {
-        AuthViewModelFactory(applicationContext)
+    private val loginVm by viewModels<LoginViewModel> {
+        LoginViewModelFactory(applicationContext)
+    }
+
+    /**
+     * ViewModel for managing signup authentication.
+     */
+    private val signupVm by viewModels<SignupViewModel> {
+        SignupViewModelFactory(applicationContext)
     }
 
     /**
@@ -56,7 +65,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             // Set up the application navigation
             StockTheme {
-                AppNavGraph(authVm, symbolVm, candlesVm)
+                AppNavGraph(loginVm, signupVm, symbolVm, candlesVm)
             }
         }
     }

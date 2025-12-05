@@ -34,7 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.stock.R
 import com.example.stock.core.ui.theme.Sizes
 import com.example.stock.core.ui.theme.Spacing
-import com.example.stock.feature.auth.viewmodel.AuthViewModel
+import com.example.stock.feature.auth.viewmodel.SignupViewModel
 
 /**
  * Signup screen.
@@ -42,27 +42,22 @@ import com.example.stock.feature.auth.viewmodel.AuthViewModel
  * Provides email/password/confirm password input, password visibility toggle,
  * signup button, error display, and progress indicator.
  *
- * @param viewModel Authentication ViewModel
+ * @param viewModel Signup ViewModel
  * @param onSignedUp Callback invoked upon successful signup
  * @param onNavigateToLogin Callback to navigate to login screen
  */
 @Composable
 fun SignupScreen(
-    viewModel: AuthViewModel,
+    viewModel: SignupViewModel,
     onSignedUp: () -> Unit,
     onNavigateToLogin: () -> Unit,
 ) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
 
-    // Reset UI state when screen is displayed
-    LaunchedEffect(Unit) {
-        viewModel.resetUiState()
-    }
-
     // Navigate on successful signup (only once)
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
-            if (event is AuthViewModel.UiEvent.SignedUp) {
+            if (event is SignupViewModel.UiEvent.SignedUp) {
                 onSignedUp()
             }
         }

@@ -23,14 +23,13 @@ import java.io.IOException
  *
  * @param repo Authentication repository responsible for calling the login API.
  */
-class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
+class LoginViewModel(private val repo: AuthRepository) : ViewModel() {
 
     private val _ui = MutableStateFlow(LoginUiState())
     val ui: StateFlow<LoginUiState> = _ui
 
     sealed interface UiEvent {
         data object LoggedIn : UiEvent
-        data object SignedUp : UiEvent
     }
 
     private val _events = MutableSharedFlow<UiEvent>(replay = 0, extraBufferCapacity = 1)
@@ -57,38 +56,6 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
      */
     fun togglePassword() {
         _ui.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
-    }
-
-    /**
-     * Updates state when confirm password input changes.
-     * @param confirmPassword The entered confirm password
-     */
-    fun onConfirmPasswordChange(confirmPassword: String) {
-        _ui.update { it.copy(confirmPassword = confirmPassword, error = null) }
-    }
-
-    /**
-     * Toggles confirm password visibility on/off.
-     */
-    fun toggleConfirmPassword() {
-        _ui.update { it.copy(isConfirmPasswordVisible = !it.isConfirmPasswordVisible) }
-    }
-
-    /**
-     * Resets the UI state (clears all input fields and errors).
-     * Call this when navigating between login and signup screens.
-     */
-    fun resetUiState() {
-        _ui.update {
-            it.copy(
-                email = "",
-                password = "",
-                confirmPassword = "",
-                error = null,
-                isPasswordVisible = false,
-                isConfirmPasswordVisible = false
-            )
-        }
     }
 
     /**
@@ -147,61 +114,7 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
     fun logout() {
         viewModelScope.launch {
             repo.logout()
-            _ui.update { it.copy(email = "", password = "", confirmPassword = "") }
+            _ui.update { it.copy(email = "", password = "") }
         }
-    }
-
-    /**
-     * Executes the signup process.
-     *
-     * After validating inputs, performs signup via [AuthRepository],
-     * and updates [LoginUiState] based on success/failure.
-     */
-    fun signup() {
-        // Prevent multiple rapid clicks
-        if (_ui.value.isLoading) return
-
-        val (email, password, confirmPassword) = _ui.value.let {
-            Triple(it.email, it.password, it.confirmPassword)
-        }
-
-        validateSignup(email, password, confirmPassword)?.let { msg ->
-            _ui.update { it.copy(error = msg) }
-            return
-        }
-
-        // Perform signup asynchronously
-        viewModelScope.launch {
-            _ui.update { it.copy(isLoading = true, error = null) }
-            runCatching { repo.signup(email, password) }
-                .onSuccess { _events.emit(UiEvent.SignedUp) }
-                .onFailure { e ->
-                    val msg = when (e) {
-                        is HttpException ->
-                            if (e.code() == 409) "Email address is already registered" else "HTTP error: ${e.code()}"
-
-                        is IOException -> "Network error: Please check your connection"
-                        is SerializationException -> "JSON error: Invalid response format"
-                        else -> "Unknown error: ${e.message}"
-                    }
-                    _ui.update { it.copy(error = msg) }
-                }
-            _ui.update { it.copy(isLoading = false) }
-        }
-    }
-
-    /**
-     * Performs validation check for signup
-     *
-     * @param email The entered email address
-     * @param password The entered password
-     * @param confirmPassword The entered confirm password
-     */
-    private fun validateSignup(email: String, password: String, confirmPassword: String): String? = when {
-        email.isBlank() || password.isBlank() || confirmPassword.isBlank() -> "Please enter all fields"
-        !email.contains("@") -> "Invalid email address format"
-        password.length < 8 -> "Password must be at least 8 characters"
-        password != confirmPassword -> "Passwords do not match"
-        else -> null
     }
 }
