@@ -12,6 +12,12 @@
     <string name="show">表示</string>
     <string name="mail">メールアドレス</string>
     <string name="logout">ログアウト</string>
+    <string name="no_account_signup">アカウントをお持ちでない方はこちら</string>
+
+    <!--サインアップ-->
+    <string name="signup">新規登録</string>
+    <string name="confirm_password">パスワード確認</string>
+    <string name="already_have_account">アカウントをお持ちですか？</string>
 
     <string name="reload">再読み込み</string>
     <string name="loading">Loading</string>

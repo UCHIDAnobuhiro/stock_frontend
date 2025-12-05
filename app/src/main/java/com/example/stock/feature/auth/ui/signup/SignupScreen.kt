@@ -1,4 +1,4 @@
-package com.example.stock.feature.auth.ui.login
+package com.example.stock.feature.auth.ui.signup
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,20 +37,20 @@ import com.example.stock.core.ui.theme.Spacing
 import com.example.stock.feature.auth.viewmodel.AuthViewModel
 
 /**
- * Login screen.
+ * Signup screen.
  *
- * Provides email/password input, password visibility toggle,
- * login button, error display, and progress indicator.
+ * Provides email/password/confirm password input, password visibility toggle,
+ * signup button, error display, and progress indicator.
  *
  * @param viewModel Authentication ViewModel
- * @param onLoggedIn Callback invoked upon successful login
- * @param onNavigateToSignup Callback to navigate to signup screen
+ * @param onSignedUp Callback invoked upon successful signup
+ * @param onNavigateToLogin Callback to navigate to login screen
  */
 @Composable
-fun LoginScreen(
+fun SignupScreen(
     viewModel: AuthViewModel,
-    onLoggedIn: () -> Unit,
-    onNavigateToSignup: () -> Unit,
+    onSignedUp: () -> Unit,
+    onNavigateToLogin: () -> Unit,
 ) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
 
@@ -59,11 +59,11 @@ fun LoginScreen(
         viewModel.resetUiState()
     }
 
-    // Navigate on successful login (only once)
+    // Navigate on successful signup (only once)
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
-            if (event is AuthViewModel.UiEvent.LoggedIn) {
-                onLoggedIn()
+            if (event is AuthViewModel.UiEvent.SignedUp) {
+                onSignedUp()
             }
         }
     }
@@ -78,7 +78,7 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center
         ) {
             // Title
-            Text(stringResource(R.string.login), style = MaterialTheme.typography.headlineMedium)
+            Text(stringResource(R.string.signup), style = MaterialTheme.typography.headlineMedium)
             Spacer(Modifier.height(Spacing.ScreenLarge))
 
             // Email input field
@@ -115,6 +115,31 @@ fun LoginScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(Modifier.height(Spacing.GapSm))
+
+            // Confirm Password input field (with visibility toggle icon)
+            OutlinedTextField(
+                value = ui.confirmPassword,
+                onValueChange = viewModel::onConfirmPasswordChange,
+                label = { Text(stringResource(R.string.confirm_password)) },
+                singleLine = true,
+                visualTransformation = if (ui.isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = viewModel::toggleConfirmPassword) {
+                        Icon(
+                            imageVector = if (ui.isConfirmPasswordVisible) {
+                                Icons.Default.Visibility
+                            } else {
+                                Icons.Default.VisibilityOff
+                            },
+                            contentDescription = if (ui.isConfirmPasswordVisible) stringResource(R.string.hide) else stringResource(
+                                R.string.show
+                            )
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
 
             // Error display
             if (ui.error != null) {
@@ -124,9 +149,9 @@ fun LoginScreen(
 
             Spacer(Modifier.height(Spacing.GapMd))
 
-            // Login button (with progress indicator)
+            // Signup button (with progress indicator)
             Button(
-                onClick = viewModel::login,
+                onClick = viewModel::signup,
                 enabled = !ui.isLoading,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -134,17 +159,17 @@ fun LoginScreen(
                     strokeWidth = Sizes.Border,
                     modifier = Modifier.size(Sizes.IconSm)
                 )
-                else Text(stringResource(R.string.login))
+                else Text(stringResource(R.string.signup))
             }
 
             Spacer(Modifier.height(Spacing.GapSm))
 
-            // Navigate to signup
+            // Navigate to login
             TextButton(
-                onClick = onNavigateToSignup,
+                onClick = onNavigateToLogin,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Text(stringResource(R.string.no_account_signup))
+                Text(stringResource(R.string.already_have_account))
             }
         }
     }
