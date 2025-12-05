@@ -2,8 +2,8 @@ package com.example.stock.core.network
 
 import com.example.stock.config.ApiConfig
 import com.example.stock.core.data.auth.InMemoryTokenProvider
-import com.example.stock.feature.auth.data.AuthApi
-import com.example.stock.feature.stocklist.data.StockApi
+import com.example.stock.feature.auth.data.remote.AuthApi
+import com.example.stock.feature.stocklist.data.remote.StockApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -13,15 +13,15 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 
 /**
- * Retrofitを使ってAPI通信を行うためのクライアントオブジェクト。
+ * Client object for API communication using Retrofit.
  *
- * - Kotlinx Serializationを使用してJSONを解析
- * - BASE_URLはエミュレータ上のローカルホスト向けに設定（10.0.2.2）
+ * - Uses Kotlinx Serialization to parse JSON
+ * - BASE_URL is configured for localhost on the emulator (10.0.2.2)
  */
 @OptIn(ExperimentalSerializationApi::class)
 object ApiClient {
 
-    // アプリ全体で共有する TokenProvider
+    // TokenProvider shared across the entire app
     val tokenProvider = InMemoryTokenProvider()
 
     private val logging = HttpLoggingInterceptor().apply {
@@ -35,17 +35,17 @@ object ApiClient {
 
 
     /**
-     * Jsonの設定:
-     * - `ignoreUnknownKeys`: キーが未知のJSONのプロパティを無視する
+     * Json configuration:
+     * - `ignoreUnknownKeys`: Ignores properties with unknown keys in JSON
      */
     private val json = Json {
         ignoreUnknownKeys = true
     }
 
     /**
-     * Retrofitのインスタンス:
-     * - `baseUrl`: APIエンドポイントのベースURL
-     * - Kotlinx Serializationのコンバータを追加
+     * Retrofit instance:
+     * - `baseUrl`: Base URL for API endpoints
+     * - Adds Kotlinx Serialization converter
      */
     val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(ApiConfig.BASE_URL)
@@ -54,8 +54,8 @@ object ApiClient {
         .build()
 
     /**
-     * AuthApiのインスタンス
-     * Retrofitを使用してインスタンスを作成
+     * AuthApi instance
+     * Created using Retrofit
      */
     val authApi: AuthApi = retrofit.create(AuthApi::class.java)
 

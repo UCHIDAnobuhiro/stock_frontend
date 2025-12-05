@@ -1,49 +1,49 @@
 package com.example.stock.core.data.auth
 
 /**
- * アクセストークンの取得・更新・クリアを行うためのインターフェース。
+ * Interface for obtaining, updating, and clearing access tokens.
  */
 interface TokenProvider {
     /**
-     * 現在保持しているトークンを取得する。
-     * @return 保持中のトークン。なければnull。
+     * Retrieves the currently held token.
+     * @return The held token, or null if none exists.
      */
     fun getToken(): String?
 
     /**
-     * トークンを新しい値で更新する。
-     * @param token 新しいトークン
+     * Updates the token with a new value.
+     * @param token The new token
      */
     fun update(token: String)
 
     /**
-     * 保持しているトークンをクリアする。
+     * Clears the held token.
      */
     fun clear()
 }
 
 /**
- * メモリ上でのみトークンを管理するTokenProvider実装。
- * スレッドセーフな@Volatile変数でトークンを保持する。
+ * TokenProvider implementation that manages tokens only in memory.
+ * Uses thread-safe @Volatile variable to hold the token.
  */
 class InMemoryTokenProvider : TokenProvider {
     @Volatile
-    private var token: String? = null // メモリ上のトークン
+    private var token: String? = null // Token in memory
 
     /**
-     * 保持中のトークンを返す。
+     * Returns the held token.
      */
     override fun getToken(): String? = token
 
     /**
-     * トークンを新しい値で上書きする。
+     * Overwrites the token with a new value.
      */
     override fun update(token: String) {
         this.token = token
     }
 
     /**
-     * トークンをクリアする。
+     * Clears the token.
      */
     override fun clear() {
         this.token = null

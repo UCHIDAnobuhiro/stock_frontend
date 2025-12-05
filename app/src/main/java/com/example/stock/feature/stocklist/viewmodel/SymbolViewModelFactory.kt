@@ -2,23 +2,23 @@ package com.example.stock.feature.stocklist.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.stock.feature.stocklist.data.StockRepository
+import com.example.stock.feature.stocklist.data.repository.StockRepository
 
 /**
- * SymbolViewModelのインスタンス生成用Factoryクラス。
- * ViewModelProviderに渡して利用することで、依存性（StockRepository）を注入できる。
+ * Factory class for creating instances of SymbolViewModel.
+ * By passing it to ViewModelProvider, dependencies (StockRepository) can be injected.
  *
- * @property repo StockRepositoryのインスタンス
+ * @property repo Instance of StockRepository
  */
 class SymbolViewModelFactory(
     private val repo: StockRepository
 ) : ViewModelProvider.Factory {
     /**
-     * ViewModelのインスタンスを生成する。
+     * Creates an instance of ViewModel.
      *
-     * @param modelClass 生成するViewModelのクラス
-     * @return SymbolViewModelのインスタンス
-     * @throws IllegalArgumentException 未対応のViewModelクラスの場合
+     * @param modelClass Class of the ViewModel to create
+     * @return Instance of SymbolViewModel
+     * @throws IllegalArgumentException If the ViewModel class is not supported
      */
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SymbolViewModel::class.java)) {

@@ -1,4 +1,4 @@
-package com.example.stock.feature.auth.ui
+package com.example.stock.feature.auth.ui.login
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,13 +35,13 @@ import com.example.stock.core.ui.theme.Spacing
 import com.example.stock.feature.auth.viewmodel.AuthViewModel
 
 /**
- * ログイン画面。
+ * Login screen.
  *
- * メールアドレス・パスワード入力、パスワード表示切替、
- * ログインボタン、エラー表示、進捗インジケータなどを提供する。
+ * Provides email/password input, password visibility toggle,
+ * login button, error display, and progress indicator.
  *
- * @param viewModel 認証用ViewModel
- * @param onLoggedIn ログイン成功時のコールバック
+ * @param viewModel Authentication ViewModel
+ * @param onLoggedIn Callback invoked upon successful login
  */
 @Composable
 fun LoginScreen(
@@ -50,7 +50,7 @@ fun LoginScreen(
 ) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
 
-    // ログイン成功時に画面遷移（1回だけ）
+    // Navigate on successful login (only once)
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             if (event is AuthViewModel.UiEvent.LoggedIn) {
@@ -68,11 +68,11 @@ fun LoginScreen(
                 .padding(Spacing.ScreenLarge),
             verticalArrangement = Arrangement.Center
         ) {
-            // タイトル
+            // Title
             Text(stringResource(R.string.login), style = MaterialTheme.typography.headlineMedium)
             Spacer(Modifier.height(Spacing.ScreenLarge))
 
-            // メールアドレス入力欄
+            // Email input field
             OutlinedTextField(
                 value = ui.email,
                 onValueChange = viewModel::onEmailChange,
@@ -83,7 +83,7 @@ fun LoginScreen(
             )
             Spacer(Modifier.height(Spacing.GapSm))
 
-            // パスワード入力欄（表示切替アイコン付き）
+            // Password input field (with visibility toggle icon)
             OutlinedTextField(
                 value = ui.password,
                 onValueChange = viewModel::onPasswordChange,
@@ -107,7 +107,7 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // エラー表示
+            // Error display
             if (ui.error != null) {
                 Spacer(Modifier.height(Spacing.GapSm))
                 Text(ui.error!!, color = MaterialTheme.colorScheme.error)
@@ -115,7 +115,7 @@ fun LoginScreen(
 
             Spacer(Modifier.height(Spacing.GapMd))
 
-            // ログインボタン（進捗インジケータ付き）
+            // Login button (with progress indicator)
             Button(
                 onClick = viewModel::login,
                 enabled = !ui.isLoading,

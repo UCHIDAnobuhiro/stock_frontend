@@ -1,7 +1,7 @@
 package com.example.stock.viewmodel
 
-import com.example.stock.feature.stocklist.data.CandleDto
-import com.example.stock.feature.stocklist.data.StockRepository
+import com.example.stock.feature.stocklist.data.remote.CandleDto
+import com.example.stock.feature.stocklist.data.repository.StockRepository
 import com.example.stock.feature.chart.viewmodel.CandlesViewModel
 import com.example.stock.util.MainDispatcherRule
 import io.mockk.Runs
@@ -104,7 +104,7 @@ class CandlesViewModelTest {
             val ui = vm.ui.value
             assertFalse(ui.isLoading)
             assertNotNull(ui.error)
-            assertTrue(ui.error!!.contains("通信エラー"))
+            assertTrue(ui.error!!.contains("Communication error"))
             assertTrue(ui.items.isEmpty())
         }
 

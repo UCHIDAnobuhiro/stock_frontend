@@ -4,23 +4,23 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.stock.feature.chart.ui.ChartScreen
-import com.example.stock.feature.auth.ui.LoginScreen
-import com.example.stock.feature.stocklist.ui.StockListScreen
+import com.example.stock.feature.auth.ui.login.LoginScreen
 import com.example.stock.feature.auth.viewmodel.AuthViewModel
+import com.example.stock.feature.chart.ui.ChartScreen
 import com.example.stock.feature.chart.viewmodel.CandlesViewModel
+import com.example.stock.feature.stocklist.ui.StockListScreen
 import com.example.stock.feature.stocklist.viewmodel.SymbolViewModel
 
-// Routesは、画面遷移の識別子です。
+// Routes are identifiers for screen navigation.
 object Routes {
     const val LOGIN = "login"
     const val STOCK = "stock"
 }
 
 /**
- * アプリ全体のナビゲーショングラフを定義するComposable。
+ * Composable that defines the navigation graph for the entire application.
  *
- * @param authViewModel ログイン認証の状態管理を行う [AuthViewModel]。
+ * @param authViewModel [AuthViewModel] that manages login authentication state.
  *
  */
 @Composable
@@ -39,7 +39,7 @@ fun AppNavGraph(
             LoginScreen(
                 authViewModel,
                 onLoggedIn = {
-                    // ログイン成功で一覧画面に遷移し、戻るでログインに戻れないように消す
+                    // Navigate to stock list screen on successful login and clear the back stack so user cannot return to login
                     navController.navigate(Routes.STOCK) {
                         popUpTo(Routes.LOGIN) { inclusive = true }
                         launchSingleTop = true
@@ -52,7 +52,7 @@ fun AppNavGraph(
                 navController,
                 symbolViewModel,
                 onLogout = {
-                    // ログアウト処理
+                    // Perform logout process
                     authViewModel.logout()
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(0) { inclusive = true }

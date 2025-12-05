@@ -128,16 +128,21 @@ This project uses a **feature-based** package structure where related components
 com.example.stock/
 ├── feature/
 │   ├── auth/                    # Authentication feature
-│   │   ├── data/                # AuthRepository, AuthApi, LoginRequest/Response DTOs
-│   │   ├── ui/                  # LoginScreen, LoginUiState
+│   │   ├── data/
+│   │   │   ├── remote/          # AuthApi (Retrofit), LoginRequest/Response DTOs
+│   │   │   └── repository/      # AuthRepository
+│   │   ├── ui/
+│   │   │   └── login/           # LoginScreen, LoginUiState
 │   │   └── viewmodel/           # AuthViewModel, AuthViewModelFactory
 │   ├── stocklist/               # Stock list feature
-│   │   ├── data/                # StockRepository (symbols), StockApi, SymbolItem DTO
+│   │   ├── data/
+│   │   │   ├── remote/          # StockApi (Retrofit), SymbolItem/CandleDto DTOs
+│   │   │   └── repository/      # StockRepository
 │   │   ├── ui/                  # StockListScreen, SymbolUiState
 │   │   └── viewmodel/           # SymbolViewModel, SymbolViewModelFactory
 │   └── chart/                   # Chart display feature
-│       ├── data/                # CandlesRepository, CandleDto, CandleUiState
-│       ├── ui/                  # ChartScreen, MPAndroidChart views, ChartSync
+│       ├── ui/                  # ChartScreen, CandleUiState, MPAndroidChart views
+│       │   └── chart/           # CandleChartView, VolumeChartView, ChartSync
 │       └── viewmodel/           # CandlesViewModel, CandlesViewModelFactory
 ├── core/
 │   ├── data/                    # Shared data components
@@ -155,15 +160,47 @@ com.example.stock/
 
 ### Feature Module Organization
 
-Each feature module (`auth`, `stocklist`, `chart`) is self-contained and includes:
-- **data/**: Repository, API interface, DTOs, and domain models specific to the feature
+Each feature module (`auth`, `stocklist`, `chart`) follows a consistent structure:
+
+- **data/remote/**: Retrofit API interfaces and DTOs (data transfer objects) for network communication
+- **data/repository/**: Repository classes that coordinate data sources and business logic
 - **ui/**: Composable screens, UI state classes, and feature-specific UI components
+  - May contain subdirectories for specific screens (e.g., `auth/ui/login/`)
+  - May contain subdirectories for reusable UI components (e.g., `chart/ui/chart/`)
 - **viewmodel/**: ViewModel and ViewModelFactory for the feature
 
-This structure makes it easy to:
-- Understand all components related to a specific feature
-- Modify or extend a feature without affecting others
-- Potentially extract features into separate modules in the future
+### Recommended Package Structure Guidelines
+
+When adding new features or modifying existing ones, follow these conventions:
+
+1. **API Interfaces & DTOs** → `feature/*/data/remote/`
+   - Retrofit API interfaces
+   - Request/Response DTOs used for API communication
+   - Serializable data classes
+
+2. **Repositories** → `feature/*/data/repository/`
+   - Repository classes that orchestrate data operations
+   - Business logic and data transformation
+   - StateFlow/SharedFlow publishers
+
+3. **UI State Classes** → `feature/*/ui/`
+   - `*UiState` data classes that represent screen state
+   - Place in the same package as their corresponding screen
+
+4. **Composable Screens** → `feature/*/ui/`
+   - Main screen composables
+   - Screen-specific UI components
+   - Organize into subdirectories by screen name if needed
+
+5. **ViewModels** → `feature/*/viewmodel/`
+   - ViewModel classes
+   - ViewModelFactory classes
+
+This structure provides:
+- **Clear separation of concerns**: API/DTOs, business logic, and UI are clearly separated
+- **Easy navigation**: All components for a feature are grouped together
+- **Scalability**: New features follow the same pattern
+- **Testability**: Dependencies are clear and easy to mock
 
 ## Key Implementation Notes
 

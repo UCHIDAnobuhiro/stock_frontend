@@ -16,10 +16,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 
 /**
- * チャートのインターバル（日足・週足・月足）を選択するドロップダウン。
+ * Dropdown for selecting chart interval (daily, weekly, monthly).
  *
- * @param selected 現在選択中のインターバル（"1day"など）
- * @param onSelected インターバル選択時のコールバック
+ * @param selected Currently selected interval (e.g., "1day")
+ * @param onSelected Callback when interval is selected
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,16 +27,16 @@ fun IntervalDropDown(
     selected: String,
     onSelected: (String) -> Unit
 ) {
-    // 選択肢一覧
+    // List of options
     val options = listOf("1day", "1week", "1month")
-    // ドロップダウン展開状態
+    // Dropdown expansion state
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded }
     ) {
-        // 選択中インターバルを表示するテキストフィールド（編集不可）
+        // Text field displaying the selected interval (read-only)
         TextField(
             value = intervalLabels[selected] ?: selected,
             onValueChange = {},
@@ -48,7 +48,7 @@ fun IntervalDropDown(
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                 .fillMaxWidth()
         )
-        // ドロップダウンメニュー本体
+        // Dropdown menu body
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
@@ -57,8 +57,8 @@ fun IntervalDropDown(
                 DropdownMenuItem(
                     text = { Text(intervalLabels[option] ?: option) },
                     onClick = {
-                        onSelected(option) // 選択時にコールバック
-                        expanded = false  // メニューを閉じる
+                        onSelected(option) // Call callback on selection
+                        expanded = false  // Close menu
                     }
                 )
             }
@@ -66,9 +66,9 @@ fun IntervalDropDown(
     }
 }
 
-// インターバルのラベル表示用マップ
+// Map for interval label display
 private val intervalLabels = mapOf(
-    "1day" to "日足",
-    "1week" to "週足",
-    "1month" to "月足"
+    "1day" to "Daily",
+    "1week" to "Weekly",
+    "1month" to "Monthly"
 )

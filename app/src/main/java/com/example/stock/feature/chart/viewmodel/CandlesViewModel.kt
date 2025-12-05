@@ -2,9 +2,9 @@ package com.example.stock.feature.chart.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.stock.feature.chart.data.CandleUiState
-import com.example.stock.feature.stocklist.data.CandleDto
-import com.example.stock.feature.stocklist.data.StockRepository
+import com.example.stock.feature.chart.ui.CandleUiState
+import com.example.stock.feature.stocklist.data.remote.CandleDto
+import com.example.stock.feature.stocklist.data.repository.StockRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,16 +16,17 @@ import java.io.IOException
 
 
 /**
- * UI表示用のローソク足データモデル。
+ * Candlestick data model for UI display.
  *
- *  * APIレスポンスのDTOを直接UIに渡さず、UI用に整形された軽量データ構造を定義する。
+ *  * Instead of directly passing the DTO from the API response to the UI,
+ *  * a lightweight data structure formatted for UI consumption is defined.
  *  *
- *  * @property time 日時（例: "2025-11-03"）
- *  * @property open 始値
- *  * @property high 高値
- *  * @property low 安値
- *  * @property close 終値
- *  * @property volume 出来高
+ *  * @property time Date and time (e.g., "2025-11-03")
+ *  * @property open Opening price
+ *  * @property high High price
+ *  * @property low Low price
+ *  * @property close Closing price
+ *  * @property volume Trading volume
  */
 data class CandleItem(
     val time: String,
@@ -37,13 +38,14 @@ data class CandleItem(
 )
 
 /**
- * 株価のローソク足データを管理するViewModel。
+ * ViewModel that manages candlestick data for stock prices.
  *
- * Repository からローソク足データを取得し、UIで利用しやすい状態として StateFlow で公開する。
- * また、読み込み中・エラー・データなどの UI 状態を一元的に保持する。
+ * Fetches candlestick data from the Repository and exposes it via StateFlow
+ * in a state that is easy to use in the UI.
+ * Additionally, centrally manages UI state such as loading, error, and data.
  *
- * @property repo 株価データ取得用のリポジトリ
- * @property io I/O 処理を行うためのコルーチンディスパッチャ
+ * @property repo Repository for fetching stock price data
+ * @property io Coroutine dispatcher for performing I/O operations
  */
 class CandlesViewModel(
     private val repo: StockRepository,
@@ -54,26 +56,27 @@ class CandlesViewModel(
 
 
     /**
-     * 現在実行中のデータ取得ジョブ。
+     * Currently executing data fetch job.
      */
     private var loadJob: Job? = null
 
     /**
-     * 指定した銘柄コード・間隔・取得件数でローソク足データを取得する。
+     * Fetches candlestick data for the specified stock code, interval, and quantity.
      *
-     * 処理中は UI を読み込み状態に更新し、成功時は CandleDto を CandleItem に変換して反映する。
-     * エラー発生時はエラーメッセージを UI に通知する。
+     * During processing, updates the UI to a loading state, and on success,
+     * converts CandleDto to CandleItem and applies it.
+     * When an error occurs, notifies the UI with an error message.
      *
-     * @param code 銘柄コード
-     * @param interval データ取得間隔（例: "1day"）
-     * @param outputsize 取得件数（デフォルト: 200）
+     * @param code Stock code
+     * @param interval Data fetch interval (e.g., "1day")
+     * @param outputsize Number of records to fetch (default: 200)
      */
     fun load(code: String, interval: String = "1day", outputsize: Int = 200) {
         if (code.isBlank()) {
-            _ui.update { it.copy(error = "銘柄コードが空です") }
+            _ui.update { it.copy(error = "Stock code is empty") }
             return
         }
-        // 前回実行中のジョブをキャンセルし、最新のリクエストのみを有効にする
+        // Cancel the previous job and keep only the latest request active
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
             _ui.update { it.copy(isLoading = true, error = null) }
@@ -88,9 +91,9 @@ class CandlesViewModel(
                     }
             }.onFailure { e ->
                 val msg = when (e) {
-                    is IOException -> "通信エラー。ネットワークを確認してください。"
-                    is HttpException -> "サーバーエラー: ${e.code()}"
-                    else -> "不明なエラー: ${e.message}"
+                    is IOException -> "Communication error. Please check your network."
+                    is HttpException -> "Server error: ${e.code()}"
+                    else -> "Unknown error: ${e.message}"
                 }
                 _ui.update { it.copy(isLoading = false, error = msg) }
             }
@@ -98,9 +101,9 @@ class CandlesViewModel(
     }
 
     /**
-     * 保持しているローソク足データをクリアする。
+     * Clears the candlestick data being held.
      *
-     * 実行中のジョブをキャンセルし、リポジトリと UI 状態を初期化する。
+     * Cancels the executing job and initializes the repository and UI state.
      */
     fun clear() {
         loadJob?.cancel()
@@ -109,10 +112,10 @@ class CandlesViewModel(
     }
 
     /**
-     * DTO を UI 表示用モデルに変換する。
+     * Converts DTO to UI display model.
      *
-     * @receiver CandleDto API レスポンスモデル
-     * @return CandleItem UI 用の軽量モデル
+     * @receiver CandleDto API response model
+     * @return CandleItem Lightweight model for UI
      */
     private fun CandleDto.toUi() = CandleItem(
         time = time, open = open, high = high, low = low, close = close, volume = volume

@@ -5,7 +5,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-/** テキストスケール（spはTypography経由で使う） */
+/** Text scales (sp should be used via Typography) */
 val AppTypography = Typography(
     headlineMedium = TextStyle(
         fontSize = 24.sp,
