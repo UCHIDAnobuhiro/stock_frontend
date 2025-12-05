@@ -5,46 +5,46 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 /**
- * 株価ローソク足データを表すDTO。
+ * Data Transfer Object representing stock candlestick data.
  *
- * @property time 日付（"YYYY-MM-DD"）
- * @property open 始値
- * @property high 高値
- * @property low 安値
- * @property close 終値
- * @property volume 出来高
+ * @property time Date in "YYYY-MM-DD" format
+ * @property open Opening price
+ * @property high High price
+ * @property low Low price
+ * @property close Closing price
+ * @property volume Trading volume
  */
 @Serializable
 data class CandleDto(
     val time: String,  // "YYYY-MM-DD"
-    val open: Double,  // 始値
-    val high: Double,  // 高値
-    val low: Double,   // 安値
-    val close: Double, // 終値
-    val volume: Long   // 出来高
+    val open: Double,  // Opening price
+    val high: Double,  // High price
+    val low: Double,   // Low price
+    val close: Double, // Closing price
+    val volume: Long   // Trading volume
 )
 
 /**
- * 株価情報APIとの通信を定義するRetrofitインターフェース。
+ * Retrofit interface defining communication with the stock information API.
  *
- * 銘柄リストやローソク足データの取得APIを提供する。
+ * Provides APIs for retrieving symbol lists and candlestick data.
  */
 interface StockApi {
     /**
-     * 銘柄リストを取得するAPI。
+     * API for fetching the list of symbols.
      *
-     * @return 銘柄情報のリスト
+     * @return List of symbol information
      */
     @GET("symbols")
     suspend fun getSymbols(): List<SymbolItem>
 
     /**
-     * 指定した銘柄コードのローソク足データを取得するAPI。
+     * API for fetching candlestick data for a specified symbol code.
      *
-     * @param code 銘柄コード
-     * @param interval データ取得間隔（例: "1day"）
-     * @param outputsize 取得件数（デフォルト: 200）
-     * @return ローソク足データのリスト
+     * @param code Symbol code
+     * @param interval Data fetching interval (e.g., "1day")
+     * @param outputsize Number of data points to fetch (default: 200)
+     * @return List of candlestick data
      */
     @GET("candles/{code}")
     suspend fun getCandles(

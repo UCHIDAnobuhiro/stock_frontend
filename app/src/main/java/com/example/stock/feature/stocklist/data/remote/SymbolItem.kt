@@ -3,13 +3,13 @@ package com.example.stock.feature.stocklist.data.remote
 import kotlinx.serialization.Serializable
 
 /**
- * 銘柄情報を表すデータクラス。
+ * Data class representing symbol information.
  *
- * @property code 銘柄コード
- * @property name 銘柄名
+ * @property code Symbol code
+ * @property name Symbol name
  */
 @Serializable
 data class SymbolItem(
-    val code: String, // 銘柄コード（例: "7203"）
-    val name: String  // 銘柄名（例: "トヨタ自動車"）
+    val code: String, // Symbol code (e.g., "7203")
+    val name: String  // Symbol name (e.g., "Toyota Motor")
 )
