@@ -62,7 +62,7 @@ class AuthViewModelTest {
 
         // 具体的なエラーメッセージを確認
         assertThat(viewModel.ui.value.error)
-            .isEqualTo("メールアドレスとパスワードを入力してください")
+            .isEqualTo("Please enter email address and password")
 
         // onEmailChangeで修正 → エラーがクリアされることを確認
         viewModel.onEmailChange("test@example.com")
@@ -81,7 +81,7 @@ class AuthViewModelTest {
 
         // 具体的なエラーメッセージを確認
         assertThat(viewModel.ui.value.error)
-            .isEqualTo("メールアドレスとパスワードを入力してください")
+            .isEqualTo("Please enter email address and password")
 
         // onEmailChangeで修正 → エラーがクリアされることを確認
         viewModel.onPasswordChange("secret123")
@@ -146,7 +146,7 @@ class AuthViewModelTest {
         viewModel.login()
         advanceUntilIdle()
 
-        assertThat(viewModel.ui.value.error).isEqualTo("メールアドレスの形式が不正です")
+        assertThat(viewModel.ui.value.error).isEqualTo("Invalid email address format")
         coVerify(exactly = 0) { repository.login(any(), any()) }
     }
 
@@ -189,7 +189,7 @@ class AuthViewModelTest {
         advanceUntilIdle()
 
         assertThat(viewModel.ui.value.isLoading).isFalse()
-        assertThat(viewModel.ui.value.error).isEqualTo("メールアドレスまたはパスワードが間違っています")
+        assertThat(viewModel.ui.value.error).isEqualTo("Email address or password is incorrect")
         coVerify(exactly = 1) { repository.login("test@example.com", "password") }
     }
 
@@ -202,7 +202,7 @@ class AuthViewModelTest {
         viewModel.login()
         advanceUntilIdle()
 
-        assertThat(viewModel.ui.value.error).isEqualTo("HTTPエラー: 500")
+        assertThat(viewModel.ui.value.error).isEqualTo("HTTP error: 500")
         coVerify(exactly = 1) { repository.login("test@example.com", "password") }
     }
 
@@ -215,7 +215,7 @@ class AuthViewModelTest {
         viewModel.login()
         advanceUntilIdle()
 
-        assertThat(viewModel.ui.value.error).isEqualTo("通信エラー: ネットワークを確認してください")
+        assertThat(viewModel.ui.value.error).isEqualTo("Network error: Please check your connection")
         coVerify(exactly = 1) { repository.login("test@example.com", "password") }
     }
 
@@ -228,7 +228,7 @@ class AuthViewModelTest {
         viewModel.login()
         advanceUntilIdle()
 
-        assertThat(viewModel.ui.value.error).isEqualTo("JSONエラー: レスポンス形式が不正です")
+        assertThat(viewModel.ui.value.error).isEqualTo("JSON error: Invalid response format")
         coVerify(exactly = 1) { repository.login("test@example.com", "password") }
     }
 

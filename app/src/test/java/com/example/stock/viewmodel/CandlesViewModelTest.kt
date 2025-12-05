@@ -104,7 +104,7 @@ class CandlesViewModelTest {
             val ui = vm.ui.value
             assertFalse(ui.isLoading)
             assertNotNull(ui.error)
-            assertTrue(ui.error!!.contains("通信エラー"))
+            assertTrue(ui.error!!.contains("Communication error"))
             assertTrue(ui.items.isEmpty())
         }
 
