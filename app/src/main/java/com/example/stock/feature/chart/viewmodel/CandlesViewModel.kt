@@ -2,7 +2,7 @@ package com.example.stock.feature.chart.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.stock.feature.chart.data.CandleUiState
+import com.example.stock.feature.chart.ui.CandleUiState
 import com.example.stock.feature.stocklist.data.remote.CandleDto
 import com.example.stock.feature.stocklist.data.repository.StockRepository
 import kotlinx.coroutines.Job

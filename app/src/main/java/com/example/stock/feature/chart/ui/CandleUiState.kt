@@ -1,4 +1,4 @@
-package com.example.stock.feature.chart.data
+package com.example.stock.feature.chart.ui
 
 import com.example.stock.feature.chart.viewmodel.CandleItem
 
