@@ -43,10 +43,10 @@ import com.example.stock.core.ui.theme.Spacing
 import com.example.stock.feature.auth.viewmodel.LoginViewModel
 
 /**
- * Login screen.
+ * Login screen with ViewModel.
  *
- * Provides email/password input, password visibility toggle,
- * login button, error display, and progress indicator.
+ * Wrapper composable that connects [LoginViewModel] to [LoginScreenContent].
+ * Handles event collection and state observation.
  *
  * @param viewModel Login ViewModel
  * @param onLoggedIn Callback invoked upon successful login
@@ -59,8 +59,6 @@ fun LoginScreen(
     onNavigateToSignup: () -> Unit,
 ) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
-    val passwordFocusRequester = remember { FocusRequester() }
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     // Navigate on successful login (only once)
     LaunchedEffect(viewModel) {
@@ -70,6 +68,41 @@ fun LoginScreen(
             }
         }
     }
+
+    LoginScreenContent(
+        uiState = ui,
+        onEmailChange = viewModel::onEmailChange,
+        onPasswordChange = viewModel::onPasswordChange,
+        onTogglePassword = viewModel::togglePassword,
+        onLogin = viewModel::login,
+        onNavigateToSignup = onNavigateToSignup
+    )
+}
+
+/**
+ * Stateless login screen content.
+ *
+ * Provides email/password input, password visibility toggle,
+ * login button, error display, and progress indicator.
+ *
+ * @param uiState Current UI state
+ * @param onEmailChange Callback when email input changes
+ * @param onPasswordChange Callback when password input changes
+ * @param onTogglePassword Callback to toggle password visibility
+ * @param onLogin Callback to execute login
+ * @param onNavigateToSignup Callback to navigate to signup screen
+ */
+@Composable
+fun LoginScreenContent(
+    uiState: LoginUiState,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onTogglePassword: () -> Unit,
+    onLogin: () -> Unit,
+    onNavigateToSignup: () -> Unit,
+) {
+    val passwordFocusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -86,8 +119,8 @@ fun LoginScreen(
 
             // Email input field
             OutlinedTextField(
-                value = ui.email,
-                onValueChange = viewModel::onEmailChange,
+                value = uiState.email,
+                onValueChange = onEmailChange,
                 label = { Text(stringResource(R.string.mail)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
@@ -103,8 +136,8 @@ fun LoginScreen(
 
             // Password input field (with visibility toggle icon)
             OutlinedTextField(
-                value = ui.password,
-                onValueChange = viewModel::onPasswordChange,
+                value = uiState.password,
+                onValueChange = onPasswordChange,
                 label = { Text(stringResource(R.string.password)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
@@ -114,19 +147,19 @@ fun LoginScreen(
                 keyboardActions = KeyboardActions(
                     onDone = {
                         keyboardController?.hide()
-                        viewModel.login()
+                        onLogin()
                     }
                 ),
-                visualTransformation = if (ui.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    IconButton(onClick = viewModel::togglePassword) {
+                    IconButton(onClick = onTogglePassword) {
                         Icon(
-                            imageVector = if (ui.isPasswordVisible) {
+                            imageVector = if (uiState.isPasswordVisible) {
                                 Icons.Default.Visibility
                             } else {
                                 Icons.Default.VisibilityOff
                             },
-                            contentDescription = if (ui.isPasswordVisible) stringResource(R.string.hide) else stringResource(
+                            contentDescription = if (uiState.isPasswordVisible) stringResource(R.string.hide) else stringResource(
                                 R.string.show
                             )
                         )
@@ -138,7 +171,7 @@ fun LoginScreen(
             )
 
             // Error display
-            ui.error?.let { error ->
+            uiState.error?.let { error ->
                 Spacer(Modifier.height(Spacing.GapSm))
                 Text(error, color = MaterialTheme.colorScheme.error)
             }
@@ -147,11 +180,11 @@ fun LoginScreen(
 
             // Login button (with progress indicator)
             Button(
-                onClick = viewModel::login,
-                enabled = !ui.isLoading,
+                onClick = onLogin,
+                enabled = !uiState.isLoading,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if (ui.isLoading) CircularProgressIndicator(
+                if (uiState.isLoading) CircularProgressIndicator(
                     strokeWidth = Sizes.Border,
                     modifier = Modifier.size(Sizes.IconSm)
                 )
@@ -163,7 +196,7 @@ fun LoginScreen(
             // Navigate to signup
             TextButton(
                 onClick = onNavigateToSignup,
-                enabled = !ui.isLoading,
+                enabled = !uiState.isLoading,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text(stringResource(R.string.no_account_signup))
