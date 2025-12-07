@@ -137,6 +137,7 @@ fun LoginScreen(
             // Navigate to signup
             TextButton(
                 onClick = onNavigateToSignup,
+                enabled = !ui.isLoading,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text(stringResource(R.string.no_account_signup))
