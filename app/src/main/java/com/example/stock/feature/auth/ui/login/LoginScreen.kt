@@ -112,9 +112,9 @@ fun LoginScreen(
             )
 
             // Error display
-            if (ui.error != null) {
+            ui.error?.let { error ->
                 Spacer(Modifier.height(Spacing.GapSm))
-                Text(ui.error!!, color = MaterialTheme.colorScheme.error)
+                Text(error, color = MaterialTheme.colorScheme.error)
             }
 
             Spacer(Modifier.height(Spacing.GapMd))
