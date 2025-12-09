@@ -11,7 +11,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
+import retrofit2.HttpException
 import timber.log.Timber
+import java.io.IOException
 
 /**
  * Manages login processing and login screen state for [ViewModel].
@@ -81,7 +84,13 @@ class LoginViewModel(private val repo: AuthRepository) : ViewModel() {
             runCatching { repo.login(email, password) }
                 .onSuccess { _events.emit(UiEvent.LoggedIn) }
                 .onFailure { e ->
-                    Timber.e(e, "Login failed")
+                    val logMessage = when (e) {
+                        is HttpException -> "HTTP error: ${e.code()} - ${e.message()}"
+                        is IOException -> "Network error: ${e.message}"
+                        is SerializationException -> "JSON parse error: ${e.message}"
+                        else -> "Unknown error: ${e.message}"
+                    }
+                    Timber.e(e, "Login failed: $logMessage")
                     _ui.update { it.copy(errorResId = R.string.error_login_failed) }
                 }
             _ui.update { it.copy(isLoading = false) }
