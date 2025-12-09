@@ -24,11 +24,14 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+@RunWith(RobolectricTestRunner::class)
 class LoginViewModelTest {
     @get:Rule
     val mainRule = MainDispatcherRule()

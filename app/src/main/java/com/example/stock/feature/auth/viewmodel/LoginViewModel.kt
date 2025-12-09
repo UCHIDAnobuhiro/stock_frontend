@@ -103,7 +103,7 @@ class LoginViewModel(private val repo: AuthRepository) : ViewModel() {
      */
     private fun validate(email: String, password: String): String? = when {
         email.isBlank() || password.isBlank() -> "Please enter email address and password"
-        !email.contains("@") -> "Invalid email address format"
+        !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "Invalid email address format"
         password.length < 8 -> "Password must be at least 8 characters"
         else -> null
     }

@@ -89,4 +89,5 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.okhttp.logging.interceptor)
     testImplementation(libs.truth)
+    testImplementation(libs.robolectric)
 }
