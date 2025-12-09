@@ -5,6 +5,8 @@ import com.example.stock.core.data.auth.TokenProvider
 import com.example.stock.core.data.local.TokenStore
 import com.example.stock.feature.auth.data.remote.AuthApi
 import com.example.stock.feature.auth.data.repository.AuthRepository
+import com.example.stock.feature.stocklist.data.remote.StockApi
+import com.example.stock.feature.stocklist.data.repository.StockRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -43,5 +45,16 @@ object DataModule {
         tokenProvider: TokenProvider
     ): AuthRepository {
         return AuthRepository(api, tokenStore, tokenProvider)
+    }
+
+    /**
+     * Provides a singleton instance of StockRepository.
+     */
+    @Provides
+    @Singleton
+    fun provideStockRepository(
+        stockApi: StockApi
+    ): StockRepository {
+        return StockRepository(stockApi)
     }
 }

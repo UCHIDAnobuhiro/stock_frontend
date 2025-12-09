@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.stock.feature.chart.ui.CandleUiState
 import com.example.stock.feature.stocklist.data.remote.CandleDto
 import com.example.stock.feature.stocklist.data.repository.StockRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
 
 
 /**
@@ -45,10 +47,10 @@ data class CandleItem(
  * Additionally, centrally manages UI state such as loading, error, and data.
  *
  * @property repo Repository for fetching stock price data
- * @property io Coroutine dispatcher for performing I/O operations
  */
-class CandlesViewModel(
-    private val repo: StockRepository,
+@HiltViewModel
+class CandlesViewModel @Inject constructor(
+    private val repo: StockRepository
 ) : ViewModel() {
 
     private val _ui = MutableStateFlow(CandleUiState())

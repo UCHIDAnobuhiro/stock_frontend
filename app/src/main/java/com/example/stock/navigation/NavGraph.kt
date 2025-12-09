@@ -23,17 +23,9 @@ object Routes {
 
 /**
  * Composable that defines the navigation graph for the entire application.
- *
- * @param signupViewModel [SignupViewModel] that manages signup authentication state.
- * @param symbolViewModel [SymbolViewModel] that manages stock symbol list state.
- * @param candlesViewModel [CandlesViewModel] that manages candlestick chart data state.
  */
 @Composable
-fun AppNavGraph(
-    signupViewModel: SignupViewModel,
-    symbolViewModel: SymbolViewModel,
-    candlesViewModel: CandlesViewModel
-) {
+fun AppNavGraph() {
     val navController = rememberNavController()
 
     NavHost(
@@ -56,7 +48,6 @@ fun AppNavGraph(
         }
         composable(Routes.SIGNUP) {
             SignupScreen(
-                signupViewModel,
                 onSignedUp = {
                     // Navigate back to login screen on successful signup
                     navController.popBackStack()
@@ -68,6 +59,7 @@ fun AppNavGraph(
         }
         composable(Routes.STOCK) {
             val loginViewModel: LoginViewModel = hiltViewModel()
+            val symbolViewModel: SymbolViewModel = hiltViewModel()
             StockListScreen(
                 navController,
                 symbolViewModel,
@@ -84,6 +76,7 @@ fun AppNavGraph(
             val name = backStackEntry.arguments?.getString("name") ?: return@composable
             val code = backStackEntry.arguments?.getString("code") ?: return@composable
             val loginViewModel: LoginViewModel = hiltViewModel()
+            val candlesViewModel: CandlesViewModel = hiltViewModel()
             ChartScreen(
                 navController,
                 name,
