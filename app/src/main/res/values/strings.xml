@@ -14,13 +14,19 @@
     <string name="logout">ログアウト</string>
     <string name="no_account_signup">アカウントをお持ちでない方はこちら</string>
 
+    <!--ログインエラー-->
+    <string name="error_empty_fields">メールアドレスとパスワードを入力してください</string>
+    <string name="error_invalid_email">メールアドレスの形式が正しくありません</string>
+    <string name="error_password_too_short">パスワードは8文字以上で入力してください</string>
+    <string name="error_login_failed">ログインに失敗しました</string>
+
     <!--サインアップ-->
     <string name="signup">新規登録</string>
     <string name="confirm_password">パスワード確認</string>
     <string name="already_have_account">アカウントをお持ちですか？</string>
 
     <string name="reload">再読み込み</string>
-    <string name="loading">Loading</string>
+    <string name="loading">読み込み中</string>
     <string name="no_symbols">銘柄がありません</string>
 
 </resources>

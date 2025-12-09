@@ -11,6 +11,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.stock.R
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -156,11 +157,9 @@ class LoginScreenContentTest {
 
     @Test
     fun errorState_displaysErrorMessage() {
-        val errorMessage = "Invalid email address format"
-
         composeTestRule.setContent {
             LoginScreenContent(
-                uiState = LoginUiState(error = errorMessage),
+                uiState = LoginUiState(errorResId = R.string.error_invalid_email),
                 onEmailChange = {},
                 onPasswordChange = {},
                 onTogglePassword = {},
@@ -169,7 +168,7 @@ class LoginScreenContentTest {
             )
         }
 
-        composeTestRule.onNodeWithText(errorMessage).assertIsDisplayed()
+        composeTestRule.onNodeWithText("メールアドレスの形式が正しくありません").assertIsDisplayed()
     }
 
     @Test

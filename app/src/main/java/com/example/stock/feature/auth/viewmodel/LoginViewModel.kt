@@ -2,6 +2,7 @@ package com.example.stock.feature.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.stock.R
 import com.example.stock.feature.auth.data.repository.AuthRepository
 import com.example.stock.feature.auth.ui.login.LoginUiState
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
+import timber.log.Timber
 import java.io.IOException
 
 /**
@@ -30,6 +32,7 @@ class LoginViewModel(private val repo: AuthRepository) : ViewModel() {
 
     sealed interface UiEvent {
         data object LoggedIn : UiEvent
+        data object LoggedOut : UiEvent
     }
 
     private val _events = MutableSharedFlow<UiEvent>(replay = 0, extraBufferCapacity = 1)
@@ -40,7 +43,7 @@ class LoginViewModel(private val repo: AuthRepository) : ViewModel() {
      * @param email The entered email address
      */
     fun onEmailChange(email: String) {
-        _ui.update { it.copy(email = email, error = null) }
+        _ui.update { it.copy(email = email, errorResId = null) }
     }
 
     /**
@@ -48,7 +51,7 @@ class LoginViewModel(private val repo: AuthRepository) : ViewModel() {
      * @param password The entered password
      */
     fun onPasswordChange(password: String) {
-        _ui.update { it.copy(password = password, error = null) }
+        _ui.update { it.copy(password = password, errorResId = null) }
     }
 
     /**
@@ -70,26 +73,25 @@ class LoginViewModel(private val repo: AuthRepository) : ViewModel() {
 
         val (email, password) = _ui.value.let { it.email to it.password }
 
-        validate(email, password)?.let { msg ->
-            _ui.update { it.copy(error = msg) }
+        validate(email, password)?.let { errorResId ->
+            _ui.update { it.copy(errorResId = errorResId) }
             return
         }
 
         // Perform login asynchronously
         viewModelScope.launch {
-            _ui.update { it.copy(isLoading = true, error = null) }
+            _ui.update { it.copy(isLoading = true, errorResId = null) }
             runCatching { repo.login(email, password) }
                 .onSuccess { _events.emit(UiEvent.LoggedIn) }
                 .onFailure { e ->
-                    val msg = when (e) {
-                        is HttpException ->
-                            if (e.code() == 401) "Email address or password is incorrect" else "HTTP error: ${e.code()}"
-
-                        is IOException -> "Network error: Please check your connection"
-                        is SerializationException -> "JSON error: Invalid response format"
+                    val logMessage = when (e) {
+                        is HttpException -> "HTTP error: ${e.code()} - ${e.message()}"
+                        is IOException -> "Network error: ${e.message}"
+                        is SerializationException -> "JSON parse error: ${e.message}"
                         else -> "Unknown error: ${e.message}"
                     }
-                    _ui.update { it.copy(error = msg) }
+                    Timber.e(e, "Login failed: $logMessage")
+                    _ui.update { it.copy(errorResId = R.string.error_login_failed) }
                 }
             _ui.update { it.copy(isLoading = false) }
         }
@@ -100,21 +102,26 @@ class LoginViewModel(private val repo: AuthRepository) : ViewModel() {
      *
      * @param email The entered email address
      * @param password The entered password
+     * @return Error message resource ID if validation fails, null if valid
      */
-    private fun validate(email: String, password: String): String? = when {
-        email.isBlank() || password.isBlank() -> "Please enter email address and password"
-        !email.contains("@") -> "Invalid email address format"
-        password.length < 8 -> "Password must be at least 8 characters"
+    private fun validate(email: String, password: String): Int? = when {
+        email.isBlank() || password.isBlank() -> R.string.error_empty_fields
+        !android.util.Patterns.EMAIL_ADDRESS.matcher(email)
+            .matches() -> R.string.error_invalid_email
+
+        password.length < 8 -> R.string.error_password_too_short
         else -> null
     }
 
     /**
-     * Executes logout processing
+     * Executes logout processing and resets UI state to initial values.
+     * Emits [UiEvent.LoggedOut] event upon completion.
      */
     fun logout() {
         viewModelScope.launch {
             repo.logout()
-            _ui.update { it.copy(email = "", password = "") }
+            _ui.value = LoginUiState()
+            _events.emit(UiEvent.LoggedOut)
         }
     }
 }

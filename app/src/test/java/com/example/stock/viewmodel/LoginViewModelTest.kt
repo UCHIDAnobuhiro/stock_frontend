@@ -1,5 +1,6 @@
 package com.example.stock.viewmodel
 
+import com.example.stock.R
 import com.example.stock.feature.auth.data.remote.LoginResponse
 import com.example.stock.feature.auth.data.repository.AuthRepository
 import com.example.stock.feature.auth.viewmodel.LoginViewModel
@@ -17,18 +18,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
-import kotlinx.serialization.SerializationException
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+@RunWith(RobolectricTestRunner::class)
 class LoginViewModelTest {
     @get:Rule
     val mainRule = MainDispatcherRule()
@@ -60,15 +63,15 @@ class LoginViewModelTest {
         viewModel.onPasswordChange("")
         viewModel.login()
 
-        // 具体的なエラーメッセージを確認
-        assertThat(viewModel.ui.value.error)
-            .isEqualTo("Please enter email address and password")
+        // エラーが設定されていることを確認
+        assertThat(viewModel.ui.value.errorResId)
+            .isEqualTo(R.string.error_empty_fields)
 
         // onEmailChangeで修正 → エラーがクリアされることを確認
         viewModel.onEmailChange("test@example.com")
 
         assertThat(viewModel.ui.value.email).isEqualTo("test@example.com")
-        assertThat(viewModel.ui.value.error).isNull()
+        assertThat(viewModel.ui.value.errorResId).isNull()
     }
 
 
@@ -79,15 +82,15 @@ class LoginViewModelTest {
         viewModel.onPasswordChange("")
         viewModel.login()
 
-        // 具体的なエラーメッセージを確認
-        assertThat(viewModel.ui.value.error)
-            .isEqualTo("Please enter email address and password")
+        // エラーが設定されていることを確認
+        assertThat(viewModel.ui.value.errorResId)
+            .isEqualTo(R.string.error_empty_fields)
 
         // onPasswordChangeで修正 → エラーがクリアされることを確認
         viewModel.onPasswordChange("secret123")
 
         assertThat(viewModel.ui.value.password).isEqualTo("secret123")
-        assertThat(viewModel.ui.value.error).isNull()
+        assertThat(viewModel.ui.value.errorResId).isNull()
     }
 
     @Test
@@ -135,7 +138,7 @@ class LoginViewModelTest {
             viewModel.onPasswordChange("")
             viewModel.login()
 
-            assertThat(viewModel.ui.value.error).isNotEmpty()
+            assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_empty_fields)
             coVerify(exactly = 0) { repository.login(any(), any()) }
         }
 
@@ -146,7 +149,18 @@ class LoginViewModelTest {
         viewModel.login()
         advanceUntilIdle()
 
-        assertThat(viewModel.ui.value.error).isEqualTo("Invalid email address format")
+        assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_invalid_email)
+        coVerify(exactly = 0) { repository.login(any(), any()) }
+    }
+
+    @Test
+    fun `login validation - short password blocks`() = runTest(mainRule.scheduler) {
+        viewModel.onEmailChange("test@example.com")
+        viewModel.onPasswordChange("short")
+        viewModel.login()
+        advanceUntilIdle()
+
+        assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_password_too_short)
         coVerify(exactly = 0) { repository.login(any(), any()) }
     }
 
@@ -171,7 +185,7 @@ class LoginViewModelTest {
         advanceUntilIdle()
 
         assertThat(viewModel.ui.value.isLoading).isFalse()
-        assertThat(viewModel.ui.value.error).isNull()
+        assertThat(viewModel.ui.value.errorResId).isNull()
         assertThat(received).isEqualTo(LoginViewModel.UiEvent.LoggedIn)
 
         job.cancelAndJoin()
@@ -180,7 +194,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `login failure - http 401 maps to credential message`() = runTest(mainRule.scheduler) {
+    fun `login failure - sets generic error message`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password")
         coEvery { repository.login(any(), any()) } throws httpError(401)
@@ -189,25 +203,12 @@ class LoginViewModelTest {
         advanceUntilIdle()
 
         assertThat(viewModel.ui.value.isLoading).isFalse()
-        assertThat(viewModel.ui.value.error).isEqualTo("Email address or password is incorrect")
+        assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_login_failed)
         coVerify(exactly = 1) { repository.login("test@example.com", "password") }
     }
 
     @Test
-    fun `login failure - http 500 shows http code`() = runTest(mainRule.scheduler) {
-        viewModel.onEmailChange("test@example.com")
-        viewModel.onPasswordChange("password")
-        coEvery { repository.login(any(), any()) } throws httpError(500)
-
-        viewModel.login()
-        advanceUntilIdle()
-
-        assertThat(viewModel.ui.value.error).isEqualTo("HTTP error: 500")
-        coVerify(exactly = 1) { repository.login("test@example.com", "password") }
-    }
-
-    @Test
-    fun `login failure - io maps to network message`() = runTest(mainRule.scheduler) {
+    fun `login failure - network error sets generic error message`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password")
         coEvery { repository.login(any(), any()) } throws IOException("timeout")
@@ -215,28 +216,53 @@ class LoginViewModelTest {
         viewModel.login()
         advanceUntilIdle()
 
-        assertThat(viewModel.ui.value.error).isEqualTo("Network error: Please check your connection")
+        assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_login_failed)
         coVerify(exactly = 1) { repository.login("test@example.com", "password") }
     }
 
     @Test
-    fun `login failure - serialization maps to json message`() = runTest(mainRule.scheduler) {
-        viewModel.onEmailChange("test@example.com")
-        viewModel.onPasswordChange("password")
-        coEvery { repository.login(any(), any()) } throws SerializationException("bad json")
+    fun `logout calls repository and emits LoggedOut event`() = runTest(mainRule.scheduler) {
+        var received: LoginViewModel.UiEvent? = null
+        val job: Job = launch {
+            received = viewModel.events.first()
+        }
 
-        viewModel.login()
-        advanceUntilIdle()
-
-        assertThat(viewModel.ui.value.error).isEqualTo("JSON error: Invalid response format")
-        coVerify(exactly = 1) { repository.login("test@example.com", "password") }
-    }
-
-    @Test
-    fun `logout calls repository`() = runTest(mainRule.scheduler) {
         viewModel.logout()
         advanceUntilIdle()
 
+        assertThat(received).isEqualTo(LoginViewModel.UiEvent.LoggedOut)
+        job.cancelAndJoin()
+
+        coVerify(exactly = 1) { repository.logout() }
+    }
+
+    @Test
+    fun `logout resets all UI state to initial values`() = runTest(mainRule.scheduler) {
+        // Set up non-default state
+        viewModel.onEmailChange("test@example.com")
+        viewModel.onPasswordChange("password123")
+        viewModel.togglePassword()
+        viewModel.login() // This will set an error since repo is mocked
+        advanceUntilIdle()
+
+        // Verify state is modified
+        assertThat(viewModel.ui.value.email).isNotEmpty()
+        assertThat(viewModel.ui.value.password).isNotEmpty()
+        assertThat(viewModel.ui.value.isPasswordVisible).isTrue()
+
+        // Logout
+        viewModel.logout()
+        advanceUntilIdle()
+
+        // Verify all state is reset to initial values
+        val state = viewModel.ui.value
+        assertThat(state.email).isEmpty()
+        assertThat(state.password).isEmpty()
+        assertThat(state.isPasswordVisible).isFalse()
+        assertThat(state.isLoading).isFalse()
+        assertThat(state.errorResId).isNull()
+
+        coVerify(exactly = 1) { repository.login("test@example.com", "password123") }
         coVerify(exactly = 1) { repository.logout() }
     }
 }
