@@ -236,9 +236,17 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `logout calls repository`() = runTest(mainRule.scheduler) {
+    fun `logout calls repository and emits LoggedOut event`() = runTest(mainRule.scheduler) {
+        var received: LoginViewModel.UiEvent? = null
+        val job: Job = launch {
+            received = viewModel.events.first()
+        }
+
         viewModel.logout()
         advanceUntilIdle()
+
+        assertThat(received).isEqualTo(LoginViewModel.UiEvent.LoggedOut)
+        job.cancelAndJoin()
 
         coVerify(exactly = 1) { repository.logout() }
     }

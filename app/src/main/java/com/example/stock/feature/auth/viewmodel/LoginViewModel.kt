@@ -30,6 +30,7 @@ class LoginViewModel(private val repo: AuthRepository) : ViewModel() {
 
     sealed interface UiEvent {
         data object LoggedIn : UiEvent
+        data object LoggedOut : UiEvent
     }
 
     private val _events = MutableSharedFlow<UiEvent>(replay = 0, extraBufferCapacity = 1)
@@ -110,11 +111,13 @@ class LoginViewModel(private val repo: AuthRepository) : ViewModel() {
 
     /**
      * Executes logout processing and resets UI state to initial values.
+     * Emits [UiEvent.LoggedOut] event upon completion.
      */
     fun logout() {
         viewModelScope.launch {
             repo.logout()
             _ui.value = LoginUiState()
+            _events.emit(UiEvent.LoggedOut)
         }
     }
 }
