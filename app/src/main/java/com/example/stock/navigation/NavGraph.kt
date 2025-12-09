@@ -1,6 +1,7 @@
 package com.example.stock.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -23,13 +24,12 @@ object Routes {
 /**
  * Composable that defines the navigation graph for the entire application.
  *
- * @param loginViewModel [LoginViewModel] that manages login authentication state.
  * @param signupViewModel [SignupViewModel] that manages signup authentication state.
- *
+ * @param symbolViewModel [SymbolViewModel] that manages stock symbol list state.
+ * @param candlesViewModel [CandlesViewModel] that manages candlestick chart data state.
  */
 @Composable
 fun AppNavGraph(
-    loginViewModel: LoginViewModel,
     signupViewModel: SignupViewModel,
     symbolViewModel: SymbolViewModel,
     candlesViewModel: CandlesViewModel
@@ -42,7 +42,6 @@ fun AppNavGraph(
     ) {
         composable(Routes.LOGIN) {
             LoginScreen(
-                loginViewModel,
                 onLoggedIn = {
                     // Navigate to stock list screen on successful login and clear the back stack so user cannot return to login
                     navController.navigate(Routes.STOCK) {
@@ -68,6 +67,7 @@ fun AppNavGraph(
             )
         }
         composable(Routes.STOCK) {
+            val loginViewModel: LoginViewModel = hiltViewModel()
             StockListScreen(
                 navController,
                 symbolViewModel,
@@ -83,6 +83,7 @@ fun AppNavGraph(
         composable("chart/{name}/{code}") { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name") ?: return@composable
             val code = backStackEntry.arguments?.getString("code") ?: return@composable
+            val loginViewModel: LoginViewModel = hiltViewModel()
             ChartScreen(
                 navController,
                 name,

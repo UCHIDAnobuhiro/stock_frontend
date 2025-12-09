@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.stock.R
 import com.example.stock.feature.auth.data.repository.AuthRepository
 import com.example.stock.feature.auth.ui.login.LoginUiState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +16,7 @@ import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
+import javax.inject.Inject
 
 /**
  * Manages login processing and login screen state for [ViewModel].
@@ -25,7 +27,10 @@ import java.io.IOException
  *
  * @param repo Authentication repository responsible for calling the login API.
  */
-class LoginViewModel(private val repo: AuthRepository) : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val repo: AuthRepository
+) : ViewModel() {
 
     private val _ui = MutableStateFlow(LoginUiState())
     val ui: StateFlow<LoginUiState> = _ui
