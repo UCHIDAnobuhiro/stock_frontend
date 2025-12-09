@@ -242,4 +242,34 @@ class LoginViewModelTest {
 
         coVerify(exactly = 1) { repository.logout() }
     }
+
+    @Test
+    fun `logout resets all UI state to initial values`() = runTest(mainRule.scheduler) {
+        // Set up non-default state
+        viewModel.onEmailChange("test@example.com")
+        viewModel.onPasswordChange("password123")
+        viewModel.togglePassword()
+        viewModel.login() // This will set an error since repo is mocked
+        advanceUntilIdle()
+
+        // Verify state is modified
+        assertThat(viewModel.ui.value.email).isNotEmpty()
+        assertThat(viewModel.ui.value.password).isNotEmpty()
+        assertThat(viewModel.ui.value.isPasswordVisible).isTrue()
+
+        // Logout
+        viewModel.logout()
+        advanceUntilIdle()
+
+        // Verify all state is reset to initial values
+        val state = viewModel.ui.value
+        assertThat(state.email).isEmpty()
+        assertThat(state.password).isEmpty()
+        assertThat(state.isPasswordVisible).isFalse()
+        assertThat(state.isLoading).isFalse()
+        assertThat(state.error).isNull()
+
+        coVerify(exactly = 1) { repository.login("test@example.com", "password123") }
+        coVerify(exactly = 1) { repository.logout() }
+    }
 }

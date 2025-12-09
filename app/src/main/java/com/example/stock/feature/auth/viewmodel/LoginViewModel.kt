@@ -109,12 +109,12 @@ class LoginViewModel(private val repo: AuthRepository) : ViewModel() {
     }
 
     /**
-     * Executes logout processing
+     * Executes logout processing and resets UI state to initial values.
      */
     fun logout() {
         viewModelScope.launch {
             repo.logout()
-            _ui.update { it.copy(email = "", password = "") }
+            _ui.value = LoginUiState()
         }
     }
 }
