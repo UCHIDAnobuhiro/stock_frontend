@@ -90,4 +90,5 @@ dependencies {
     implementation(libs.okhttp.logging.interceptor)
     testImplementation(libs.truth)
     testImplementation(libs.robolectric)
+    implementation(libs.timber)
 }

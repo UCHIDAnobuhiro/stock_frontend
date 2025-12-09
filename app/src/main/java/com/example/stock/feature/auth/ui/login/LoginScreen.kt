@@ -171,9 +171,9 @@ fun LoginScreenContent(
             )
 
             // Error display
-            uiState.error?.let { error ->
+            uiState.errorResId?.let { errorResId ->
                 Spacer(Modifier.height(Spacing.GapSm))
-                Text(error, color = MaterialTheme.colorScheme.error)
+                Text(stringResource(errorResId), color = MaterialTheme.colorScheme.error)
             }
 
             Spacer(Modifier.height(Spacing.GapMd))
