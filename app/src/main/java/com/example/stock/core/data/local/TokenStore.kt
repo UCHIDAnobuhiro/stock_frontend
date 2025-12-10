@@ -37,7 +37,7 @@ class TokenStore(private val context: Context) {
         .catch { e ->
             if (e is IOException) emit(emptyPreferences()) else throw e
         }
-        .map { prefs -> prefs[TokenStoreKeys.TOKEN] }
+        .map { it[TOKEN] }
 
     suspend fun save(token: String) {
         appContext.dataStore.edit { it[TOKEN] = token }
