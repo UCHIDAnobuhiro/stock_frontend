@@ -5,6 +5,7 @@ import com.example.stock.feature.auth.data.remote.LoginResponse
 import com.example.stock.feature.auth.data.repository.AuthRepository
 import com.example.stock.feature.auth.viewmodel.LoginViewModel
 import com.example.stock.util.MainDispatcherRule
+import com.example.stock.util.TestDispatcherProvider
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -37,12 +38,14 @@ class LoginViewModelTest {
     val mainRule = MainDispatcherRule()
 
     private lateinit var repository: AuthRepository
+    private lateinit var dispatcherProvider: TestDispatcherProvider
     private lateinit var viewModel: LoginViewModel
 
     @Before
     fun setUp() {
         repository = mockk(relaxed = true)
-        viewModel = LoginViewModel(repository)
+        dispatcherProvider = TestDispatcherProvider(mainRule.scheduler)
+        viewModel = LoginViewModel(repository, dispatcherProvider)
     }
 
     @After

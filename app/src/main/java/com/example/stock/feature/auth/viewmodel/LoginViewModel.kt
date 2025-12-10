@@ -3,6 +3,7 @@ package com.example.stock.feature.auth.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stock.R
+import com.example.stock.core.util.DispatcherProvider
 import com.example.stock.feature.auth.data.repository.AuthRepository
 import com.example.stock.feature.auth.ui.login.LoginUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -22,10 +24,12 @@ import javax.inject.Inject
  * - Updates [LoginUiState]
  *
  * @param repo Authentication repository responsible for calling the login API.
+ * @param dispatcherProvider Provider for coroutine dispatchers, enabling testability.
  */
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val repo: AuthRepository
+    private val repo: AuthRepository,
+    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
     private val _ui = MutableStateFlow(LoginUiState())
@@ -69,6 +73,9 @@ class LoginViewModel @Inject constructor(
      * and updates [LoginUiState] based on success/failure.
      */
     fun login() {
+        // Prevent multiple rapid clicks
+        if (_ui.value.isLoading) return
+
         val (email, password) = _ui.value.let { it.email to it.password }
 
         InputValidator.validateLogin(email, password)?.let { errorResId ->
@@ -76,19 +83,22 @@ class LoginViewModel @Inject constructor(
             return
         }
 
-        // Perform login asynchronously with managed loading state
-        viewModelScope.launch {
-            StateManager.executeWithLoading(
-                stateFlow = _ui,
-                isLoading = { isLoading },
-                setLoading = { loading -> copy(isLoading = loading, errorResId = if (loading) null else errorResId) }
-            ) {
-                runCatching { repo.login(email, password) }
+        // Perform login asynchronously
+        viewModelScope.launch(dispatcherProvider.main) {
+            _ui.update { it.copy(isLoading = true, errorResId = null) }
+            try {
+                runCatching {
+                    withContext(dispatcherProvider.io) {
+                        repo.login(email, password)
+                    }
+                }
                     .onSuccess { _events.emit(UiEvent.LoggedIn) }
                     .onFailure { e ->
                         ErrorHandler.logError(e, "Login")
                         _ui.update { it.copy(errorResId = R.string.error_login_failed) }
                     }
+            } finally {
+                _ui.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -98,8 +108,10 @@ class LoginViewModel @Inject constructor(
      * Emits [UiEvent.LoggedOut] event upon completion.
      */
     fun logout() {
-        viewModelScope.launch {
-            repo.logout()
+        viewModelScope.launch(dispatcherProvider.main) {
+            withContext(dispatcherProvider.io) {
+                repo.logout()
+            }
             _ui.value = LoginUiState()
             _events.emit(UiEvent.LoggedOut)
         }
