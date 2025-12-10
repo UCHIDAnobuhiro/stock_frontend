@@ -25,6 +25,11 @@
     <string name="confirm_password">パスワード確認</string>
     <string name="already_have_account">アカウントをお持ちですか？</string>
 
+    <!--サインアップエラー-->
+    <string name="error_passwords_do_not_match">パスワードが一致しません</string>
+    <string name="error_signup_failed">登録に失敗しました</string>
+    <string name="error_email_already_registered">このメールアドレスは既に登録されています</string>
+
     <string name="reload">再読み込み</string>
     <string name="loading">読み込み中</string>
     <string name="no_symbols">銘柄がありません</string>

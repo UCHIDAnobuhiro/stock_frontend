@@ -1,5 +1,6 @@
 package com.example.stock.viewmodel
 
+import com.example.stock.R
 import com.example.stock.feature.auth.data.remote.SignupResponse
 import com.example.stock.feature.auth.data.repository.AuthRepository
 import com.example.stock.feature.auth.viewmodel.SignupViewModel
@@ -24,11 +25,14 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+@RunWith(RobolectricTestRunner::class)
 class SignupViewModelTest {
     @get:Rule
     val mainRule = MainDispatcherRule()
@@ -61,15 +65,15 @@ class SignupViewModelTest {
         viewModel.onConfirmPasswordChange("")
         viewModel.signup()
 
-        // 具体的なエラーメッセージを確認
-        assertThat(viewModel.ui.value.error)
-            .isEqualTo("Please enter all fields")
+        // エラーが設定されていることを確認
+        assertThat(viewModel.ui.value.errorResId)
+            .isEqualTo(R.string.error_empty_fields)
 
         // onEmailChangeで修正 → エラーがクリアされることを確認
         viewModel.onEmailChange("test@example.com")
 
         assertThat(viewModel.ui.value.email).isEqualTo("test@example.com")
-        assertThat(viewModel.ui.value.error).isNull()
+        assertThat(viewModel.ui.value.errorResId).isNull()
     }
 
     @Test
@@ -80,15 +84,15 @@ class SignupViewModelTest {
         viewModel.onConfirmPasswordChange("")
         viewModel.signup()
 
-        // 具体的なエラーメッセージを確認
-        assertThat(viewModel.ui.value.error)
-            .isEqualTo("Please enter all fields")
+        // エラーが設定されていることを確認
+        assertThat(viewModel.ui.value.errorResId)
+            .isEqualTo(R.string.error_empty_fields)
 
         // onPasswordChangeで修正 → エラーがクリアされることを確認
         viewModel.onPasswordChange("secret123")
 
         assertThat(viewModel.ui.value.password).isEqualTo("secret123")
-        assertThat(viewModel.ui.value.error).isNull()
+        assertThat(viewModel.ui.value.errorResId).isNull()
     }
 
     @Test
@@ -99,15 +103,15 @@ class SignupViewModelTest {
         viewModel.onConfirmPasswordChange("")
         viewModel.signup()
 
-        // 具体的なエラーメッセージを確認
-        assertThat(viewModel.ui.value.error)
-            .isEqualTo("Please enter all fields")
+        // エラーが設定されていることを確認
+        assertThat(viewModel.ui.value.errorResId)
+            .isEqualTo(R.string.error_empty_fields)
 
         // onConfirmPasswordChangeで修正 → エラーがクリアされることを確認
         viewModel.onConfirmPasswordChange("secret123")
 
         assertThat(viewModel.ui.value.confirmPassword).isEqualTo("secret123")
-        assertThat(viewModel.ui.value.error).isNull()
+        assertThat(viewModel.ui.value.errorResId).isNull()
     }
 
     @Test
@@ -127,8 +131,8 @@ class SignupViewModelTest {
     @Test
     fun `signup blocks when already loading`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
-        viewModel.onPasswordChange("password")
-        viewModel.onConfirmPasswordChange("password")
+        viewModel.onPasswordChange("password12345678")
+        viewModel.onConfirmPasswordChange("password12345678")
 
         val gate = Channel<Unit>(capacity = 0)
         coEvery { repository.signup(any(), any()) } coAnswers {
@@ -153,7 +157,7 @@ class SignupViewModelTest {
         advanceUntilIdle()
 
         // repo.signup は最終的に1回だけ
-        coVerify(exactly = 1) { repository.signup("test@example.com", "password") }
+        coVerify(exactly = 1) { repository.signup("test@example.com", "password12345678") }
     }
 
     @Test
@@ -164,7 +168,7 @@ class SignupViewModelTest {
             viewModel.onConfirmPasswordChange("")
             viewModel.signup()
 
-            assertThat(viewModel.ui.value.error).isEqualTo("Please enter all fields")
+            assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_empty_fields)
             coVerify(exactly = 0) { repository.signup(any(), any()) }
         }
 
@@ -176,7 +180,7 @@ class SignupViewModelTest {
         viewModel.signup()
         advanceUntilIdle()
 
-        assertThat(viewModel.ui.value.error).isEqualTo("Invalid email address format")
+        assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_invalid_email)
         coVerify(exactly = 0) { repository.signup(any(), any()) }
     }
 
@@ -188,7 +192,7 @@ class SignupViewModelTest {
         viewModel.signup()
         advanceUntilIdle()
 
-        assertThat(viewModel.ui.value.error).isEqualTo("Password must be at least 8 characters")
+        assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_password_too_short)
         coVerify(exactly = 0) { repository.signup(any(), any()) }
     }
 
@@ -200,7 +204,7 @@ class SignupViewModelTest {
         viewModel.signup()
         advanceUntilIdle()
 
-        assertThat(viewModel.ui.value.error).isEqualTo("Passwords do not match")
+        assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_passwords_do_not_match)
         coVerify(exactly = 0) { repository.signup(any(), any()) }
     }
 
@@ -226,7 +230,7 @@ class SignupViewModelTest {
         advanceUntilIdle()
 
         assertThat(viewModel.ui.value.isLoading).isFalse()
-        assertThat(viewModel.ui.value.error).isNull()
+        assertThat(viewModel.ui.value.errorResId).isNull()
         assertThat(received).isEqualTo(SignupViewModel.UiEvent.SignedUp)
 
         job.cancelAndJoin()
@@ -245,12 +249,12 @@ class SignupViewModelTest {
         advanceUntilIdle()
 
         assertThat(viewModel.ui.value.isLoading).isFalse()
-        assertThat(viewModel.ui.value.error).isEqualTo("Email address is already registered")
+        assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_email_already_registered)
         coVerify(exactly = 1) { repository.signup("test@example.com", "password123") }
     }
 
     @Test
-    fun `signup failure - http 500 shows http code`() = runTest(mainRule.scheduler) {
+    fun `signup failure - http 500 shows generic error`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password123")
         viewModel.onConfirmPasswordChange("password123")
@@ -259,12 +263,12 @@ class SignupViewModelTest {
         viewModel.signup()
         advanceUntilIdle()
 
-        assertThat(viewModel.ui.value.error).isEqualTo("HTTP error: 500")
+        assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_signup_failed)
         coVerify(exactly = 1) { repository.signup("test@example.com", "password123") }
     }
 
     @Test
-    fun `signup failure - io maps to network message`() = runTest(mainRule.scheduler) {
+    fun `signup failure - io maps to generic error`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password123")
         viewModel.onConfirmPasswordChange("password123")
@@ -273,12 +277,12 @@ class SignupViewModelTest {
         viewModel.signup()
         advanceUntilIdle()
 
-        assertThat(viewModel.ui.value.error).isEqualTo("Network error: Please check your connection")
+        assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_signup_failed)
         coVerify(exactly = 1) { repository.signup("test@example.com", "password123") }
     }
 
     @Test
-    fun `signup failure - serialization maps to json message`() = runTest(mainRule.scheduler) {
+    fun `signup failure - serialization maps to generic error`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password123")
         viewModel.onConfirmPasswordChange("password123")
@@ -287,7 +291,7 @@ class SignupViewModelTest {
         viewModel.signup()
         advanceUntilIdle()
 
-        assertThat(viewModel.ui.value.error).isEqualTo("JSON error: Invalid response format")
+        assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_signup_failed)
         coVerify(exactly = 1) { repository.signup("test@example.com", "password123") }
     }
 }

@@ -9,7 +9,7 @@ package com.example.stock.feature.auth.ui.signup
  * @property isPasswordVisible Flag for password visibility toggle
  * @property isConfirmPasswordVisible Flag for confirm password visibility toggle
  * @property isLoading Whether signup process is in progress
- * @property error Error message (null if no error)
+ * @property errorResId Error message resource ID (null if no error)
  */
 data class SignupUiState(
     val email: String = "",
@@ -18,5 +18,5 @@ data class SignupUiState(
     val isPasswordVisible: Boolean = false,
     val isConfirmPasswordVisible: Boolean = false,
     val isLoading: Boolean = false,
-    val error: String? = null,
+    val errorResId: Int? = null,
 )
