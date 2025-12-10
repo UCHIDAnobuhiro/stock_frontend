@@ -15,30 +15,6 @@ import java.io.IOException
 object ErrorHandler {
 
     /**
-     * Handles authentication-related errors by logging them and mapping to user-friendly error messages.
-     *
-     * @param exception The exception that occurred during authentication
-     * @param operation A string describing the operation that failed (e.g., "Login", "Signup")
-     * @param errorMapper A function that maps specific error types to string resource IDs
-     * @return String resource ID for the error message to display to the user
-     */
-    fun handleAuthError(
-        exception: Throwable,
-        operation: String,
-        errorMapper: (Throwable) -> Int
-    ): Int {
-        val logMessage = when (exception) {
-            is HttpException -> "HTTP error: ${exception.code()} - ${exception.message()}"
-            is IOException -> "Network error: ${exception.message}"
-            is SerializationException -> "JSON parse error: ${exception.message}"
-            else -> "Unknown error: ${exception.message}"
-        }
-        Timber.e(exception, "$operation failed: $logMessage")
-
-        return errorMapper(exception)
-    }
-
-    /**
      * Logs the error with a simple message format.
      *
      * @param exception The exception to log
