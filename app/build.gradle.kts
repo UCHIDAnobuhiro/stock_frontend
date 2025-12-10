@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.kotlin.kapt)
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.20"
 }
 
@@ -91,4 +93,8 @@ dependencies {
     testImplementation(libs.truth)
     testImplementation(libs.robolectric)
     implementation(libs.timber)
+    // Hilt dependencies
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
 }

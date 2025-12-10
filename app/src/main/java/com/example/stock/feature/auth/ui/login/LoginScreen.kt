@@ -36,6 +36,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.stock.R
 import com.example.stock.core.ui.theme.Sizes
@@ -47,16 +48,17 @@ import com.example.stock.feature.auth.viewmodel.LoginViewModel
  *
  * Wrapper composable that connects [LoginViewModel] to [LoginScreenContent].
  * Handles event collection and state observation.
+ * Uses Hilt to automatically inject the LoginViewModel.
  *
- * @param viewModel Login ViewModel
  * @param onLoggedIn Callback invoked upon successful login
  * @param onNavigateToSignup Callback to navigate to signup screen
+ * @param viewModel Login ViewModel (injected by Hilt)
  */
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel,
     onLoggedIn: () -> Unit,
     onNavigateToSignup: () -> Unit,
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
 

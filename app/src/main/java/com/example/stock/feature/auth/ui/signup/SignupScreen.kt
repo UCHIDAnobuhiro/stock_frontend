@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.stock.R
 import com.example.stock.core.ui.theme.Sizes
@@ -41,16 +42,17 @@ import com.example.stock.feature.auth.viewmodel.SignupViewModel
  *
  * Provides email/password/confirm password input, password visibility toggle,
  * signup button, error display, and progress indicator.
+ * Uses Hilt to automatically inject the SignupViewModel.
  *
- * @param viewModel Signup ViewModel
  * @param onSignedUp Callback invoked upon successful signup
  * @param onNavigateToLogin Callback to navigate to login screen
+ * @param viewModel Signup ViewModel (injected by Hilt)
  */
 @Composable
 fun SignupScreen(
-    viewModel: SignupViewModel,
     onSignedUp: () -> Unit,
     onNavigateToLogin: () -> Unit,
+    viewModel: SignupViewModel = hiltViewModel()
 ) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
 

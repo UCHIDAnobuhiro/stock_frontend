@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stock.feature.auth.data.repository.AuthRepository
 import com.example.stock.feature.auth.ui.signup.SignupUiState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
 
 /**
  * Manages signup processing and signup screen state for [ViewModel].
@@ -23,7 +25,10 @@ import java.io.IOException
  *
  * @param repo Authentication repository responsible for calling the signup API.
  */
-class SignupViewModel(private val repo: AuthRepository) : ViewModel() {
+@HiltViewModel
+class SignupViewModel @Inject constructor(
+    private val repo: AuthRepository
+) : ViewModel() {
 
     private val _ui = MutableStateFlow(SignupUiState())
     val ui: StateFlow<SignupUiState> = _ui

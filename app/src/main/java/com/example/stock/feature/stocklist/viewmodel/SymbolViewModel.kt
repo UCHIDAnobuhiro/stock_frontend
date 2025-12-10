@@ -4,17 +4,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stock.feature.stocklist.data.repository.StockRepository
 import com.example.stock.feature.stocklist.ui.SymbolUiState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * ViewModel that manages symbol list data.
  *
  * @property repo Repository for fetching symbol data
  */
-class SymbolViewModel(private val repo: StockRepository) : ViewModel() {
+@HiltViewModel
+class SymbolViewModel @Inject constructor(
+    private val repo: StockRepository
+) : ViewModel() {
 
     private val _ui = MutableStateFlow(SymbolUiState())
     val ui: StateFlow<SymbolUiState> = _ui
