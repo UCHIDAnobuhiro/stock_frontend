@@ -2,6 +2,7 @@ package com.example.stock.feature.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.stock.R
 import com.example.stock.feature.auth.data.repository.AuthRepository
 import com.example.stock.feature.auth.ui.signup.SignupUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
+import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
@@ -45,7 +47,7 @@ class SignupViewModel @Inject constructor(
      * @param email The entered email address
      */
     fun onEmailChange(email: String) {
-        _ui.update { it.copy(email = email, error = null) }
+        _ui.update { it.copy(email = email, errorResId = null) }
     }
 
     /**
@@ -53,7 +55,7 @@ class SignupViewModel @Inject constructor(
      * @param password The entered password
      */
     fun onPasswordChange(password: String) {
-        _ui.update { it.copy(password = password, error = null) }
+        _ui.update { it.copy(password = password, errorResId = null) }
     }
 
     /**
@@ -68,7 +70,7 @@ class SignupViewModel @Inject constructor(
      * @param confirmPassword The entered confirm password
      */
     fun onConfirmPasswordChange(confirmPassword: String) {
-        _ui.update { it.copy(confirmPassword = confirmPassword, error = null) }
+        _ui.update { it.copy(confirmPassword = confirmPassword, errorResId = null) }
     }
 
     /**
@@ -92,26 +94,33 @@ class SignupViewModel @Inject constructor(
             Triple(it.email, it.password, it.confirmPassword)
         }
 
-        validate(email, password, confirmPassword)?.let { msg ->
-            _ui.update { it.copy(error = msg) }
+        validate(email, password, confirmPassword)?.let { errorResId ->
+            _ui.update { it.copy(errorResId = errorResId) }
             return
         }
 
         // Perform signup asynchronously
         viewModelScope.launch {
-            _ui.update { it.copy(isLoading = true, error = null) }
+            _ui.update { it.copy(isLoading = true, errorResId = null) }
             runCatching { repo.signup(email, password) }
                 .onSuccess { _events.emit(UiEvent.SignedUp) }
                 .onFailure { e ->
-                    val msg = when (e) {
-                        is HttpException ->
-                            if (e.code() == 409) "Email address is already registered" else "HTTP error: ${e.code()}"
-
-                        is IOException -> "Network error: Please check your connection"
-                        is SerializationException -> "JSON error: Invalid response format"
+                    val logMessage = when (e) {
+                        is HttpException -> "HTTP error: ${e.code()} - ${e.message()}"
+                        is IOException -> "Network error: ${e.message}"
+                        is SerializationException -> "JSON parse error: ${e.message}"
                         else -> "Unknown error: ${e.message}"
                     }
-                    _ui.update { it.copy(error = msg) }
+                    Timber.e(e, "Signup failed: $logMessage")
+
+                    val errorResId = when (e) {
+                        is HttpException -> {
+                            if (e.code() == 409) R.string.error_email_already_registered
+                            else R.string.error_signup_failed
+                        }
+                        else -> R.string.error_signup_failed
+                    }
+                    _ui.update { it.copy(errorResId = errorResId) }
                 }
             _ui.update { it.copy(isLoading = false) }
         }
@@ -123,12 +132,15 @@ class SignupViewModel @Inject constructor(
      * @param email The entered email address
      * @param password The entered password
      * @param confirmPassword The entered confirm password
+     * @return Error message resource ID if validation fails, null if valid
      */
-    private fun validate(email: String, password: String, confirmPassword: String): String? = when {
-        email.isBlank() || password.isBlank() || confirmPassword.isBlank() -> "Please enter all fields"
-        !email.contains("@") -> "Invalid email address format"
-        password.length < 8 -> "Password must be at least 8 characters"
-        password != confirmPassword -> "Passwords do not match"
+    private fun validate(email: String, password: String, confirmPassword: String): Int? = when {
+        email.isBlank() || password.isBlank() || confirmPassword.isBlank() -> R.string.error_empty_fields
+        !android.util.Patterns.EMAIL_ADDRESS.matcher(email)
+            .matches() -> R.string.error_invalid_email
+
+        password.length < 8 -> R.string.error_password_too_short
+        password != confirmPassword -> R.string.error_passwords_do_not_match
         else -> null
     }
 }
