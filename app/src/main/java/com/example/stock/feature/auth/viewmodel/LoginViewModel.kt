@@ -69,9 +69,6 @@ class LoginViewModel @Inject constructor(
      * and updates [LoginUiState] based on success/failure.
      */
     fun login() {
-        // Prevent multiple rapid clicks
-        if (_ui.value.isLoading) return
-
         val (email, password) = _ui.value.let { it.email to it.password }
 
         InputValidator.validateLogin(email, password)?.let { errorResId ->
@@ -79,16 +76,20 @@ class LoginViewModel @Inject constructor(
             return
         }
 
-        // Perform login asynchronously
+        // Perform login asynchronously with managed loading state
         viewModelScope.launch {
-            _ui.update { it.copy(isLoading = true, errorResId = null) }
-            runCatching { repo.login(email, password) }
-                .onSuccess { _events.emit(UiEvent.LoggedIn) }
-                .onFailure { e ->
-                    ErrorHandler.logError(e, "Login")
-                    _ui.update { it.copy(errorResId = R.string.error_login_failed) }
-                }
-            _ui.update { it.copy(isLoading = false) }
+            StateManager.executeWithLoading(
+                stateFlow = _ui,
+                isLoading = { isLoading },
+                setLoading = { loading -> copy(isLoading = loading, errorResId = if (loading) null else errorResId) }
+            ) {
+                runCatching { repo.login(email, password) }
+                    .onSuccess { _events.emit(UiEvent.LoggedIn) }
+                    .onFailure { e ->
+                        ErrorHandler.logError(e, "Login")
+                        _ui.update { it.copy(errorResId = R.string.error_login_failed) }
+                    }
+            }
         }
     }
 

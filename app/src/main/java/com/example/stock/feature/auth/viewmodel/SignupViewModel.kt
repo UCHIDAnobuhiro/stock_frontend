@@ -83,9 +83,6 @@ class SignupViewModel @Inject constructor(
      * and updates [SignupUiState] based on success/failure.
      */
     fun signup() {
-        // Prevent multiple rapid clicks
-        if (_ui.value.isLoading) return
-
         val (email, password, confirmPassword) = _ui.value.let {
             Triple(it.email, it.password, it.confirmPassword)
         }
@@ -95,24 +92,28 @@ class SignupViewModel @Inject constructor(
             return
         }
 
-        // Perform signup asynchronously
+        // Perform signup asynchronously with managed loading state
         viewModelScope.launch {
-            _ui.update { it.copy(isLoading = true, errorResId = null) }
-            runCatching { repo.signup(email, password) }
-                .onSuccess { _events.emit(UiEvent.SignedUp) }
-                .onFailure { e ->
-                    ErrorHandler.logError(e, "Signup")
-                    val errorResId = ErrorHandler.mapErrorToResource(
-                        exception = e,
-                        httpErrorMapper = { httpException ->
-                            if (httpException.code() == 409) R.string.error_email_already_registered
-                            else R.string.error_signup_failed
-                        },
-                        defaultErrorResId = R.string.error_signup_failed
-                    )
-                    _ui.update { it.copy(errorResId = errorResId) }
-                }
-            _ui.update { it.copy(isLoading = false) }
+            StateManager.executeWithLoading(
+                stateFlow = _ui,
+                isLoading = { isLoading },
+                setLoading = { loading -> copy(isLoading = loading, errorResId = if (loading) null else errorResId) }
+            ) {
+                runCatching { repo.signup(email, password) }
+                    .onSuccess { _events.emit(UiEvent.SignedUp) }
+                    .onFailure { e ->
+                        ErrorHandler.logError(e, "Signup")
+                        val errorResId = ErrorHandler.mapErrorToResource(
+                            exception = e,
+                            httpErrorMapper = { httpException ->
+                                if (httpException.code() == 409) R.string.error_email_already_registered
+                                else R.string.error_signup_failed
+                            },
+                            defaultErrorResId = R.string.error_signup_failed
+                        )
+                        _ui.update { it.copy(errorResId = errorResId) }
+                    }
+            }
         }
     }
 }
