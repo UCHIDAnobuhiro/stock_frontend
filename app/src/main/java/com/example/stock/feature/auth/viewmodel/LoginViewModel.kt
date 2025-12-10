@@ -12,10 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.serialization.SerializationException
-import retrofit2.HttpException
-import timber.log.Timber
-import java.io.IOException
 import javax.inject.Inject
 
 /**
@@ -89,13 +85,7 @@ class LoginViewModel @Inject constructor(
             runCatching { repo.login(email, password) }
                 .onSuccess { _events.emit(UiEvent.LoggedIn) }
                 .onFailure { e ->
-                    val logMessage = when (e) {
-                        is HttpException -> "HTTP error: ${e.code()} - ${e.message()}"
-                        is IOException -> "Network error: ${e.message}"
-                        is SerializationException -> "JSON parse error: ${e.message}"
-                        else -> "Unknown error: ${e.message}"
-                    }
-                    Timber.e(e, "Login failed: $logMessage")
+                    ErrorHandler.logError(e, "Login")
                     _ui.update { it.copy(errorResId = R.string.error_login_failed) }
                 }
             _ui.update { it.copy(isLoading = false) }

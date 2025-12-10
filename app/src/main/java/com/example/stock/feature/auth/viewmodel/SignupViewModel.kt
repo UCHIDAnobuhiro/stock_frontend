@@ -12,10 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.serialization.SerializationException
-import retrofit2.HttpException
-import timber.log.Timber
-import java.io.IOException
 import javax.inject.Inject
 
 /**
@@ -105,21 +101,15 @@ class SignupViewModel @Inject constructor(
             runCatching { repo.signup(email, password) }
                 .onSuccess { _events.emit(UiEvent.SignedUp) }
                 .onFailure { e ->
-                    val logMessage = when (e) {
-                        is HttpException -> "HTTP error: ${e.code()} - ${e.message()}"
-                        is IOException -> "Network error: ${e.message}"
-                        is SerializationException -> "JSON parse error: ${e.message}"
-                        else -> "Unknown error: ${e.message}"
-                    }
-                    Timber.e(e, "Signup failed: $logMessage")
-
-                    val errorResId = when (e) {
-                        is HttpException -> {
-                            if (e.code() == 409) R.string.error_email_already_registered
+                    ErrorHandler.logError(e, "Signup")
+                    val errorResId = ErrorHandler.mapErrorToResource(
+                        exception = e,
+                        httpErrorMapper = { httpException ->
+                            if (httpException.code() == 409) R.string.error_email_already_registered
                             else R.string.error_signup_failed
-                        }
-                        else -> R.string.error_signup_failed
-                    }
+                        },
+                        defaultErrorResId = R.string.error_signup_failed
+                    )
                     _ui.update { it.copy(errorResId = errorResId) }
                 }
             _ui.update { it.copy(isLoading = false) }
