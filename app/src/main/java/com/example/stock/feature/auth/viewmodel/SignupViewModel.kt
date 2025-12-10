@@ -90,7 +90,7 @@ class SignupViewModel @Inject constructor(
             Triple(it.email, it.password, it.confirmPassword)
         }
 
-        validate(email, password, confirmPassword)?.let { errorResId ->
+        InputValidator.validateSignup(email, password, confirmPassword)?.let { errorResId ->
             _ui.update { it.copy(errorResId = errorResId) }
             return
         }
@@ -114,23 +114,5 @@ class SignupViewModel @Inject constructor(
                 }
             _ui.update { it.copy(isLoading = false) }
         }
-    }
-
-    /**
-     * Performs validation check for signup
-     *
-     * @param email The entered email address
-     * @param password The entered password
-     * @param confirmPassword The entered confirm password
-     * @return Error message resource ID if validation fails, null if valid
-     */
-    private fun validate(email: String, password: String, confirmPassword: String): Int? = when {
-        email.isBlank() || password.isBlank() || confirmPassword.isBlank() -> R.string.error_empty_fields
-        !android.util.Patterns.EMAIL_ADDRESS.matcher(email)
-            .matches() -> R.string.error_invalid_email
-
-        password.length < 8 -> R.string.error_password_too_short
-        password != confirmPassword -> R.string.error_passwords_do_not_match
-        else -> null
     }
 }
