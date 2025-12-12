@@ -4,7 +4,6 @@ import com.example.stock.core.data.auth.TokenProvider
 import com.example.stock.core.data.local.TokenStore
 import com.example.stock.feature.auth.data.remote.AuthApi
 import com.example.stock.feature.auth.data.remote.LoginRequest
-import com.example.stock.feature.auth.data.remote.LoginResponse
 import com.example.stock.feature.auth.data.remote.SignupRequest
 import com.example.stock.feature.auth.data.remote.SignupResponse
 import kotlinx.coroutines.CoroutineDispatcher
@@ -33,11 +32,10 @@ class AuthRepository(
      *
      * @param email Email address
      * @param password Password
-     * @return Authentication response containing token
      *
      * Authenticates via API and saves token to both memory and persistent storage.
      */
-    suspend fun login(email: String, password: String): LoginResponse {
+    suspend fun login(email: String, password: String) {
         val res = api.login(LoginRequest(email, password))
         // Update in-memory token (enables immediate Authorization header)
         tokenProvider.update(res.token)
@@ -45,7 +43,6 @@ class AuthRepository(
         withContext(io) {
             tokenStore.save(res.token)
         }
-        return res
     }
 
     /**

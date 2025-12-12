@@ -42,7 +42,7 @@ class AuthRepositoryTest {
     }
 
     @Test
-    fun `login success - updates provider, saves token, returns response`() =
+    fun `login success - updates provider and saves token`() =
         runTest(scheduler) {
             val email = "test@example.com"
             val password = "password"
@@ -51,9 +51,8 @@ class AuthRepositoryTest {
             coEvery { api.login(LoginRequest(email, password)) } returns response
             coEvery { tokenStore.save("token_123") } just runs
 
-            val result = repo.login(email, password)
+            repo.login(email, password)
 
-            assertThat(result).isEqualTo(response)
             coVerify(exactly = 1) { tokenProvider.update("token_123") }
             coVerify(exactly = 1) { tokenStore.save("token_123") }
             coVerify(exactly = 1) { api.login(LoginRequest(email, password)) }

@@ -1,7 +1,6 @@
 package com.example.stock.viewmodel
 
 import com.example.stock.R
-import com.example.stock.feature.auth.data.remote.LoginResponse
 import com.example.stock.feature.auth.data.repository.AuthRepository
 import com.example.stock.feature.auth.viewmodel.LoginViewModel
 import com.example.stock.util.MainDispatcherRule
@@ -111,7 +110,6 @@ class LoginViewModelTest {
         val gate = Channel<Unit>(capacity = 0)
         coEvery { repository.login(any(), any()) } coAnswers {
             gate.receive()
-            LoginResponse("tkn")
         }
 
         // 1回目の login を開始
@@ -176,7 +174,7 @@ class LoginViewModelTest {
                 "test@example.com",
                 "password"
             )
-        } returns LoginResponse("token123")
+        } returns Unit
 
         // イベントを待ち受け
         var received: LoginViewModel.UiEvent? = null
