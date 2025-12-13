@@ -1,7 +1,6 @@
 package com.example.stock.feature.auth.viewmodel
 
 import android.util.Patterns
-import androidx.annotation.StringRes
 import com.example.stock.R
 
 /**
@@ -74,14 +73,4 @@ object InputValidator {
         return password == confirmPassword
     }
 
-    /**
-     * Validates a single field is not blank.
-     *
-     * @param value The field value to validate
-     * @param errorResId The error resource ID to return if blank
-     * @return Error message resource ID if blank, null if valid
-     */
-    fun validateNotBlank(value: String, @StringRes errorResId: Int): Int? {
-        return if (value.isBlank()) errorResId else null
-    }
 }

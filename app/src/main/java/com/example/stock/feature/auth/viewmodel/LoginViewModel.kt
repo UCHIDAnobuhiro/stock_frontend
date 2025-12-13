@@ -37,7 +37,6 @@ class LoginViewModel @Inject constructor(
 
     sealed interface UiEvent {
         data object LoggedIn : UiEvent
-        data object LoggedOut : UiEvent
     }
 
     private val _events = MutableSharedFlow<UiEvent>(replay = 0, extraBufferCapacity = 1)
@@ -100,20 +99,6 @@ class LoginViewModel @Inject constructor(
             } finally {
                 _ui.update { it.copy(isLoading = false) }
             }
-        }
-    }
-
-    /**
-     * Executes logout processing and resets UI state to initial values.
-     * Emits [UiEvent.LoggedOut] event upon completion.
-     */
-    fun logout() {
-        viewModelScope.launch(dispatcherProvider.main) {
-            withContext(dispatcherProvider.io) {
-                repo.logout()
-            }
-            _ui.value = LoginUiState()
-            _events.emit(UiEvent.LoggedOut)
         }
     }
 

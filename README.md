@@ -51,6 +51,7 @@ Built with Kotlin, Jetpack Compose, and MVVM architecture, featuring **login aut
 - **Chart Drawing**: MPAndroidChart
 - **Authentication**: JWT (JSON Web Token)
 - **Testing**: JUnit4 / MockK / CoroutineTestRule
+- **DI**: Hilt
 - **Build Management**: Gradle (KTS)
 - **Version Control**: Git / GitHub
 
@@ -116,9 +117,37 @@ Built with Kotlin, Jetpack Compose, and MVVM architecture, featuring **login aut
 
 ---
 
+### 🔓 Logout Flow
+
+```text
+User taps logout button
+       ↓
+Screen (StockListScreen / ChartScreen)
+       ↓ onLogout callback
+NavGraph
+       ↓ logoutViewModel.logout()
+LogoutViewModel
+       ↓ repo.logout() [IO dispatcher]
+AuthRepository
+       ├─ tokenProvider.clear()  ← Clear in-memory token
+       └─ tokenStore.clear()     ← Clear DataStore token
+       ↓
+LogoutViewModel
+       ↓ emit(UiEvent.LoggedOut)
+NavGraph (LaunchedEffect)
+       ↓ Collect event
+Navigate to Login Screen (clear back stack)
+```
+
+**Separation of Concerns:**
+- `LogoutViewModel`: Handles logout business logic
+- `NavGraph`: Handles navigation only (listens for events and navigates)
+- `AuthRepository`: Data layer (token management)
+
+---
+
 ### 🚀 Future Improvements
 
-- Introduce DI with Hilt/Koin
 - Local caching with Room
 - Add UseCase layer for separation of concerns (Clean Architecture)
 
@@ -136,8 +165,9 @@ app/
     │   │   │   ├── remote/      # AuthApi (Retrofit), LoginRequest/Response DTOs
     │   │   │   └── repository/  # AuthRepository
     │   │   ├── ui/
-    │   │   │   └── login/       # LoginScreen, LoginUiState
-    │   │   └── viewmodel/       # AuthViewModel, AuthViewModelFactory
+    │   │   │   ├── login/       # LoginScreen, LoginUiState
+    │   │   │   └── signup/      # SignupScreen, SignupUiState
+    │   │   └── viewmodel/       # LoginViewModel, LogoutViewModel, SignupViewModel
     │   ├── stocklist/           # Stock list feature
     │   │   ├── data/
     │   │   │   ├── remote/      # StockApi (Retrofit), SymbolItem/CandleDto DTOs
@@ -158,6 +188,7 @@ app/
     │       ├── theme/           # Material3 theme, typography
     │       └── util/            # Utilities like ClickGuard
     ├── config/                  # ApiConfig (BASE_URL configuration)
+    ├── di/                      # Hilt modules (DataModule, NetworkModule, DispatcherModule)
     └── navigation/              # AppNavGraph, Routes
 ```
 
@@ -263,6 +294,5 @@ and test results are automatically verified.
 
 ### ⚙️ Improvement Ideas
 
-- Introduce DI (Hilt / Koin)
 - Add UseCase layer (separate screen logic from business logic)
 - Extend theme switching (Light/Dark)

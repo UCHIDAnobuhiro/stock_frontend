@@ -10,6 +10,7 @@ separation between data, UI, and ViewModel layers.
 
 - **Login**: Email/password authentication with JWT token storage
 - **Signup**: New user registration with password confirmation
+- **Logout**: Token clearing with proper separation of concerns (dedicated ViewModel)
 - **Token Management**: Dual-layer token storage (in-memory + persistent DataStore)
 - **Input Validation**: Email format, password length, and password match validation
 - **Error Handling**: User-friendly error messages for various failure scenarios
@@ -30,23 +31,23 @@ separation between data, UI, and ViewModel layers.
               ▼                               ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                           ViewModel Layer                               │
-│  ┌─────────────────────┐         ┌─────────────────────┐                │
-│  │   LoginViewModel    │         │   SignupViewModel   │                │
-│  │  - ui: StateFlow    │         │  - ui: StateFlow    │                │
-│  │  - events: SharedFlow│        │  - events: SharedFlow│               │
-│  └──────────┬──────────┘         └──────────┬──────────┘                │
-│             │                               │                           │
-│             │ uses                          │ uses                      │
-│             ▼                               ▼                           │
-│  ┌─────────────────────┐         ┌─────────────────────┐                │
-│  │   InputValidator    │         │    ErrorHandler     │                │
-│  │  - validateLogin()  │         │  - logError()       │                │
-│  │  - validateSignup() │         │  - mapErrorToResource()│             │
-│  └─────────────────────┘         └─────────────────────┘                │
-└─────────────┬───────────────────────────────┬───────────────────────────┘
-              │ calls                         │
-              └───────────────┬───────────────┘
-                              ▼
+│  ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────┐  │
+│  │   LoginViewModel    │  │   SignupViewModel   │  │ LogoutViewModel │  │
+│  │  - ui: StateFlow    │  │  - ui: StateFlow    │  │ - events: Flow  │  │
+│  │  - events: SharedFlow│ │  - events: SharedFlow│ │ - logout()      │  │
+│  └──────────┬──────────┘  └──────────┬──────────┘  └────────┬────────┘  │
+│             │                        │                      │           │
+│             │ uses                   │ uses                 │           │
+│             ▼                        ▼                      │           │
+│  ┌─────────────────────┐  ┌─────────────────────┐           │           │
+│  │   InputValidator    │  │    ErrorHandler     │           │           │
+│  │  - validateLogin()  │  │  - logError()       │           │           │
+│  │  - validateSignup() │  │  - mapErrorToResource()│        │           │
+│  └─────────────────────┘  └─────────────────────┘           │           │
+└─────────────┬───────────────────────────────┬───────────────┼───────────┘
+              │ calls                         │               │
+              └───────────────┬───────────────┘               │
+                              ▼                               ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                          Repository Layer                               │
 │                    ┌─────────────────────┐                              │
@@ -97,6 +98,7 @@ feature/auth/
 │
 ├── viewmodel/
 │   ├── LoginViewModel.kt        # Manages login state and business logic
+│   ├── LogoutViewModel.kt       # Manages logout with event-based navigation
 │   ├── SignupViewModel.kt       # Manages signup state and business logic
 │   ├── InputValidator.kt        # Reusable input validation utilities
 │   └── ErrorHandler.kt          # Error logging and mapping utilities
@@ -121,7 +123,8 @@ Tests are organized by type:
 
 | File                                    | Description                                                                               |
 |-----------------------------------------|-------------------------------------------------------------------------------------------|
-| `viewmodel/LoginViewModelTest.kt`       | Tests for LoginViewModel including validation, login success/failure, and logout          |
+| `viewmodel/LoginViewModelTest.kt`       | Tests for LoginViewModel including validation, login success/failure                      |
+| `viewmodel/LogoutViewModelTest.kt`      | Tests for LogoutViewModel including logout and event emission                             |
 | `viewmodel/SignupViewModelTest.kt`      | Tests for SignupViewModel including validation, signup success/failure, and error mapping |
 | `data/repository/AuthRepositoryTest.kt` | Tests for AuthRepository including token management                                       |
 
@@ -136,6 +139,7 @@ Tests are organized by type:
 ```bash
 # Run all unit tests for auth feature
 ./gradlew testDebugUnitTest --tests "*.LoginViewModelTest.*"
+./gradlew testDebugUnitTest --tests "*.LogoutViewModelTest.*"
 ./gradlew testDebugUnitTest --tests "*.SignupViewModelTest.*"
 ./gradlew testDebugUnitTest --tests "*.AuthRepositoryTest.*"
 
@@ -151,7 +155,12 @@ Tests are organized by type:
 - Validation (empty fields, invalid email, short password)
 - Login success/failure handling
 - Loading state management
-- Logout functionality
+- Auto-login check (`checkAuthState`)
+
+#### LogoutViewModel Tests
+
+- Logout calls repository
+- Event emission (`UiEvent.LoggedOut`)
 
 #### SignupViewModel Tests
 

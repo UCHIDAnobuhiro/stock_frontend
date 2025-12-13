@@ -1,14 +1,14 @@
 package com.example.stock.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.stock.feature.auth.ui.login.LoginScreen
 import com.example.stock.feature.auth.ui.signup.SignupScreen
-import com.example.stock.feature.auth.viewmodel.LoginViewModel
-import com.example.stock.feature.auth.viewmodel.SignupViewModel
+import com.example.stock.feature.auth.viewmodel.LogoutViewModel
 import com.example.stock.feature.chart.ui.ChartScreen
 import com.example.stock.feature.chart.viewmodel.CandlesViewModel
 import com.example.stock.feature.stocklist.ui.StockListScreen
@@ -27,6 +27,20 @@ object Routes {
 @Composable
 fun AppNavGraph() {
     val navController = rememberNavController()
+    val logoutViewModel: LogoutViewModel = hiltViewModel()
+
+    // Observe logout events and navigate to login screen
+    LaunchedEffect(Unit) {
+        logoutViewModel.events.collect { event ->
+            when (event) {
+                LogoutViewModel.UiEvent.LoggedOut -> {
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            }
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -58,36 +72,24 @@ fun AppNavGraph() {
             )
         }
         composable(Routes.STOCK) {
-            val loginViewModel: LoginViewModel = hiltViewModel()
             val symbolViewModel: SymbolViewModel = hiltViewModel()
             StockListScreen(
                 navController,
                 symbolViewModel,
-                onLogout = {
-                    // Perform logout process
-                    loginViewModel.logout()
-                    navController.navigate(Routes.LOGIN) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
+                onLogout = { logoutViewModel.logout() }
             )
         }
         composable("chart/{name}/{code}") { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name") ?: return@composable
             val code = backStackEntry.arguments?.getString("code") ?: return@composable
-            val loginViewModel: LoginViewModel = hiltViewModel()
             val candlesViewModel: CandlesViewModel = hiltViewModel()
             ChartScreen(
                 navController,
                 name,
                 code,
                 candlesViewModel,
-                onLogout = {
-                    loginViewModel.logout()
-                    navController.navigate(Routes.LOGIN) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                })
+                onLogout = { logoutViewModel.logout() }
+            )
         }
     }
 }
