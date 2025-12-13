@@ -69,4 +69,11 @@ class AuthRepository(
             tokenStore.clear()
         }
     }
+
+    /**
+     * Checks if a valid token exists in memory.
+     *
+     * @return true if a token exists, false otherwise
+     */
+    fun hasToken(): Boolean = tokenProvider.getToken() != null
 }

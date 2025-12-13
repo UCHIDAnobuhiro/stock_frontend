@@ -62,6 +62,11 @@ fun LoginScreen(
 ) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
 
+    // Check if already authenticated on startup
+    LaunchedEffect(Unit) {
+        viewModel.checkAuthState()
+    }
+
     // Navigate on successful login (only once)
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
