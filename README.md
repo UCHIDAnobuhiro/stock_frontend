@@ -119,7 +119,7 @@ Built with Kotlin, Jetpack Compose, and MVVM architecture, featuring **login aut
 
 ### 🔓 Logout Flow
 
-```
+```text
 User taps logout button
        ↓
 Screen (StockListScreen / ChartScreen)

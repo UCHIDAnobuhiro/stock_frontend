@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stock.core.util.DispatcherProvider
 import com.example.stock.feature.auth.data.repository.AuthRepository
+import com.example.stock.feature.auth.viewmodel.ErrorHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -38,9 +39,15 @@ class LogoutViewModel @Inject constructor(
      */
     fun logout() {
         viewModelScope.launch(dispatcherProvider.main) {
-            withContext(dispatcherProvider.io) {
-                repo.logout()
+            try {
+                withContext(dispatcherProvider.io) {
+                    repo.logout()
+                }
+            } catch (e: Exception) {
+                // Log error but continue - user intends to logout regardless of failure
+                ErrorHandler.logError(e, "Logout")
             }
+            // Always emit LoggedOut to navigate to login screen
             _events.emit(UiEvent.LoggedOut)
         }
     }
