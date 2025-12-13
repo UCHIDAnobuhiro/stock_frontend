@@ -1,4 +1,4 @@
-package com.example.stock.data.repository
+package com.example.stock.feature.stocklist.data.repository
 
 import com.example.stock.feature.stocklist.data.remote.CandleDto
 import com.example.stock.feature.stocklist.data.remote.StockApi

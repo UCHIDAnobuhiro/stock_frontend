@@ -1,4 +1,4 @@
-package com.example.stock.data.repository
+package com.example.stock.feature.auth.data.repository
 
 import com.example.stock.core.data.auth.TokenProvider
 import com.example.stock.core.data.local.TokenStore
