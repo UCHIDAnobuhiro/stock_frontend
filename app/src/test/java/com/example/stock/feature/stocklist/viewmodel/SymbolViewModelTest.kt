@@ -1,4 +1,4 @@
-package com.example.stock.viewmodel
+package com.example.stock.feature.stocklist.viewmodel
 
 import com.example.stock.feature.stocklist.data.remote.SymbolItem
 import com.example.stock.feature.stocklist.data.repository.StockRepository

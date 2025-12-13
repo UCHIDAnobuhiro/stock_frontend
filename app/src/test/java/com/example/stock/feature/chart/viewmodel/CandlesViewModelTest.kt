@@ -1,4 +1,4 @@
-package com.example.stock.viewmodel
+package com.example.stock.feature.chart.viewmodel
 
 import com.example.stock.feature.stocklist.data.remote.CandleDto
 import com.example.stock.feature.stocklist.data.repository.StockRepository

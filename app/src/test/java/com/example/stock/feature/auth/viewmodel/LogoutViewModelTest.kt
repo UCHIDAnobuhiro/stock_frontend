@@ -1,4 +1,4 @@
-package com.example.stock.viewmodel
+package com.example.stock.feature.auth.viewmodel
 
 import com.example.stock.feature.auth.data.repository.AuthRepository
 import com.example.stock.feature.auth.viewmodel.LogoutViewModel
