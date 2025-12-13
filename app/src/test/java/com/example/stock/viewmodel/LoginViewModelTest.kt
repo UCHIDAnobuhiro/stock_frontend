@@ -9,7 +9,9 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
@@ -265,5 +267,42 @@ class LoginViewModelTest {
 
         coVerify(exactly = 1) { repository.login("test@example.com", "password123") }
         coVerify(exactly = 1) { repository.logout() }
+    }
+
+    @Test
+    fun `checkAuthState emits LoggedIn when token exists`() = runTest(mainRule.scheduler) {
+        every { repository.hasToken() } returns true
+
+        var received: LoginViewModel.UiEvent? = null
+        val job: Job = launch {
+            received = viewModel.events.first()
+        }
+
+        viewModel.checkAuthState()
+        advanceUntilIdle()
+
+        assertThat(received).isEqualTo(LoginViewModel.UiEvent.LoggedIn)
+        job.cancelAndJoin()
+
+        verify(exactly = 1) { repository.hasToken() }
+    }
+
+    @Test
+    fun `checkAuthState does not emit when no token exists`() = runTest(mainRule.scheduler) {
+        every { repository.hasToken() } returns false
+
+        var received: LoginViewModel.UiEvent? = null
+        val job: Job = launch {
+            received = viewModel.events.first()
+        }
+
+        viewModel.checkAuthState()
+        advanceUntilIdle()
+
+        // Give some time to ensure no event is emitted
+        assertThat(received).isNull()
+        job.cancelAndJoin()
+
+        verify(exactly = 1) { repository.hasToken() }
     }
 }
