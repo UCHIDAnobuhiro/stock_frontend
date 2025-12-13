@@ -1,18 +1,25 @@
 package com.example.stock.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.stock.feature.auth.data.repository.AuthRepository
 import com.example.stock.feature.auth.ui.login.LoginScreen
 import com.example.stock.feature.auth.ui.signup.SignupScreen
-import com.example.stock.feature.auth.viewmodel.LoginViewModel
-import com.example.stock.feature.auth.viewmodel.SignupViewModel
 import com.example.stock.feature.chart.ui.ChartScreen
 import com.example.stock.feature.chart.viewmodel.CandlesViewModel
 import com.example.stock.feature.stocklist.ui.StockListScreen
 import com.example.stock.feature.stocklist.viewmodel.SymbolViewModel
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.launch
 
 // Routes are identifiers for screen navigation.
 object Routes {
@@ -21,12 +28,26 @@ object Routes {
     const val STOCK = "stock"
 }
 
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface AuthRepositoryEntryPoint {
+    fun authRepository(): AuthRepository
+}
+
 /**
  * Composable that defines the navigation graph for the entire application.
  */
 @Composable
 fun AppNavGraph() {
     val navController = rememberNavController()
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val authRepository = remember {
+        EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            AuthRepositoryEntryPoint::class.java
+        ).authRepository()
+    }
 
     NavHost(
         navController = navController,
@@ -58,14 +79,14 @@ fun AppNavGraph() {
             )
         }
         composable(Routes.STOCK) {
-            val loginViewModel: LoginViewModel = hiltViewModel()
             val symbolViewModel: SymbolViewModel = hiltViewModel()
             StockListScreen(
                 navController,
                 symbolViewModel,
                 onLogout = {
-                    // Perform logout process
-                    loginViewModel.logout()
+                    coroutineScope.launch {
+                        authRepository.logout()
+                    }
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(0) { inclusive = true }
                     }
@@ -75,7 +96,6 @@ fun AppNavGraph() {
         composable("chart/{name}/{code}") { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name") ?: return@composable
             val code = backStackEntry.arguments?.getString("code") ?: return@composable
-            val loginViewModel: LoginViewModel = hiltViewModel()
             val candlesViewModel: CandlesViewModel = hiltViewModel()
             ChartScreen(
                 navController,
@@ -83,7 +103,9 @@ fun AppNavGraph() {
                 code,
                 candlesViewModel,
                 onLogout = {
-                    loginViewModel.logout()
+                    coroutineScope.launch {
+                        authRepository.logout()
+                    }
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(0) { inclusive = true }
                     }
