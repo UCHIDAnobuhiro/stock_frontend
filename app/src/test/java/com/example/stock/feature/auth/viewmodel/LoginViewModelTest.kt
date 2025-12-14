@@ -169,12 +169,7 @@ class LoginViewModelTest {
     fun `login success - emits LoggedIn event and clears loading`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password")
-        coEvery {
-            repository.login(
-                "test@example.com",
-                "password"
-            )
-        } returns Unit
+        coEvery { repository.login("test@example.com", "password") } returns Unit
 
         // Collect events before triggering login
         var received: LoginViewModel.UiEvent? = null
