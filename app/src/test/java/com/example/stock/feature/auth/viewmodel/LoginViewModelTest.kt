@@ -2,7 +2,6 @@ package com.example.stock.feature.auth.viewmodel
 
 import com.example.stock.R
 import com.example.stock.feature.auth.data.repository.AuthRepository
-import com.example.stock.feature.auth.viewmodel.LoginViewModel
 import com.example.stock.util.MainDispatcherRule
 import com.example.stock.util.TestDispatcherProvider
 import com.google.common.truth.Truth.assertThat
@@ -13,6 +12,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
@@ -54,43 +54,40 @@ class LoginViewModelTest {
         confirmVerified(repository)
     }
 
-    private fun httpError(code: Int): HttpException {
+    private fun httpError(): HttpException {
         val body = """{"message":"err"}""".toResponseBody("application/json".toMediaType())
-        val resp: Response<Any> = Response.error(code, body)
+        val resp: Response<Any> = Response.error(401, body)
         return HttpException(resp)
     }
 
     @Test
     fun `onEmailChange updates state and clears error`() = runTest(mainRule.scheduler) {
-        // まずエラーを発生させる（空入力で login）
+        // Trigger error state by attempting login with empty fields
         viewModel.onEmailChange("")
         viewModel.onPasswordChange("")
         viewModel.login()
 
-        // エラーが設定されていることを確認
         assertThat(viewModel.ui.value.errorResId)
             .isEqualTo(R.string.error_empty_fields)
 
-        // onEmailChangeで修正 → エラーがクリアされることを確認
+        // Changing email should clear the error
         viewModel.onEmailChange("test@example.com")
 
         assertThat(viewModel.ui.value.email).isEqualTo("test@example.com")
         assertThat(viewModel.ui.value.errorResId).isNull()
     }
 
-
     @Test
     fun `onPasswordChange updates state and clears error`() = runTest(mainRule.scheduler) {
-        // まずエラーを発生させる（空入力で login）
+        // Trigger error state by attempting login with empty fields
         viewModel.onEmailChange("")
         viewModel.onPasswordChange("")
         viewModel.login()
 
-        // エラーが設定されていることを確認
         assertThat(viewModel.ui.value.errorResId)
             .isEqualTo(R.string.error_empty_fields)
 
-        // onPasswordChangeで修正 → エラーがクリアされることを確認
+        // Changing password should clear the error
         viewModel.onPasswordChange("secret123")
 
         assertThat(viewModel.ui.value.password).isEqualTo("secret123")
@@ -114,23 +111,23 @@ class LoginViewModelTest {
             gate.receive()
         }
 
-        // 1回目の login を開始
+        // Start first login
         backgroundScope.launch { viewModel.login() }
 
-        // isLoading が true になるまで待つ（ビューの状態で同期を取る）
+        // Wait until loading state is true
         withTimeout(1_000) {
             viewModel.ui.first { it.isLoading }
         }
 
-        // 2回目の login を開始
+        // Attempt second login while first is still in progress
         backgroundScope.launch { viewModel.login() }
 
-        // 1回目を完了させる
+        // Complete the first login
         gate.trySend(Unit)
 
         advanceUntilIdle()
 
-        // repo.login は最終的に1回だけ
+        // Repository should only be called once
         coVerify(exactly = 1) { repository.login("test@example.com", "password") }
     }
 
@@ -140,6 +137,7 @@ class LoginViewModelTest {
             viewModel.onEmailChange("")
             viewModel.onPasswordChange("")
             viewModel.login()
+            advanceUntilIdle()
 
             assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_empty_fields)
             coVerify(exactly = 0) { repository.login(any(), any()) }
@@ -171,14 +169,9 @@ class LoginViewModelTest {
     fun `login success - emits LoggedIn event and clears loading`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password")
-        coEvery {
-            repository.login(
-                "test@example.com",
-                "password"
-            )
-        } returns Unit
+        coEvery { repository.login("test@example.com", "password") } returns Unit
 
-        // イベントを待ち受け
+        // Collect events before triggering login
         var received: LoginViewModel.UiEvent? = null
         val job: Job = launch {
             received = viewModel.events.first()
@@ -200,7 +193,7 @@ class LoginViewModelTest {
     fun `login failure - sets generic error message`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password")
-        coEvery { repository.login(any(), any()) } throws httpError(401)
+        coEvery { repository.login(any(), any()) } throws httpError()
 
         viewModel.login()
         advanceUntilIdle()
@@ -245,17 +238,17 @@ class LoginViewModelTest {
     fun `checkAuthState does not emit when no token exists`() = runTest(mainRule.scheduler) {
         every { repository.hasToken() } returns false
 
-        var received: LoginViewModel.UiEvent? = null
-        val job: Job = launch {
-            received = viewModel.events.first()
-        }
-
         viewModel.checkAuthState()
         advanceUntilIdle()
 
-        // Give some time to ensure no event is emitted
-        assertThat(received).isNull()
-        job.cancelAndJoin()
+        // Verify no event is emitted by expecting a timeout
+        val result = runCatching {
+            withTimeout(100) {
+                viewModel.events.first()
+            }
+        }
+        assertThat(result.exceptionOrNull())
+            .isInstanceOf(TimeoutCancellationException::class.java)
 
         verify(exactly = 1) { repository.hasToken() }
     }
