@@ -1,7 +1,6 @@
 package com.example.stock.feature.auth.viewmodel
 
 import com.example.stock.feature.auth.data.repository.AuthRepository
-import com.example.stock.feature.auth.viewmodel.LogoutViewModel
 import com.example.stock.util.MainDispatcherRule
 import com.example.stock.util.TestDispatcherProvider
 import com.google.common.truth.Truth.assertThat
@@ -9,7 +8,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.mockk
-import java.io.IOException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.first
@@ -20,6 +18,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.io.IOException
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class LogoutViewModelTest {
@@ -43,36 +42,38 @@ class LogoutViewModelTest {
     }
 
     @Test
-    fun `logout success - calls repository and emits LoggedOut event`() = runTest(mainRule.scheduler) {
-        var received: LogoutViewModel.UiEvent? = null
-        val job: Job = launch {
-            received = viewModel.events.first()
+    fun `logout success - calls repository and emits LoggedOut event`() =
+        runTest(mainRule.scheduler) {
+            var received: LogoutViewModel.UiEvent? = null
+            val job: Job = launch {
+                received = viewModel.events.first()
+            }
+
+            viewModel.logout()
+            advanceUntilIdle()
+
+            assertThat(received).isEqualTo(LogoutViewModel.UiEvent.LoggedOut)
+            job.cancelAndJoin()
+
+            coVerify(exactly = 1) { repository.logout() }
         }
-
-        viewModel.logout()
-        advanceUntilIdle()
-
-        assertThat(received).isEqualTo(LogoutViewModel.UiEvent.LoggedOut)
-        job.cancelAndJoin()
-
-        coVerify(exactly = 1) { repository.logout() }
-    }
 
     @Test
-    fun `logout failure - emits LoggedOut event even when repository throws exception`() = runTest(mainRule.scheduler) {
-        coEvery { repository.logout() } throws IOException("Network error")
+    fun `logout failure - emits LoggedOut event even when repository throws exception`() =
+        runTest(mainRule.scheduler) {
+            coEvery { repository.logout() } throws IOException("Network error")
 
-        var received: LogoutViewModel.UiEvent? = null
-        val job: Job = launch {
-            received = viewModel.events.first()
+            var received: LogoutViewModel.UiEvent? = null
+            val job: Job = launch {
+                received = viewModel.events.first()
+            }
+
+            viewModel.logout()
+            advanceUntilIdle()
+
+            assertThat(received).isEqualTo(LogoutViewModel.UiEvent.LoggedOut)
+            job.cancelAndJoin()
+
+            coVerify(exactly = 1) { repository.logout() }
         }
-
-        viewModel.logout()
-        advanceUntilIdle()
-
-        assertThat(received).isEqualTo(LogoutViewModel.UiEvent.LoggedOut)
-        job.cancelAndJoin()
-
-        coVerify(exactly = 1) { repository.logout() }
-    }
 }
