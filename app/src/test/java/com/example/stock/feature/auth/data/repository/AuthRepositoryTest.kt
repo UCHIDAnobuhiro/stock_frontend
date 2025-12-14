@@ -8,13 +8,12 @@ import com.example.stock.feature.auth.data.remote.LoginResponse
 import com.example.stock.feature.auth.data.remote.SignupRequest
 import com.example.stock.feature.auth.data.remote.SignupResponse
 import com.google.common.truth.Truth.assertThat
+import io.mockk.Called
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
-import io.mockk.verify
-import io.mockk.just
 import io.mockk.mockk
-import io.mockk.runs
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
@@ -55,7 +54,6 @@ class AuthRepositoryTest {
             val response = LoginResponse(token = "token_123")
 
             coEvery { api.login(LoginRequest(email, password)) } returns response
-            coEvery { tokenStore.save("token_123") } just runs
 
             repo.login(email, password)
 
@@ -63,6 +61,26 @@ class AuthRepositoryTest {
             coVerify(exactly = 1) { tokenStore.save("token_123") }
             coVerify(exactly = 1) { api.login(LoginRequest(email, password)) }
         }
+
+    @Test
+    fun `login fails when api returns error - token not updated`() = runTest(scheduler) {
+        val email = "test@example.com"
+        val password = "wrong_password"
+        val errorResponse = Response.error<LoginResponse>(
+            401,
+            "Unauthorized".toResponseBody(null)
+        )
+
+        coEvery { api.login(LoginRequest(email, password)) } throws HttpException(errorResponse)
+
+        val result = runCatching { repo.login(email, password) }
+
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isInstanceOf(HttpException::class.java)
+        // Token should not be updated when API fails
+        verify { tokenProvider wasNot Called }
+        verify { tokenStore wasNot Called }
+    }
 
     @Test
     fun `login fails when token store save throws - provider remains updated in current impl`() =
@@ -93,26 +111,6 @@ class AuthRepositoryTest {
         // then
         coVerify(exactly = 1) { tokenProvider.clear() }
         coVerify(exactly = 1) { tokenStore.clear() }
-    }
-
-    @Test
-    fun `login fails when api returns error - token not updated`() = runTest(scheduler) {
-        val email = "test@example.com"
-        val password = "wrong_password"
-        val errorResponse = Response.error<LoginResponse>(
-            401,
-            "Unauthorized".toResponseBody(null)
-        )
-
-        coEvery { api.login(LoginRequest(email, password)) } throws HttpException(errorResponse)
-
-        val result = runCatching { repo.login(email, password) }
-
-        assertThat(result.isFailure).isTrue()
-        assertThat(result.exceptionOrNull()).isInstanceOf(HttpException::class.java)
-        // Token should not be updated when API fails
-        verify { tokenProvider wasNot io.mockk.Called }
-        verify { tokenStore wasNot io.mockk.Called }
     }
 
     @Test
