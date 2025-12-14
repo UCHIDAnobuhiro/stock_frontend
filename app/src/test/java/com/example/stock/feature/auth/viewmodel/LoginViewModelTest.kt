@@ -2,7 +2,6 @@ package com.example.stock.feature.auth.viewmodel
 
 import com.example.stock.R
 import com.example.stock.feature.auth.data.repository.AuthRepository
-import com.example.stock.feature.auth.viewmodel.LoginViewModel
 import com.example.stock.util.MainDispatcherRule
 import com.example.stock.util.TestDispatcherProvider
 import com.google.common.truth.Truth.assertThat
@@ -13,6 +12,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
@@ -77,7 +77,6 @@ class LoginViewModelTest {
         assertThat(viewModel.ui.value.email).isEqualTo("test@example.com")
         assertThat(viewModel.ui.value.errorResId).isNull()
     }
-
 
     @Test
     fun `onPasswordChange updates state and clears error`() = runTest(mainRule.scheduler) {
@@ -245,17 +244,17 @@ class LoginViewModelTest {
     fun `checkAuthState does not emit when no token exists`() = runTest(mainRule.scheduler) {
         every { repository.hasToken() } returns false
 
-        var received: LoginViewModel.UiEvent? = null
-        val job: Job = launch {
-            received = viewModel.events.first()
-        }
-
         viewModel.checkAuthState()
         advanceUntilIdle()
 
-        // Give some time to ensure no event is emitted
-        assertThat(received).isNull()
-        job.cancelAndJoin()
+        // イベントが発行されていないことを確認（タイムアウトで検証）
+        val result = runCatching {
+            withTimeout(100) {
+                viewModel.events.first()
+            }
+        }
+        assertThat(result.exceptionOrNull())
+            .isInstanceOf(TimeoutCancellationException::class.java)
 
         verify(exactly = 1) { repository.hasToken() }
     }
