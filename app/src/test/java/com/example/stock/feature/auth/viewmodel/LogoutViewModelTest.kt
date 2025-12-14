@@ -43,7 +43,7 @@ class LogoutViewModelTest {
     }
 
     @Test
-    fun `logout calls repository and emits LoggedOut event`() = runTest(mainRule.scheduler) {
+    fun `logout success - calls repository and emits LoggedOut event`() = runTest(mainRule.scheduler) {
         var received: LogoutViewModel.UiEvent? = null
         val job: Job = launch {
             received = viewModel.events.first()
@@ -59,7 +59,7 @@ class LogoutViewModelTest {
     }
 
     @Test
-    fun `logout emits LoggedOut even when repository throws exception`() = runTest(mainRule.scheduler) {
+    fun `logout failure - emits LoggedOut event even when repository throws exception`() = runTest(mainRule.scheduler) {
         coEvery { repository.logout() } throws IOException("Network error")
 
         var received: LogoutViewModel.UiEvent? = null
