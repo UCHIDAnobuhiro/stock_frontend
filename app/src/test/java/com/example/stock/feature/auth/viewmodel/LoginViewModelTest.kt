@@ -139,6 +139,7 @@ class LoginViewModelTest {
             viewModel.onEmailChange("")
             viewModel.onPasswordChange("")
             viewModel.login()
+            advanceUntilIdle()
 
             assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_empty_fields)
             coVerify(exactly = 0) { repository.login(any(), any()) }
