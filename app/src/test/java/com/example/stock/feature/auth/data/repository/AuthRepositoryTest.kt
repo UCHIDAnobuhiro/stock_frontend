@@ -25,6 +25,12 @@ import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 
+/**
+ * Unit tests for [AuthRepository].
+ *
+ * Tests cover login, logout, signup, and token checking functionality.
+ * Uses MockK for mocking dependencies and Truth for assertions.
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AuthRepositoryTest {
     private val api: AuthApi = mockk()
@@ -45,6 +51,8 @@ class AuthRepositoryTest {
             io = testDispatcher
         )
     }
+
+    // region Login Tests
 
     @Test
     fun `login success - updates provider and saves token`() =
@@ -103,6 +111,10 @@ class AuthRepositoryTest {
             coVerify(exactly = 1) { tokenStore.save("token123") }
         }
 
+    // endregion
+
+    // region Logout Tests
+
     @Test
     fun `logout - clears provider and store`() = runTest(scheduler) {
         // when
@@ -112,6 +124,10 @@ class AuthRepositoryTest {
         coVerify(exactly = 1) { tokenProvider.clear() }
         coVerify(exactly = 1) { tokenStore.clear() }
     }
+
+    // endregion
+
+    // region Signup Tests
 
     @Test
     fun `signup success - returns response message`() = runTest(scheduler) {
@@ -144,6 +160,10 @@ class AuthRepositoryTest {
         assertThat(result.exceptionOrNull()).isInstanceOf(HttpException::class.java)
     }
 
+    // endregion
+
+    // region HasToken Tests
+
     @Test
     fun `hasToken returns true when token exists`() {
         every { tokenProvider.getToken() } returns "valid_token"
@@ -161,4 +181,6 @@ class AuthRepositoryTest {
 
         assertThat(result).isFalse()
     }
+
+    // endregion
 }
