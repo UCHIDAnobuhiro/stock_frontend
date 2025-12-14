@@ -4,9 +4,10 @@
 
 **A simple and lightweight stock chart application**
 An intuitive app for viewing US stock candlestick charts with daily, weekly, and monthly intervals.
-Built with Kotlin, Jetpack Compose, and MVVM architecture, featuring **login authentication** and **stock price display**.
+Built with Kotlin, Jetpack Compose, and MVVM architecture, featuring **login authentication** and *
+*stock price display**.
 
-<p align="center">
+<p>
   <video src="https://github.com/user-attachments/assets/fd6fcc0c-c268-4e54-8930-1a236458c454" width="70%" controls></video>
 </p>
 
@@ -140,6 +141,7 @@ Navigate to Login Screen (clear back stack)
 ```
 
 **Separation of Concerns:**
+
 - `LogoutViewModel`: Handles logout business logic
 - `NavGraph`: Handles navigation only (listens for events and navigates)
 - `AuthRepository`: Data layer (token management)
@@ -154,7 +156,8 @@ Navigate to Login Screen (clear back stack)
 ## 📂 Directory Structure
 
 This project adopts a **feature-based** package structure.
-By grouping related components (data, UI, ViewModel) by feature, modularity and maintainability are improved.
+By grouping related components (data, UI, ViewModel) by feature, modularity and maintainability are
+improved.
 
 ```text
 app/
@@ -184,7 +187,7 @@ app/
     │   │   └── local/           # TokenStore (DataStore)
     │   ├── network/             # ApiClient, AuthInterceptor
     │   └── ui/                  # Common UI
-    │       ├── component/       # Reusable Composables
+    │       ├── component/       # Reusable Composable
     │       ├── theme/           # Material3 theme, typography
     │       └── util/            # Utilities like ClickGuard
     ├── config/                  # ApiConfig (BASE_URL configuration)
