@@ -54,9 +54,9 @@ class LoginViewModelTest {
         confirmVerified(repository)
     }
 
-    private fun httpError(code: Int): HttpException {
+    private fun httpError(): HttpException {
         val body = """{"message":"err"}""".toResponseBody("application/json".toMediaType())
-        val resp: Response<Any> = Response.error(code, body)
+        val resp: Response<Any> = Response.error(401, body)
         return HttpException(resp)
     }
 
@@ -198,7 +198,7 @@ class LoginViewModelTest {
     fun `login failure - sets generic error message`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password")
-        coEvery { repository.login(any(), any()) } throws httpError(401)
+        coEvery { repository.login(any(), any()) } throws httpError()
 
         viewModel.login()
         advanceUntilIdle()
