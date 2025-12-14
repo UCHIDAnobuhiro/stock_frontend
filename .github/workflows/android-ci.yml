@@ -95,3 +95,17 @@ jobs:
             **/build/reports/tests/**/*
             **/build/test-results/**/*
           if-no-files-found: ignore
+
+  ci:
+    name: CI
+    needs: [lint, test]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check CI status
+        run: |
+          if [[ "${{ needs.lint.result }}" == "failure" || "${{ needs.test.result }}" == "failure" ]]; then
+            echo "CI failed"
+            exit 1
+          fi
+          echo "CI passed (jobs succeeded or skipped)"
