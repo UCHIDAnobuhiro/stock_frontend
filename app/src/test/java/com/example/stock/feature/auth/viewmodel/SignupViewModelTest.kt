@@ -3,7 +3,6 @@ package com.example.stock.feature.auth.viewmodel
 import com.example.stock.R
 import com.example.stock.feature.auth.data.remote.SignupResponse
 import com.example.stock.feature.auth.data.repository.AuthRepository
-import com.example.stock.feature.auth.viewmodel.SignupViewModel
 import com.example.stock.util.MainDispatcherRule
 import com.example.stock.util.TestDispatcherProvider
 import com.google.common.truth.Truth.assertThat
@@ -62,17 +61,16 @@ class SignupViewModelTest {
 
     @Test
     fun `onEmailChange updates state and clears error`() = runTest(mainRule.scheduler) {
-        // まずエラーを発生させる（空入力で signup）
+        // Trigger error state by attempting signup with empty fields
         viewModel.onEmailChange("")
         viewModel.onPasswordChange("")
         viewModel.onConfirmPasswordChange("")
         viewModel.signup()
 
-        // エラーが設定されていることを確認
         assertThat(viewModel.ui.value.errorResId)
             .isEqualTo(R.string.error_empty_fields)
 
-        // onEmailChangeで修正 → エラーがクリアされることを確認
+        // Changing email should clear the error
         viewModel.onEmailChange("test@example.com")
 
         assertThat(viewModel.ui.value.email).isEqualTo("test@example.com")
@@ -81,17 +79,16 @@ class SignupViewModelTest {
 
     @Test
     fun `onPasswordChange updates state and clears error`() = runTest(mainRule.scheduler) {
-        // まずエラーを発生させる（空入力で signup）
+        // Trigger error state by attempting signup with empty fields
         viewModel.onEmailChange("")
         viewModel.onPasswordChange("")
         viewModel.onConfirmPasswordChange("")
         viewModel.signup()
 
-        // エラーが設定されていることを確認
         assertThat(viewModel.ui.value.errorResId)
             .isEqualTo(R.string.error_empty_fields)
 
-        // onPasswordChangeで修正 → エラーがクリアされることを確認
+        // Changing password should clear the error
         viewModel.onPasswordChange("secret123")
 
         assertThat(viewModel.ui.value.password).isEqualTo("secret123")
@@ -100,17 +97,16 @@ class SignupViewModelTest {
 
     @Test
     fun `onConfirmPasswordChange updates state and clears error`() = runTest(mainRule.scheduler) {
-        // まずエラーを発生させる（空入力で signup）
+        // Trigger error state by attempting signup with empty fields
         viewModel.onEmailChange("")
         viewModel.onPasswordChange("")
         viewModel.onConfirmPasswordChange("")
         viewModel.signup()
 
-        // エラーが設定されていることを確認
         assertThat(viewModel.ui.value.errorResId)
             .isEqualTo(R.string.error_empty_fields)
 
-        // onConfirmPasswordChangeで修正 → エラーがクリアされることを確認
+        // Changing confirm password should clear the error
         viewModel.onConfirmPasswordChange("secret123")
 
         assertThat(viewModel.ui.value.confirmPassword).isEqualTo("secret123")
@@ -143,23 +139,23 @@ class SignupViewModelTest {
             SignupResponse("User registered successfully")
         }
 
-        // 1回目の signup を開始
+        // Start first signup
         backgroundScope.launch { viewModel.signup() }
 
-        // isLoading が true になるまで待つ（ビューの状態で同期を取る）
+        // Wait until loading state is true
         withTimeout(1_000) {
             viewModel.ui.first { it.isLoading }
         }
 
-        // 2回目の signup を開始
+        // Attempt second signup while first is still in progress
         backgroundScope.launch { viewModel.signup() }
 
-        // 1回目を完了させる
+        // Complete the first signup
         gate.trySend(Unit)
 
         advanceUntilIdle()
 
-        // repo.signup は最終的に1回だけ
+        // Repository should only be called once
         coVerify(exactly = 1) { repository.signup("test@example.com", "password12345678") }
     }
 
@@ -223,7 +219,7 @@ class SignupViewModelTest {
             )
         } returns SignupResponse("User registered successfully")
 
-        // イベントを待ち受け
+        // Collect events before triggering signup
         var received: SignupViewModel.UiEvent? = null
         val job: Job = launch {
             received = viewModel.events.first()
@@ -242,19 +238,20 @@ class SignupViewModelTest {
     }
 
     @Test
-    fun `signup failure - http 409 maps to already registered message`() = runTest(mainRule.scheduler) {
-        viewModel.onEmailChange("test@example.com")
-        viewModel.onPasswordChange("password123")
-        viewModel.onConfirmPasswordChange("password123")
-        coEvery { repository.signup(any(), any()) } throws httpError(409)
+    fun `signup failure - http 409 maps to already registered message`() =
+        runTest(mainRule.scheduler) {
+            viewModel.onEmailChange("test@example.com")
+            viewModel.onPasswordChange("password123")
+            viewModel.onConfirmPasswordChange("password123")
+            coEvery { repository.signup(any(), any()) } throws httpError(409)
 
-        viewModel.signup()
-        advanceUntilIdle()
+            viewModel.signup()
+            advanceUntilIdle()
 
-        assertThat(viewModel.ui.value.isLoading).isFalse()
-        assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_email_already_registered)
-        coVerify(exactly = 1) { repository.signup("test@example.com", "password123") }
-    }
+            assertThat(viewModel.ui.value.isLoading).isFalse()
+            assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_email_already_registered)
+            coVerify(exactly = 1) { repository.signup("test@example.com", "password123") }
+        }
 
     @Test
     fun `signup failure - http 500 shows generic error`() = runTest(mainRule.scheduler) {
