@@ -166,6 +166,7 @@ class SignupViewModelTest {
             viewModel.onPasswordChange("")
             viewModel.onConfirmPasswordChange("")
             viewModel.signup()
+            advanceUntilIdle()
 
             assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_empty_fields)
             coVerify(exactly = 0) { repository.signup(any(), any()) }
@@ -212,12 +213,7 @@ class SignupViewModelTest {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password123")
         viewModel.onConfirmPasswordChange("password123")
-        coEvery {
-            repository.signup(
-                "test@example.com",
-                "password123"
-            )
-        } returns SignupResponse("User registered successfully")
+        coEvery { repository.signup("test@example.com", "password123") } returns SignupResponse("User registered successfully")
 
         // Collect events before triggering signup
         var received: SignupViewModel.UiEvent? = null
