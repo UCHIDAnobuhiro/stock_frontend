@@ -97,7 +97,7 @@ jobs:
           if-no-files-found: ignore
 
   ci:
-    name: CI
+    name: unit-and-lint
     needs: [lint, test]
     if: always()
     runs-on: ubuntu-latest
