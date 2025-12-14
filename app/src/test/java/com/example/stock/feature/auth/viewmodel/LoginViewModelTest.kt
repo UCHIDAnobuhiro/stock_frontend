@@ -62,16 +62,15 @@ class LoginViewModelTest {
 
     @Test
     fun `onEmailChange updates state and clears error`() = runTest(mainRule.scheduler) {
-        // まずエラーを発生させる（空入力で login）
+        // Trigger error state by attempting login with empty fields
         viewModel.onEmailChange("")
         viewModel.onPasswordChange("")
         viewModel.login()
 
-        // エラーが設定されていることを確認
         assertThat(viewModel.ui.value.errorResId)
             .isEqualTo(R.string.error_empty_fields)
 
-        // onEmailChangeで修正 → エラーがクリアされることを確認
+        // Changing email should clear the error
         viewModel.onEmailChange("test@example.com")
 
         assertThat(viewModel.ui.value.email).isEqualTo("test@example.com")
@@ -80,16 +79,15 @@ class LoginViewModelTest {
 
     @Test
     fun `onPasswordChange updates state and clears error`() = runTest(mainRule.scheduler) {
-        // まずエラーを発生させる（空入力で login）
+        // Trigger error state by attempting login with empty fields
         viewModel.onEmailChange("")
         viewModel.onPasswordChange("")
         viewModel.login()
 
-        // エラーが設定されていることを確認
         assertThat(viewModel.ui.value.errorResId)
             .isEqualTo(R.string.error_empty_fields)
 
-        // onPasswordChangeで修正 → エラーがクリアされることを確認
+        // Changing password should clear the error
         viewModel.onPasswordChange("secret123")
 
         assertThat(viewModel.ui.value.password).isEqualTo("secret123")
@@ -113,23 +111,23 @@ class LoginViewModelTest {
             gate.receive()
         }
 
-        // 1回目の login を開始
+        // Start first login
         backgroundScope.launch { viewModel.login() }
 
-        // isLoading が true になるまで待つ（ビューの状態で同期を取る）
+        // Wait until loading state is true
         withTimeout(1_000) {
             viewModel.ui.first { it.isLoading }
         }
 
-        // 2回目の login を開始
+        // Attempt second login while first is still in progress
         backgroundScope.launch { viewModel.login() }
 
-        // 1回目を完了させる
+        // Complete the first login
         gate.trySend(Unit)
 
         advanceUntilIdle()
 
-        // repo.login は最終的に1回だけ
+        // Repository should only be called once
         coVerify(exactly = 1) { repository.login("test@example.com", "password") }
     }
 
@@ -178,7 +176,7 @@ class LoginViewModelTest {
             )
         } returns Unit
 
-        // イベントを待ち受け
+        // Collect events before triggering login
         var received: LoginViewModel.UiEvent? = null
         val job: Job = launch {
             received = viewModel.events.first()
@@ -248,7 +246,7 @@ class LoginViewModelTest {
         viewModel.checkAuthState()
         advanceUntilIdle()
 
-        // イベントが発行されていないことを確認（タイムアウトで検証）
+        // Verify no event is emitted by expecting a timeout
         val result = runCatching {
             withTimeout(100) {
                 viewModel.events.first()
