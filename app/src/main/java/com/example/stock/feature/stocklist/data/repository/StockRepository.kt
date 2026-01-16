@@ -3,7 +3,6 @@ package com.example.stock.feature.stocklist.data.repository
 import com.example.stock.core.network.ApiClient
 import com.example.stock.feature.stocklist.data.remote.StockApi
 import com.example.stock.feature.stocklist.data.remote.SymbolItem
-import com.example.stock.feature.stocklist.data.remote.CandleDto
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,10 +26,6 @@ class StockRepository(
     private val _symbols = MutableStateFlow<List<SymbolItem>>(emptyList())
     val symbols: StateFlow<List<SymbolItem>> = _symbols
 
-    // StateFlow for candlestick data (read-only)
-    private val _candles = MutableStateFlow<List<CandleDto>>(emptyList())
-    val candles: StateFlow<List<CandleDto>> = _candles
-
     /**
      * Fetches the symbol list from the API.
      *
@@ -41,27 +36,5 @@ class StockRepository(
      */
     suspend fun fetchSymbols(): List<SymbolItem> = withContext(io) {
         stockApi.getSymbols()
-    }
-
-    /**
-     * Fetches candlestick data for a specified symbol code, interval, and count, and updates StateFlow.
-     *
-     * @param code Symbol code
-     * @param interval Data fetching interval (e.g., "1day")
-     * @param outputsize Number of data points to fetch (default: 200)
-     */
-    suspend fun fetchCandles(
-        code: String,
-        interval: String = "1day",
-        outputsize: Int = 200
-    ) = withContext(io) {
-        _candles.value = stockApi.getCandles(code, interval, outputsize)
-    }
-
-    /**
-     * Clears the stored candlestick data.
-     */
-    fun clearCandles() {
-        _candles.value = emptyList()
     }
 }

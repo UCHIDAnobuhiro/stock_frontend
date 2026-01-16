@@ -1,8 +1,7 @@
 package com.example.stock.feature.chart.viewmodel
 
-import com.example.stock.feature.stocklist.data.remote.CandleDto
-import com.example.stock.feature.stocklist.data.repository.StockRepository
-import com.example.stock.feature.chart.viewmodel.CandlesViewModel
+import com.example.stock.feature.chart.data.remote.CandleDto
+import com.example.stock.feature.chart.data.repository.CandleRepository
 import com.example.stock.util.MainDispatcherRule
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -33,7 +32,7 @@ class CandlesViewModelTest {
     @get:Rule
     val mainRule = MainDispatcherRule()
 
-    private lateinit var repo: StockRepository
+    private lateinit var repo: CandleRepository
     private lateinit var vm: CandlesViewModel
 
     // ViewModel から見えるローソク足のストリームをテスト用に差し込み
