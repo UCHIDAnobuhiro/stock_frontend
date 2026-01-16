@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
@@ -46,6 +47,7 @@ class SymbolViewModel @Inject constructor(
                 val errorResId = when (e) {
                     is IOException -> R.string.error_network
                     is HttpException -> R.string.error_server
+                    is SerializationException -> R.string.error_json
                     else -> R.string.error_unknown
                 }
                 _ui.update { it.copy(errorResId = errorResId, isLoading = false) }

@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
@@ -88,6 +89,22 @@ class SymbolViewModelTest {
             val state = vm.ui.value
             assertThat(state.isLoading).isFalse()
             assertThat(state.errorResId).isEqualTo(R.string.error_server)
+        }
+
+    @Test
+    fun `load failure with SerializationException - sets json error`() =
+        runTest(mainRule.scheduler) {
+            // given
+            coEvery { repo.fetchSymbols() } throws SerializationException("Invalid JSON")
+
+            // when
+            vm.load()
+            advanceUntilIdle()
+
+            // then
+            val state = vm.ui.value
+            assertThat(state.isLoading).isFalse()
+            assertThat(state.errorResId).isEqualTo(R.string.error_json)
         }
 
     @Test

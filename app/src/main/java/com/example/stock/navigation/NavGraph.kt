@@ -1,5 +1,6 @@
 package com.example.stock.navigation
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -73,12 +74,16 @@ fun AppNavGraph() {
         composable(Routes.STOCK) {
             SymbolListScreen(
                 onNavigateToChart = { name, code ->
-                    navController.navigate("chart/$name/$code")
+                    // Encode parameters to handle special characters and spaces
+                    val encodedName = Uri.encode(name)
+                    val encodedCode = Uri.encode(code)
+                    navController.navigate("chart/$encodedName/$encodedCode")
                 },
                 onLogout = { logoutViewModel.logout() }
             )
         }
         composable("chart/{name}/{code}") { backStackEntry ->
+            // Navigation component automatically decodes URI parameters
             val name = backStackEntry.arguments?.getString("name") ?: return@composable
             val code = backStackEntry.arguments?.getString("code") ?: return@composable
             val candlesViewModel: CandlesViewModel = hiltViewModel()
