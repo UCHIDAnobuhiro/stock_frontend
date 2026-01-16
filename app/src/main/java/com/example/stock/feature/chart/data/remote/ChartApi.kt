@@ -1,4 +1,5 @@
-package com.example.stock.feature.stocklist.data.remote
+package com.example.stock.feature.chart.data.remote
+
 import kotlinx.serialization.Serializable
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -25,19 +26,11 @@ data class CandleDto(
 )
 
 /**
- * Retrofit interface defining communication with the stock information API.
+ * Retrofit interface defining communication with the chart data API.
  *
- * Provides APIs for retrieving symbol lists and candlestick data.
+ * Provides APIs for retrieving candlestick data.
  */
-interface StockApi {
-    /**
-     * API for fetching the list of symbols.
-     *
-     * @return List of symbol information
-     */
-    @GET("symbols")
-    suspend fun getSymbols(): List<SymbolItem>
-
+interface ChartApi {
     /**
      * API for fetching candlestick data for a specified symbol code.
      *

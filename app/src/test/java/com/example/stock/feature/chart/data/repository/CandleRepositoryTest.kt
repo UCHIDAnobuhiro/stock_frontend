@@ -1,9 +1,7 @@
-package com.example.stock.feature.stocklist.data.repository
+package com.example.stock.feature.chart.data.repository
 
-import com.example.stock.feature.stocklist.data.remote.CandleDto
-import com.example.stock.feature.stocklist.data.remote.StockApi
-import com.example.stock.feature.stocklist.data.remote.SymbolItem
-import com.example.stock.feature.stocklist.data.repository.StockRepository
+import com.example.stock.feature.chart.data.remote.CandleDto
+import com.example.stock.feature.chart.data.remote.ChartApi
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -19,35 +17,19 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class StockRepositoryTest {
+class CandleRepositoryTest {
 
     private val scheduler = TestCoroutineScheduler()
     private val dispatcher = StandardTestDispatcher(scheduler)
 
-    private lateinit var stockApi: StockApi
-    private lateinit var repo: StockRepository
+    private lateinit var chartApi: ChartApi
+    private lateinit var repo: CandleRepository
 
     @Before
     fun setup() {
         Dispatchers.setMain(dispatcher)
-        stockApi = mockk()
-        repo = StockRepository(stockApi = stockApi, io = dispatcher)
-    }
-
-    @Test
-    fun `fetchSymbols should return symbols from api`() = runTest(scheduler) {
-        val expected = listOf(
-            SymbolItem("AAPL", "Apple Inc."),
-            SymbolItem("GOOG", "Alphabet Inc.")
-        )
-        coEvery { stockApi.getSymbols() } returns expected
-
-        // when
-        val result = repo.fetchSymbols()
-
-        // then
-        assertEquals(expected, result)
-        coVerify(exactly = 1) { stockApi.getSymbols() }
+        chartApi = mockk()
+        repo = CandleRepository(chartApi = chartApi, io = dispatcher)
     }
 
     @Test
@@ -70,36 +52,33 @@ class StockRepositoryTest {
                 volume = 1500
             )
         )
-        coEvery { stockApi.getCandles(any(), any(), any()) } returns mockCandles
+        coEvery { chartApi.getCandles(any(), any(), any()) } returns mockCandles
 
         repo.fetchCandles("AAPL", "1day", 200)
         advanceUntilIdle()
 
-        coVerify(exactly = 1) { stockApi.getCandles("AAPL", "1day", 200) }
+        coVerify(exactly = 1) { chartApi.getCandles("AAPL", "1day", 200) }
         assertEquals(mockCandles, repo.candles.value)
-
     }
 
     @Test
     fun `clearCandles empties the candles flow`() = runTest(scheduler) {
-        // 事前に値をセット
         val initial = listOf(CandleDto("2024-01-01", 100.00, 110.00, 90.00, 105.00, 1000))
-        coEvery { stockApi.getCandles(any(), any(), any()) } returns initial
+        coEvery { chartApi.getCandles(any(), any(), any()) } returns initial
         repo.fetchCandles("AAPL")
         advanceUntilIdle()
 
-        // 実行
         repo.clearCandles()
         assertEquals(emptyList<CandleDto>(), repo.candles.value)
     }
 
     @Test
     fun `fetchCandles uses default params`() = runTest(scheduler) {
-        coEvery { stockApi.getCandles(any(), any(), any()) } returns emptyList()
+        coEvery { chartApi.getCandles(any(), any(), any()) } returns emptyList()
 
         repo.fetchCandles("MSFT")
         advanceUntilIdle()
 
-        coVerify(exactly = 1) { stockApi.getCandles("MSFT", "1day", 200) }
+        coVerify(exactly = 1) { chartApi.getCandles("MSFT", "1day", 200) }
     }
 }

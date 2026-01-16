@@ -5,8 +5,10 @@ import com.example.stock.core.data.auth.TokenProvider
 import com.example.stock.core.data.local.TokenStore
 import com.example.stock.feature.auth.data.remote.AuthApi
 import com.example.stock.feature.auth.data.repository.AuthRepository
-import com.example.stock.feature.stocklist.data.remote.StockApi
-import com.example.stock.feature.stocklist.data.repository.StockRepository
+import com.example.stock.feature.chart.data.remote.ChartApi
+import com.example.stock.feature.chart.data.repository.CandleRepository
+import com.example.stock.feature.stocklist.data.remote.SymbolApi
+import com.example.stock.feature.stocklist.data.repository.SymbolRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,13 +50,24 @@ object DataModule {
     }
 
     /**
-     * Provides a singleton instance of StockRepository.
+     * Provides a singleton instance of SymbolRepository.
      */
     @Provides
     @Singleton
-    fun provideStockRepository(
-        stockApi: StockApi
-    ): StockRepository {
-        return StockRepository(stockApi)
+    fun provideSymbolRepository(
+        symbolApi: SymbolApi
+    ): SymbolRepository {
+        return SymbolRepository(symbolApi)
+    }
+
+    /**
+     * Provides a singleton instance of CandleRepository.
+     */
+    @Provides
+    @Singleton
+    fun provideCandleRepository(
+        chartApi: ChartApi
+    ): CandleRepository {
+        return CandleRepository(chartApi)
     }
 }

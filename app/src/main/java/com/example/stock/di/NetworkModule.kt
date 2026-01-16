@@ -5,7 +5,8 @@ import com.example.stock.core.data.auth.InMemoryTokenProvider
 import com.example.stock.core.data.auth.TokenProvider
 import com.example.stock.core.network.AuthInterceptor
 import com.example.stock.feature.auth.data.remote.AuthApi
-import com.example.stock.feature.stocklist.data.remote.StockApi
+import com.example.stock.feature.chart.data.remote.ChartApi
+import com.example.stock.feature.stocklist.data.remote.SymbolApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -100,11 +101,20 @@ object NetworkModule {
     }
 
     /**
-     * Provides a singleton instance of StockApi.
+     * Provides a singleton instance of SymbolApi.
      */
     @Provides
     @Singleton
-    fun provideStockApi(retrofit: Retrofit): StockApi {
-        return retrofit.create(StockApi::class.java)
+    fun provideSymbolApi(retrofit: Retrofit): SymbolApi {
+        return retrofit.create(SymbolApi::class.java)
+    }
+
+    /**
+     * Provides a singleton instance of ChartApi.
+     */
+    @Provides
+    @Singleton
+    fun provideChartApi(retrofit: Retrofit): ChartApi {
+        return retrofit.create(ChartApi::class.java)
     }
 }

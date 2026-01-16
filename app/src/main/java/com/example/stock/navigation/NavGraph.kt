@@ -1,5 +1,6 @@
 package com.example.stock.navigation
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -11,8 +12,7 @@ import com.example.stock.feature.auth.ui.signup.SignupScreen
 import com.example.stock.feature.auth.viewmodel.LogoutViewModel
 import com.example.stock.feature.chart.ui.ChartScreen
 import com.example.stock.feature.chart.viewmodel.CandlesViewModel
-import com.example.stock.feature.stocklist.ui.StockListScreen
-import com.example.stock.feature.stocklist.viewmodel.SymbolViewModel
+import com.example.stock.feature.stocklist.ui.SymbolListScreen
 
 // Routes are identifiers for screen navigation.
 object Routes {
@@ -72,14 +72,18 @@ fun AppNavGraph() {
             )
         }
         composable(Routes.STOCK) {
-            val symbolViewModel: SymbolViewModel = hiltViewModel()
-            StockListScreen(
-                navController,
-                symbolViewModel,
+            SymbolListScreen(
+                onNavigateToChart = { name, code ->
+                    // Encode parameters to handle special characters and spaces
+                    val encodedName = Uri.encode(name)
+                    val encodedCode = Uri.encode(code)
+                    navController.navigate("chart/$encodedName/$encodedCode")
+                },
                 onLogout = { logoutViewModel.logout() }
             )
         }
         composable("chart/{name}/{code}") { backStackEntry ->
+            // Navigation component automatically decodes URI parameters
             val name = backStackEntry.arguments?.getString("name") ?: return@composable
             val code = backStackEntry.arguments?.getString("code") ?: return@composable
             val candlesViewModel: CandlesViewModel = hiltViewModel()
