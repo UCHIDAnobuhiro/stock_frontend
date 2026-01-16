@@ -14,5 +14,5 @@ interface SymbolApi {
      * @return List of symbol information
      */
     @GET("symbols")
-    suspend fun getSymbols(): List<SymbolItem>
+    suspend fun getSymbols(): List<SymbolDto>
 }

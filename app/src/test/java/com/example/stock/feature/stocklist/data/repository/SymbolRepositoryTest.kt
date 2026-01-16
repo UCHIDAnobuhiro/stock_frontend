@@ -1,7 +1,7 @@
 package com.example.stock.feature.stocklist.data.repository
 
 import com.example.stock.feature.stocklist.data.remote.SymbolApi
-import com.example.stock.feature.stocklist.data.remote.SymbolItem
+import com.example.stock.feature.stocklist.data.remote.SymbolDto
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -34,8 +34,8 @@ class SymbolRepositoryTest {
     @Test
     fun `fetchSymbols should return symbols from api`() = runTest(scheduler) {
         val expected = listOf(
-            SymbolItem("AAPL", "Apple Inc."),
-            SymbolItem("GOOG", "Alphabet Inc.")
+            SymbolDto("AAPL", "Apple Inc."),
+            SymbolDto("GOOG", "Alphabet Inc.")
         )
         coEvery { symbolApi.getSymbols() } returns expected
 

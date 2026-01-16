@@ -1,6 +1,6 @@
 package com.example.stock.feature.stocklist.viewmodel
 
-import com.example.stock.feature.stocklist.data.remote.SymbolItem
+import com.example.stock.feature.stocklist.data.remote.SymbolDto
 import com.example.stock.feature.stocklist.data.repository.SymbolRepository
 import com.example.stock.feature.stocklist.viewmodel.SymbolViewModel
 import com.example.stock.util.MainDispatcherRule
@@ -36,8 +36,8 @@ class SymbolViewModelTest {
         runTest(mainRule.scheduler) {
             // given
             val expected = listOf(
-                SymbolItem("AAPL", "Apple Inc."),
-                SymbolItem("GOOG", "Alphabet Inc.")
+                SymbolDto("AAPL", "Apple Inc."),
+                SymbolDto("GOOG", "Alphabet Inc.")
             )
             coEvery { repo.fetchSymbols() } returns expected
 
@@ -69,7 +69,7 @@ class SymbolViewModelTest {
 
             val state = vm.ui.value
             assertThat(state.isLoading).isFalse()
-            assertThat(state.symbols).isEqualTo(emptyList<SymbolItem>())
+            assertThat(state.symbols).isEqualTo(emptyList<SymbolDto>())
             assertThat(state.error).isEqualTo("Network down")
 
             coVerify(exactly = 1) { repo.fetchSymbols() }
@@ -84,7 +84,7 @@ class SymbolViewModelTest {
         assertThat(vm.ui.value.error).isEqualTo("first failure")
 
         // 次は成功させる
-        val expected = listOf(SymbolItem("MSFT", "Microsoft"))
+        val expected = listOf(SymbolDto("MSFT", "Microsoft"))
         coEvery { repo.fetchSymbols() } returns expected
 
         vm.load()

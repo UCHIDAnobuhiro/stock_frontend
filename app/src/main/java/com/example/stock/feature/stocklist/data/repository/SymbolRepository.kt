@@ -2,7 +2,7 @@ package com.example.stock.feature.stocklist.data.repository
 
 import com.example.stock.core.network.ApiClient
 import com.example.stock.feature.stocklist.data.remote.SymbolApi
-import com.example.stock.feature.stocklist.data.remote.SymbolItem
+import com.example.stock.feature.stocklist.data.remote.SymbolDto
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,8 +23,8 @@ class SymbolRepository(
     private val io: CoroutineDispatcher = Dispatchers.IO
 ) {
     // StateFlow for symbol list (read-only)
-    private val _symbols = MutableStateFlow<List<SymbolItem>>(emptyList())
-    val symbols: StateFlow<List<SymbolItem>> = _symbols
+    private val _symbols = MutableStateFlow<List<SymbolDto>>(emptyList())
+    val symbols: StateFlow<List<SymbolDto>> = _symbols
 
     /**
      * Fetches the symbol list from the API.
@@ -34,7 +34,7 @@ class SymbolRepository(
      *
      * @return Symbol list fetched from the API
      */
-    suspend fun fetchSymbols(): List<SymbolItem> = withContext(io) {
+    suspend fun fetchSymbols(): List<SymbolDto> = withContext(io) {
         symbolApi.getSymbols()
     }
 }
