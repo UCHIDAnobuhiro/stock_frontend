@@ -11,8 +11,7 @@ import com.example.stock.feature.auth.ui.signup.SignupScreen
 import com.example.stock.feature.auth.viewmodel.LogoutViewModel
 import com.example.stock.feature.chart.ui.ChartScreen
 import com.example.stock.feature.chart.viewmodel.CandlesViewModel
-import com.example.stock.feature.stocklist.ui.StockListScreen
-import com.example.stock.feature.stocklist.viewmodel.SymbolViewModel
+import com.example.stock.feature.stocklist.ui.SymbolListScreen
 
 // Routes are identifiers for screen navigation.
 object Routes {
@@ -72,10 +71,10 @@ fun AppNavGraph() {
             )
         }
         composable(Routes.STOCK) {
-            val symbolViewModel: SymbolViewModel = hiltViewModel()
-            StockListScreen(
-                navController,
-                symbolViewModel,
+            SymbolListScreen(
+                onNavigateToChart = { name, code ->
+                    navController.navigate("chart/$name/$code")
+                },
                 onLogout = { logoutViewModel.logout() }
             )
         }

@@ -3,11 +3,11 @@ package com.example.stock.feature.stocklist.data.remote
 import retrofit2.http.GET
 
 /**
- * Retrofit interface defining communication with the stock information API.
+ * Retrofit interface defining communication with the symbol API.
  *
  * Provides APIs for retrieving symbol lists.
  */
-interface StockApi {
+interface SymbolApi {
     /**
      * API for fetching the list of symbols.
      *

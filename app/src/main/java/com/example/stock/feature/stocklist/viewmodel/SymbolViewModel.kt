@@ -2,7 +2,7 @@ package com.example.stock.feature.stocklist.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.stock.feature.stocklist.data.repository.StockRepository
+import com.example.stock.feature.stocklist.data.repository.SymbolRepository
 import com.example.stock.feature.stocklist.ui.SymbolUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +18,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SymbolViewModel @Inject constructor(
-    private val repo: StockRepository
+    private val repo: SymbolRepository
 ) : ViewModel() {
 
     private val _ui = MutableStateFlow(SymbolUiState())

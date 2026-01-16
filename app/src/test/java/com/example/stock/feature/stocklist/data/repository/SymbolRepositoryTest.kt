@@ -1,6 +1,6 @@
 package com.example.stock.feature.stocklist.data.repository
 
-import com.example.stock.feature.stocklist.data.remote.StockApi
+import com.example.stock.feature.stocklist.data.remote.SymbolApi
 import com.example.stock.feature.stocklist.data.remote.SymbolItem
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -16,19 +16,19 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class StockRepositoryTest {
+class SymbolRepositoryTest {
 
     private val scheduler = TestCoroutineScheduler()
     private val dispatcher = StandardTestDispatcher(scheduler)
 
-    private lateinit var stockApi: StockApi
-    private lateinit var repo: StockRepository
+    private lateinit var symbolApi: SymbolApi
+    private lateinit var repo: SymbolRepository
 
     @Before
     fun setup() {
         Dispatchers.setMain(dispatcher)
-        stockApi = mockk()
-        repo = StockRepository(stockApi = stockApi, io = dispatcher)
+        symbolApi = mockk()
+        repo = SymbolRepository(symbolApi = symbolApi, io = dispatcher)
     }
 
     @Test
@@ -37,13 +37,13 @@ class StockRepositoryTest {
             SymbolItem("AAPL", "Apple Inc."),
             SymbolItem("GOOG", "Alphabet Inc.")
         )
-        coEvery { stockApi.getSymbols() } returns expected
+        coEvery { symbolApi.getSymbols() } returns expected
 
         // when
         val result = repo.fetchSymbols()
 
         // then
         assertEquals(expected, result)
-        coVerify(exactly = 1) { stockApi.getSymbols() }
+        coVerify(exactly = 1) { symbolApi.getSymbols() }
     }
 }

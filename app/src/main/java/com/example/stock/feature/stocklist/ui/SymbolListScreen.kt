@@ -25,36 +25,64 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.example.stock.R
 import com.example.stock.core.ui.component.MainHeader
 import com.example.stock.core.ui.theme.Spacing
 import com.example.stock.core.ui.theme.Thickness
 import com.example.stock.feature.stocklist.viewmodel.SymbolViewModel
 
-
 /**
- * 銘柄リスト画面。
+ * Symbol list screen with ViewModel.
  *
- * APIから取得した銘柄一覧をリスト表示し、
- * タップでチャート画面へ遷移できる。
+ * Wrapper composable that connects [SymbolViewModel] to [SymbolListScreenContent].
+ * Handles state observation and initial data loading.
+ * Uses Hilt to automatically inject the SymbolViewModel.
  *
- * @param navController ナビゲーション操作用コントローラ
- * @param vm 銘柄リスト取得用ViewModel
- * @param onLogout ログアウト時のコールバック
+ * @param onNavigateToChart Callback to navigate to chart screen with symbol name and code
+ * @param onLogout Callback invoked when logout button is pressed
+ * @param viewModel Symbol list ViewModel (injected by Hilt)
  */
 @Composable
-fun StockListScreen(
-    navController: NavController,
-    vm: SymbolViewModel,
+fun SymbolListScreen(
+    onNavigateToChart: (name: String, code: String) -> Unit,
+    onLogout: () -> Unit,
+    viewModel: SymbolViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.ui.collectAsStateWithLifecycle()
+
+    // Load symbol list on first display
+    LaunchedEffect(viewModel) {
+        viewModel.load()
+    }
+
+    SymbolListScreenContent(
+        uiState = uiState,
+        onSymbolClick = onNavigateToChart,
+        onReload = viewModel::load,
+        onLogout = onLogout
+    )
+}
+
+/**
+ * Stateless symbol list screen content.
+ *
+ * Displays a list of symbols fetched from the API.
+ * Shows loading indicator, error state with retry button, or empty state as appropriate.
+ *
+ * @param uiState Current UI state
+ * @param onSymbolClick Callback when a symbol item is clicked
+ * @param onReload Callback to reload the symbol list
+ * @param onLogout Callback when logout button is pressed
+ */
+@Composable
+fun SymbolListScreenContent(
+    uiState: SymbolUiState,
+    onSymbolClick: (name: String, code: String) -> Unit,
+    onReload: () -> Unit,
     onLogout: () -> Unit,
 ) {
-    // 銘柄リストのStateFlowを購読
-    val state by vm.ui.collectAsStateWithLifecycle()
-    // 初回表示時にリスト取得
-    LaunchedEffect(vm) { vm.load() }
-
     Scaffold(
         topBar = {
             MainHeader(
@@ -69,8 +97,8 @@ fun StockListScreen(
             .padding(Spacing.Screen)
 
         when {
-            // 1) 読み込み中
-            state.isLoading -> {
+            // Loading state
+            uiState.isLoading -> {
                 Box(
                     modifier,
                     contentAlignment = Alignment.Center
@@ -79,8 +107,8 @@ fun StockListScreen(
                 }
             }
 
-            // 2) エラー
-            state.error != null -> {
+            // Error state
+            uiState.error != null -> {
                 Box(
                     modifier,
                     contentAlignment = Alignment.Center
@@ -88,19 +116,19 @@ fun StockListScreen(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(state.error!!, color = MaterialTheme.colorScheme.error)
+                        Text(uiState.error, color = MaterialTheme.colorScheme.error)
                         Spacer(
                             modifier = Modifier.padding(top = Spacing.ListItemVertical)
                         )
-                        Button(onClick = { vm.load() }) {
+                        Button(onClick = onReload) {
                             Text(stringResource(R.string.reload))
                         }
                     }
                 }
             }
 
-            // 3) 空データ
-            state.symbols.isEmpty() -> {
+            // Empty state
+            uiState.symbols.isEmpty() -> {
                 Box(
                     modifier,
                     contentAlignment = Alignment.Center
@@ -109,31 +137,31 @@ fun StockListScreen(
                 }
             }
 
-            // 銘柄リスト表示
+            // Symbol list display
             else -> {
                 Column(modifier) {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         itemsIndexed(
-                            state.symbols,
+                            uiState.symbols,
                             key = { _, item -> item.code }
-                        ) { index, stock ->
+                        ) { index, symbol ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    // タップでチャート画面へ遷移
+                                    // Navigate to chart screen on tap
                                     .clickable {
-                                        navController.navigate("chart/${stock.name}/${stock.code}")
+                                        onSymbolClick(symbol.name, symbol.code)
                                     }
                                     .background(Color.Transparent)
                                     .padding(vertical = Spacing.ListItemVertical),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                // 銘柄名
-                                Text(text = stock.name, style = MaterialTheme.typography.bodyLarge)
-                                // 銘柄コード
-                                Text(text = stock.code, style = MaterialTheme.typography.bodyLarge)
+                                // Symbol name
+                                Text(text = symbol.name, style = MaterialTheme.typography.bodyLarge)
+                                // Symbol code
+                                Text(text = symbol.code, style = MaterialTheme.typography.bodyLarge)
                             }
-                            if (index < state.symbols.lastIndex) {
+                            if (index < uiState.symbols.lastIndex) {
                                 HorizontalDivider(thickness = Thickness.Divider)
                             }
                         }

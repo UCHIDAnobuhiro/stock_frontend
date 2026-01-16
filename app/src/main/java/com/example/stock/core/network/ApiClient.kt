@@ -4,7 +4,7 @@ import com.example.stock.config.ApiConfig
 import com.example.stock.core.data.auth.InMemoryTokenProvider
 import com.example.stock.feature.auth.data.remote.AuthApi
 import com.example.stock.feature.chart.data.remote.ChartApi
-import com.example.stock.feature.stocklist.data.remote.StockApi
+import com.example.stock.feature.stocklist.data.remote.SymbolApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -60,7 +60,7 @@ object ApiClient {
      */
     val authApi: AuthApi = retrofit.create(AuthApi::class.java)
 
-    val stockApi: StockApi = retrofit.create(StockApi::class.java)
+    val symbolApi: SymbolApi = retrofit.create(SymbolApi::class.java)
 
     val chartApi: ChartApi = retrofit.create(ChartApi::class.java)
 }

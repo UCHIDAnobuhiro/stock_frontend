@@ -1,7 +1,7 @@
 package com.example.stock.feature.stocklist.viewmodel
 
 import com.example.stock.feature.stocklist.data.remote.SymbolItem
-import com.example.stock.feature.stocklist.data.repository.StockRepository
+import com.example.stock.feature.stocklist.data.repository.SymbolRepository
 import com.example.stock.feature.stocklist.viewmodel.SymbolViewModel
 import com.example.stock.util.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
@@ -22,7 +22,7 @@ class SymbolViewModelTest {
     @get:Rule
     val mainRule = MainDispatcherRule()
 
-    private lateinit var repo: StockRepository
+    private lateinit var repo: SymbolRepository
     private lateinit var vm: SymbolViewModel
 
     @Before

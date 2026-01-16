@@ -1,7 +1,7 @@
 package com.example.stock.feature.stocklist.data.repository
 
 import com.example.stock.core.network.ApiClient
-import com.example.stock.feature.stocklist.data.remote.StockApi
+import com.example.stock.feature.stocklist.data.remote.SymbolApi
 import com.example.stock.feature.stocklist.data.remote.SymbolItem
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -10,16 +10,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 
 /**
- * Repository responsible for fetching and managing stock information.
+ * Repository responsible for fetching and managing symbol information.
  *
- * - Fetches symbol lists and candlestick data via API and exposes them via StateFlow
+ * - Fetches symbol lists via API and exposes them via StateFlow
  * - Data fetching is executed on the IO thread
  *
- * @property stockApi Stock information API
+ * @property symbolApi Symbol information API
  * @property io Coroutine dispatcher for IO thread
  */
-class StockRepository(
-    private val stockApi: StockApi = ApiClient.stockApi,
+class SymbolRepository(
+    private val symbolApi: SymbolApi = ApiClient.symbolApi,
     private val io: CoroutineDispatcher = Dispatchers.IO
 ) {
     // StateFlow for symbol list (read-only)
@@ -35,6 +35,6 @@ class StockRepository(
      * @return Symbol list fetched from the API
      */
     suspend fun fetchSymbols(): List<SymbolItem> = withContext(io) {
-        stockApi.getSymbols()
+        symbolApi.getSymbols()
     }
 }
