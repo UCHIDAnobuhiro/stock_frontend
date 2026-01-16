@@ -108,7 +108,7 @@ fun SymbolListScreenContent(
             }
 
             // Error state
-            uiState.error != null -> {
+            uiState.errorResId != null -> {
                 Box(
                     modifier,
                     contentAlignment = Alignment.Center
@@ -116,7 +116,7 @@ fun SymbolListScreenContent(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(uiState.error, color = MaterialTheme.colorScheme.error)
+                        Text(stringResource(uiState.errorResId), color = MaterialTheme.colorScheme.error)
                         Spacer(
                             modifier = Modifier.padding(top = Spacing.ListItemVertical)
                         )
