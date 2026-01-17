@@ -1,37 +1,36 @@
 package com.example.stock.feature.chart.ui.chart
 
-/** チャート専用トークン（Compose Color） */
+/** Design tokens for chart configuration. */
 object ChartTokens {
     object Dimens {
-        // ロウソク足チャートの余白
+        // Candlestick chart viewport offsets
         const val CANDLE_LEFT = 20f
         const val CANDLE_TOP = 20f
         const val CANDLE_RIGHT = 70f
         const val CANDLE_BOTTOM = 20f
 
-        // 出来高チャートの余白
+        // Volume chart viewport offsets
         const val VOLUME_LEFT = 20f
         const val VOLUME_TOP = 10f
         const val VOLUME_RIGHT = 70f
         const val VOLUME_BOTTOM = 80f
 
-        // チャートの表示本数
+        // Number of visible candles
         const val VISIBLE_COUNT = 60f
 
-        // X軸の目盛の感覚
+        // X-axis grid line interval
         const val X_STRIDE = 10
 
-        // X軸のラベル
+        // X-axis label rotation angle
         const val X_LABEL_ROTATION = -25f
 
-        // X軸の余白(食い込み防止)
+        // X-axis margin to prevent clipping
         const val X_BOUND_MARGIN = 0.5f
 
-        // ロウソク足の表示範囲の余白
+        // Y-axis padding ratio for candlestick range
         const val Y_PAD_RATIO = 0.05f
 
-        // 出来高の軸の数
+        // Number of Y-axis labels
         const val Y_LABEL_COUNT = 5
-
     }
 }
