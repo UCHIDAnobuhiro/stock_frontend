@@ -104,12 +104,16 @@ class LoginViewModel @Inject constructor(
 
     /**
      * Checks if user is already authenticated.
+     * Waits for token restoration from storage to complete before checking.
      * If a valid token exists, emits [UiEvent.LoggedIn] to navigate to main screen.
      * Called on app startup to enable auto-login.
      */
     fun checkAuthState() {
         viewModelScope.launch(dispatcherProvider.main) {
-            if (repo.hasToken()) {
+            val hasToken = withContext(dispatcherProvider.io) {
+                repo.hasToken()
+            }
+            if (hasToken) {
                 _events.emit(UiEvent.LoggedIn)
             }
         }

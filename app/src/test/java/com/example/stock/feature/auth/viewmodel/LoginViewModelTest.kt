@@ -218,7 +218,7 @@ class LoginViewModelTest {
 
     @Test
     fun `checkAuthState emits LoggedIn when token exists`() = runTest(mainRule.scheduler) {
-        every { repository.hasToken() } returns true
+        coEvery { repository.hasToken() } returns true
 
         var received: LoginViewModel.UiEvent? = null
         val job: Job = launch {
@@ -231,12 +231,12 @@ class LoginViewModelTest {
         assertThat(received).isEqualTo(LoginViewModel.UiEvent.LoggedIn)
         job.cancelAndJoin()
 
-        verify(exactly = 1) { repository.hasToken() }
+        coVerify(exactly = 1) { repository.hasToken() }
     }
 
     @Test
     fun `checkAuthState does not emit when no token exists`() = runTest(mainRule.scheduler) {
-        every { repository.hasToken() } returns false
+        coEvery { repository.hasToken() } returns false
 
         viewModel.checkAuthState()
         advanceUntilIdle()
@@ -250,6 +250,6 @@ class LoginViewModelTest {
         assertThat(result.exceptionOrNull())
             .isInstanceOf(TimeoutCancellationException::class.java)
 
-        verify(exactly = 1) { repository.hasToken() }
+        coVerify(exactly = 1) { repository.hasToken() }
     }
 }

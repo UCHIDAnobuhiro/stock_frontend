@@ -7,6 +7,7 @@ import com.example.stock.core.network.AuthInterceptor
 import com.example.stock.feature.auth.data.remote.AuthApi
 import com.example.stock.feature.chart.data.remote.ChartApi
 import com.example.stock.feature.stocklist.data.remote.SymbolApi
+import com.example.stock.BuildConfig
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -39,12 +40,17 @@ object NetworkModule {
 
     /**
      * Provides a singleton instance of HttpLoggingInterceptor.
+     * Only logs request/response body in debug builds to prevent token leakage.
      */
     @Provides
     @Singleton
     fun provideLoggingInterceptor(): HttpLoggingInterceptor {
         return HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
         }
     }
 
