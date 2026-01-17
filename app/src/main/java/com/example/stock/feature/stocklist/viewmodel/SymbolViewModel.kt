@@ -3,13 +3,17 @@ package com.example.stock.feature.stocklist.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stock.R
+import com.example.stock.core.util.DispatcherProvider
+import com.example.stock.feature.stocklist.data.remote.SymbolDto
 import com.example.stock.feature.stocklist.data.repository.SymbolRepository
+import com.example.stock.feature.stocklist.ui.SymbolItem
 import com.example.stock.feature.stocklist.ui.SymbolUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
 import java.io.IOException
@@ -19,10 +23,12 @@ import javax.inject.Inject
  * ViewModel that manages symbol list data.
  *
  * @property repo Repository for fetching symbol data
+ * @property dispatcherProvider Provider for coroutine dispatchers, enabling testability
  */
 @HiltViewModel
 class SymbolViewModel @Inject constructor(
-    private val repo: SymbolRepository
+    private val repo: SymbolRepository,
+    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
     private val _ui = MutableStateFlow(SymbolUiState())
@@ -37,11 +43,13 @@ class SymbolViewModel @Inject constructor(
      *
      * Executed asynchronously in ViewModelScope, so it remains safe even if the screen is recreated due to rotation.
      */
-    fun load() = viewModelScope.launch {
+    fun load() = viewModelScope.launch(dispatcherProvider.main) {
         _ui.update { it.copy(isLoading = true, errorResId = null) }
-        runCatching { repo.fetchSymbols() }
+        runCatching {
+            withContext(dispatcherProvider.io) { repo.fetchSymbols() }
+        }
             .onSuccess { list ->
-                _ui.update { it.copy(symbols = list, isLoading = false) }
+                _ui.update { it.copy(symbols = list.map { dto -> dto.toUi() }, isLoading = false) }
             }
             .onFailure { e ->
                 val errorResId = when (e) {
@@ -53,4 +61,15 @@ class SymbolViewModel @Inject constructor(
                 _ui.update { it.copy(errorResId = errorResId, isLoading = false) }
             }
     }
+
+    /**
+     * Converts DTO to UI display model.
+     *
+     * @receiver SymbolDto API response model
+     * @return SymbolItem Lightweight model for UI
+     */
+    private fun SymbolDto.toUi() = SymbolItem(
+        code = code,
+        name = name
+    )
 }
