@@ -72,9 +72,7 @@ candlestick charts (daily/weekly/monthly) with JWT authentication and a Go backe
 **UiState Pattern**: ViewModels expose domain models via dedicated UiState classes (not DTOs
 directly). Example: `CandleUiState`, `SymbolUiState`, `LoginUiState`.
 
-**Factory Pattern**: ViewModels use custom factories (`AuthViewModelFactory`,
-`SymbolViewModelFactory`, `CandlesViewModelFactory`) for dependency injection since Hilt/Koin is not
-yet integrated.
+**Hilt DI**: ViewModels use Hilt for dependency injection with `@HiltViewModel` and `@Inject constructor`. Dependencies like repositories and `DispatcherProvider` are injected automatically.
 
 **Token Management**: Dual-layer approach with `InMemoryTokenProvider` (in-memory) + `TokenStore` (
 DataStore persistence). `AuthInterceptor` automatically adds JWT Bearer token to API requests.
@@ -133,17 +131,17 @@ com.example.stock/
 │   │   │   └── repository/      # AuthRepository
 │   │   ├── ui/
 │   │   │   └── login/           # LoginScreen, LoginUiState
-│   │   └── viewmodel/           # AuthViewModel, AuthViewModelFactory
+│   │   └── viewmodel/           # LoginViewModel, LogoutViewModel, SignupViewModel
 │   ├── stocklist/               # Stock list feature
 │   │   ├── data/
 │   │   │   ├── remote/          # StockApi (Retrofit), SymbolItem/CandleDto DTOs
 │   │   │   └── repository/      # StockRepository
 │   │   ├── ui/                  # StockListScreen, SymbolUiState
-│   │   └── viewmodel/           # SymbolViewModel, SymbolViewModelFactory
+│   │   └── viewmodel/           # SymbolViewModel
 │   └── chart/                   # Chart display feature
 │       ├── ui/                  # ChartScreen, CandleUiState, MPAndroidChart views
 │       │   └── chart/           # CandleChartView, VolumeChartView, ChartSync
-│       └── viewmodel/           # CandlesViewModel, CandlesViewModelFactory
+│       └── viewmodel/           # CandlesViewModel
 ├── core/
 │   ├── data/                    # Shared data components
 │   │   ├── auth/                # TokenProvider interface, InMemoryTokenProvider
@@ -167,7 +165,7 @@ Each feature module (`auth`, `stocklist`, `chart`) follows a consistent structur
 - **ui/**: Composable screens, UI state classes, and feature-specific UI components
   - May contain subdirectories for specific screens (e.g., `auth/ui/login/`)
   - May contain subdirectories for reusable UI components (e.g., `chart/ui/chart/`)
-- **viewmodel/**: ViewModel and ViewModelFactory for the feature
+- **viewmodel/**: ViewModel classes with `@HiltViewModel` annotation
 
 ### Recommended Package Structure Guidelines
 
@@ -193,8 +191,7 @@ When adding new features or modifying existing ones, follow these conventions:
    - Organize into subdirectories by screen name if needed
 
 5. **ViewModels** → `feature/*/viewmodel/`
-   - ViewModel classes
-   - ViewModelFactory classes
+   - ViewModel classes with `@HiltViewModel` and `@Inject constructor`
 
 This structure provides:
 - **Clear separation of concerns**: API/DTOs, business logic, and UI are clearly separated
@@ -204,8 +201,8 @@ This structure provides:
 
 ## Key Implementation Notes
 
-- **Manual DI**: Uses ViewModelFactory pattern. All ViewModels are instantiated in `MainActivity`
-  via `by viewModels<T> { Factory(...) }` and passed to composables.
+- **Hilt DI**: ViewModels use `@HiltViewModel` and `@Inject constructor` for dependency injection.
+  Use `hiltViewModel()` in Compose screens to obtain ViewModel instances.
 - **Coroutines**: All API calls use `viewModelScope.launch` with IO dispatcher (
   `withContext(Dispatchers.IO)`)
 - **State Management**: Repositories use `MutableStateFlow` internally and expose `StateFlow`

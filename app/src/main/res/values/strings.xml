@@ -39,5 +39,6 @@
     <string name="error_server">サーバーエラーが発生しました</string>
     <string name="error_json">データの読み込みに失敗しました</string>
     <string name="error_unknown">予期しないエラーが発生しました</string>
+    <string name="error_empty_stock_code">銘柄コードが入力されていません</string>
 
 </resources>
