@@ -22,16 +22,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.example.stock.R
-import com.example.stock.feature.chart.ui.chart.CandleChartView
-import com.example.stock.feature.chart.ui.chart.SyncChartsOnce
-import com.example.stock.feature.chart.ui.chart.VolumeChartView
 import com.example.stock.core.ui.component.CommonHeader
 import com.example.stock.core.ui.component.IntervalDropDown
 import com.example.stock.core.ui.theme.Sizes
 import com.example.stock.core.ui.theme.Spacing
+import com.example.stock.feature.chart.ui.chart.CandleChartView
+import com.example.stock.feature.chart.ui.chart.SyncChartsOnce
+import com.example.stock.feature.chart.ui.chart.VolumeChartView
 import com.example.stock.feature.chart.viewmodel.CandlesViewModel
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.CandleStickChart
@@ -39,30 +39,74 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
 
 /**
- * Screen displaying candlestick and volume charts for a stock.
+ * Chart screen with ViewModel.
  *
- * @param navController Navigation controller
+ * Wrapper composable that connects [CandlesViewModel] to [ChartScreenContent].
+ * Handles state observation and data loading.
+ * Uses Hilt to automatically inject the CandlesViewModel.
+ *
  * @param name Stock name
  * @param code Stock symbol code
- * @param vm ViewModel for candlestick data
- * @param onLogout Callback for logout action
+ * @param onNavigateBack Callback to navigate back to previous screen
+ * @param onLogout Callback invoked when logout button is pressed
+ * @param viewModel Candles ViewModel (injected by Hilt)
  */
 @Composable
 fun ChartScreen(
-    navController: NavController,
     name: String,
     code: String,
-    vm: CandlesViewModel,
-    onLogout: () -> Unit
+    onNavigateBack: () -> Unit,
+    onLogout: () -> Unit,
+    viewModel: CandlesViewModel = hiltViewModel()
 ) {
-    val ui by vm.ui.collectAsStateWithLifecycle()
-
-    val dataAsc = remember(ui.items) { ui.items.sortedBy { it.time } }
-    val labels = remember(dataAsc) { dataAsc.map { it.time } }
+    val uiState by viewModel.ui.collectAsStateWithLifecycle()
     var interval by remember { mutableStateOf("1day") }
 
-    LaunchedEffect(code, interval) { vm.load(code, interval = interval, outputsize = 200) }
-    DisposableEffect(Unit) { onDispose { vm.clear() } }
+    LaunchedEffect(code, interval) {
+        viewModel.load(code, interval = interval, outputsize = 200)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose { viewModel.clear() }
+    }
+
+    ChartScreenContent(
+        uiState = uiState,
+        name = name,
+        code = code,
+        interval = interval,
+        onIntervalChange = { interval = it },
+        onNavigateBack = onNavigateBack,
+        onLogout = onLogout
+    )
+}
+
+/**
+ * Stateless chart screen content.
+ *
+ * Displays candlestick and volume charts for a stock.
+ * Shows stock name, code, interval selector, and synchronized charts.
+ *
+ * @param uiState Current UI state
+ * @param name Stock name
+ * @param code Stock symbol code
+ * @param interval Current interval selection
+ * @param onIntervalChange Callback when interval selection changes
+ * @param onNavigateBack Callback to navigate back
+ * @param onLogout Callback when logout button is pressed
+ */
+@Composable
+fun ChartScreenContent(
+    uiState: CandleUiState,
+    name: String,
+    code: String,
+    interval: String,
+    onIntervalChange: (String) -> Unit,
+    onNavigateBack: () -> Unit,
+    onLogout: () -> Unit
+) {
+    val dataAsc = remember(uiState.items) { uiState.items.sortedBy { it.time } }
+    val labels = remember(dataAsc) { dataAsc.map { it.time } }
 
     var candleChartRef by remember { mutableStateOf<CandleStickChart?>(null) }
     var volumeChartRef by remember { mutableStateOf<BarChart?>(null) }
@@ -71,7 +115,7 @@ fun ChartScreen(
         topBar = {
             CommonHeader(
                 titleText = stringResource(R.string.app_header_candle_chart),
-                onBack = { navController.popBackStack() },
+                onBack = onNavigateBack,
                 onLogout = onLogout
             )
         }
@@ -106,7 +150,7 @@ fun ChartScreen(
 
             IntervalDropDown(
                 selected = interval,
-                onSelected = { interval = it }
+                onSelected = onIntervalChange
             )
 
             Column(Modifier.fillMaxSize()) {
@@ -143,7 +187,6 @@ fun ChartScreen(
                     labels = labels,
                     onReady = { volumeChartRef = it }
                 )
-
             }
         }
     }
