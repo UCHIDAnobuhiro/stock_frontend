@@ -1,12 +1,13 @@
 package com.example.stock.feature.chart.data.repository
 
+import com.example.stock.core.util.DispatcherProvider
 import com.example.stock.feature.chart.data.remote.CandleDto
 import com.example.stock.feature.chart.data.remote.ChartApi
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Repository responsible for fetching and managing candlestick data.
@@ -15,11 +16,12 @@ import kotlinx.coroutines.withContext
  * - Data fetching is executed on the IO thread
  *
  * @property chartApi Chart data API
- * @property io Coroutine dispatcher for IO thread
+ * @property dispatcherProvider Provider for coroutine dispatchers
  */
-class CandleRepository(
+@Singleton
+class CandleRepository @Inject constructor(
     private val chartApi: ChartApi,
-    private val io: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcherProvider: DispatcherProvider
 ) {
     // StateFlow for candlestick data (read-only)
     private val _candles = MutableStateFlow<List<CandleDto>>(emptyList())
@@ -36,7 +38,7 @@ class CandleRepository(
         code: String,
         interval: String = "1day",
         outputsize: Int = 200
-    ) = withContext(io) {
+    ) = withContext(dispatcherProvider.io) {
         _candles.value = chartApi.getCandles(code, interval, outputsize)
     }
 

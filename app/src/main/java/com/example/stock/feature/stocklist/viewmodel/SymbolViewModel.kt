@@ -3,7 +3,9 @@ package com.example.stock.feature.stocklist.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stock.R
+import com.example.stock.feature.stocklist.data.remote.SymbolDto
 import com.example.stock.feature.stocklist.data.repository.SymbolRepository
+import com.example.stock.feature.stocklist.ui.SymbolItem
 import com.example.stock.feature.stocklist.ui.SymbolUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +43,7 @@ class SymbolViewModel @Inject constructor(
         _ui.update { it.copy(isLoading = true, errorResId = null) }
         runCatching { repo.fetchSymbols() }
             .onSuccess { list ->
-                _ui.update { it.copy(symbols = list, isLoading = false) }
+                _ui.update { it.copy(symbols = list.map { dto -> dto.toUi() }, isLoading = false) }
             }
             .onFailure { e ->
                 val errorResId = when (e) {
@@ -53,4 +55,15 @@ class SymbolViewModel @Inject constructor(
                 _ui.update { it.copy(errorResId = errorResId, isLoading = false) }
             }
     }
+
+    /**
+     * Converts DTO to UI display model.
+     *
+     * @receiver SymbolDto API response model
+     * @return SymbolItem Lightweight model for UI
+     */
+    private fun SymbolDto.toUi() = SymbolItem(
+        code = code,
+        name = name
+    )
 }

@@ -1,7 +1,6 @@
 package com.example.stock.feature.stocklist.ui
 
 import androidx.annotation.StringRes
-import com.example.stock.feature.stocklist.data.remote.SymbolDto
 
 /**
  * UI state for the symbol list screen.
@@ -10,11 +9,11 @@ import com.example.stock.feature.stocklist.data.remote.SymbolDto
  * including loading status, fetched symbols, and error information.
  *
  * @property isLoading Whether the symbol list is currently being loaded
- * @property symbols List of symbols fetched from the API
+ * @property symbols List of symbol items for UI display
  * @property errorResId String resource ID for error message, or null if no error
  */
 data class SymbolUiState(
     val isLoading: Boolean = false,
-    val symbols: List<SymbolDto> = emptyList(),
+    val symbols: List<SymbolItem> = emptyList(),
     @StringRes val errorResId: Int? = null
 )

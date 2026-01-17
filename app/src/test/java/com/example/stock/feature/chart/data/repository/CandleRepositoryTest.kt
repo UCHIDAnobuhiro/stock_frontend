@@ -2,12 +2,12 @@ package com.example.stock.feature.chart.data.repository
 
 import com.example.stock.feature.chart.data.remote.CandleDto
 import com.example.stock.feature.chart.data.remote.ChartApi
+import com.example.stock.util.TestDispatcherProvider
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -20,16 +20,17 @@ import org.junit.Test
 class CandleRepositoryTest {
 
     private val scheduler = TestCoroutineScheduler()
-    private val dispatcher = StandardTestDispatcher(scheduler)
+    private lateinit var dispatcherProvider: TestDispatcherProvider
 
     private lateinit var chartApi: ChartApi
     private lateinit var repo: CandleRepository
 
     @Before
     fun setup() {
-        Dispatchers.setMain(dispatcher)
+        dispatcherProvider = TestDispatcherProvider(scheduler)
+        Dispatchers.setMain(dispatcherProvider.main)
         chartApi = mockk()
-        repo = CandleRepository(chartApi = chartApi, io = dispatcher)
+        repo = CandleRepository(chartApi = chartApi, dispatcherProvider = dispatcherProvider)
     }
 
     @Test

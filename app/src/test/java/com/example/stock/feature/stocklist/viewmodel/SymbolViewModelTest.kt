@@ -3,6 +3,7 @@ package com.example.stock.feature.stocklist.viewmodel
 import com.example.stock.R
 import com.example.stock.feature.stocklist.data.remote.SymbolDto
 import com.example.stock.feature.stocklist.data.repository.SymbolRepository
+import com.example.stock.feature.stocklist.ui.SymbolItem
 import com.example.stock.util.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
@@ -38,11 +39,15 @@ class SymbolViewModelTest {
     fun `load success - updates symbols and clears error`() =
         runTest(mainRule.scheduler) {
             // given
-            val expected = listOf(
+            val dtos = listOf(
                 SymbolDto("AAPL", "Apple Inc."),
                 SymbolDto("GOOG", "Alphabet Inc.")
             )
-            coEvery { repo.fetchSymbols() } returns expected
+            val expected = listOf(
+                SymbolItem("AAPL", "Apple Inc."),
+                SymbolItem("GOOG", "Alphabet Inc.")
+            )
+            coEvery { repo.fetchSymbols() } returns dtos
 
             // when
             vm.load()
@@ -131,8 +136,9 @@ class SymbolViewModelTest {
         assertThat(vm.ui.value.errorResId).isEqualTo(R.string.error_network)
 
         // given - second request succeeds
-        val expected = listOf(SymbolDto("MSFT", "Microsoft"))
-        coEvery { repo.fetchSymbols() } returns expected
+        val dtos = listOf(SymbolDto("MSFT", "Microsoft"))
+        val expected = listOf(SymbolItem("MSFT", "Microsoft"))
+        coEvery { repo.fetchSymbols() } returns dtos
 
         // when
         vm.load()

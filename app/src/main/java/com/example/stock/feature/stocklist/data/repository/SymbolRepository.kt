@@ -1,10 +1,11 @@
 package com.example.stock.feature.stocklist.data.repository
 
+import com.example.stock.core.util.DispatcherProvider
 import com.example.stock.feature.stocklist.data.remote.SymbolApi
 import com.example.stock.feature.stocklist.data.remote.SymbolDto
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Repository responsible for fetching symbol information.
@@ -13,11 +14,12 @@ import kotlinx.coroutines.withContext
  * - Data fetching is executed on the IO thread
  *
  * @property symbolApi Symbol information API
- * @property io Coroutine dispatcher for IO thread
+ * @property dispatcherProvider Provider for coroutine dispatchers
  */
-class SymbolRepository(
+@Singleton
+class SymbolRepository @Inject constructor(
     private val symbolApi: SymbolApi,
-    private val io: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcherProvider: DispatcherProvider
 ) {
     /**
      * Fetches the symbol list from the API.
@@ -26,7 +28,7 @@ class SymbolRepository(
      *
      * @return Symbol list fetched from the API
      */
-    suspend fun fetchSymbols(): List<SymbolDto> = withContext(io) {
+    suspend fun fetchSymbols(): List<SymbolDto> = withContext(dispatcherProvider.io) {
         symbolApi.getSymbols()
     }
 }

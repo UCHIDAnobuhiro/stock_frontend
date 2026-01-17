@@ -3,6 +3,7 @@ package com.example.stock.feature.stocklist.data.repository
 import com.example.stock.feature.stocklist.data.remote.SymbolApi
 import com.example.stock.feature.stocklist.data.remote.SymbolDto
 import com.example.stock.util.MainDispatcherRule
+import com.example.stock.util.TestDispatcherProvider
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -25,12 +26,14 @@ class SymbolRepositoryTest {
     val mainRule = MainDispatcherRule()
 
     private lateinit var symbolApi: SymbolApi
+    private lateinit var dispatcherProvider: TestDispatcherProvider
     private lateinit var repo: SymbolRepository
 
     @Before
     fun setup() {
         symbolApi = mockk()
-        repo = SymbolRepository(symbolApi = symbolApi, io = mainRule.dispatcher)
+        dispatcherProvider = TestDispatcherProvider(mainRule.scheduler)
+        repo = SymbolRepository(symbolApi = symbolApi, dispatcherProvider = dispatcherProvider)
     }
 
     @Test
