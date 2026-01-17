@@ -7,6 +7,7 @@ import com.example.stock.feature.auth.data.remote.LoginRequest
 import com.example.stock.feature.auth.data.remote.LoginResponse
 import com.example.stock.feature.auth.data.remote.SignupRequest
 import com.example.stock.feature.auth.data.remote.SignupResponse
+import com.example.stock.util.TestDispatcherProvider
 import com.google.common.truth.Truth.assertThat
 import io.mockk.Called
 import io.mockk.coEvery
@@ -15,7 +16,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -38,17 +38,18 @@ class AuthRepositoryTest {
     private val tokenProvider: TokenProvider = mockk(relaxed = true)
 
     private val scheduler = TestCoroutineScheduler()
-    private val testDispatcher = StandardTestDispatcher(scheduler)
+    private lateinit var dispatcherProvider: TestDispatcherProvider
 
     private lateinit var repo: AuthRepository
 
     @Before
     fun setUp() {
+        dispatcherProvider = TestDispatcherProvider(scheduler)
         repo = AuthRepository(
             api = api,
             tokenStore = tokenStore,
             tokenProvider = tokenProvider,
-            io = testDispatcher
+            dispatcherProvider = dispatcherProvider
         )
     }
 

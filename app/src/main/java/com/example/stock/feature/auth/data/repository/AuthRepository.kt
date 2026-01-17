@@ -2,13 +2,14 @@ package com.example.stock.feature.auth.data.repository
 
 import com.example.stock.core.data.auth.TokenProvider
 import com.example.stock.core.data.local.TokenStore
+import com.example.stock.core.util.DispatcherProvider
 import com.example.stock.feature.auth.data.remote.AuthApi
 import com.example.stock.feature.auth.data.remote.LoginRequest
 import com.example.stock.feature.auth.data.remote.SignupRequest
 import com.example.stock.feature.auth.data.remote.SignupResponse
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Repository responsible for authentication and token management.
@@ -19,13 +20,14 @@ import kotlinx.coroutines.withContext
  * @property api Authentication API
  * @property tokenStore Persistent token storage
  * @property tokenProvider In-memory token manager
- * @property io Dispatcher for IO operations
+ * @property dispatcherProvider Provider for coroutine dispatchers
  */
-class AuthRepository(
+@Singleton
+class AuthRepository @Inject constructor(
     private val api: AuthApi,
     private val tokenStore: TokenStore,
     private val tokenProvider: TokenProvider,
-    private val io: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcherProvider: DispatcherProvider
 ) {
     /**
      * Handles login process.
@@ -40,7 +42,7 @@ class AuthRepository(
         // Update in-memory token (enables immediate Authorization header)
         tokenProvider.update(res.token)
         // Persist to storage (survives app restart)
-        withContext(io) {
+        withContext(dispatcherProvider.io) {
             tokenStore.save(res.token)
         }
     }
@@ -65,7 +67,7 @@ class AuthRepository(
      */
     suspend fun logout() {
         tokenProvider.clear()
-        withContext(io) {
+        withContext(dispatcherProvider.io) {
             tokenStore.clear()
         }
     }

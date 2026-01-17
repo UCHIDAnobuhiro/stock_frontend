@@ -1,10 +1,7 @@
 package com.example.stock.di
 
 import android.content.Context
-import com.example.stock.core.data.auth.TokenProvider
 import com.example.stock.core.data.local.TokenStore
-import com.example.stock.feature.auth.data.remote.AuthApi
-import com.example.stock.feature.auth.data.repository.AuthRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,7 +13,7 @@ import javax.inject.Singleton
  * Hilt module for providing data layer dependencies.
  * Installed in SingletonComponent to provide app-wide singleton instances.
  *
- * Note: SymbolRepository and CandleRepository use @Inject constructor
+ * Note: AuthRepository, SymbolRepository, and CandleRepository use @Inject constructor
  * and are automatically provided by Hilt.
  */
 @Module
@@ -33,18 +30,5 @@ object DataModule {
         @ApplicationContext context: Context
     ): TokenStore {
         return TokenStore(context)
-    }
-
-    /**
-     * Provides a singleton instance of AuthRepository.
-     */
-    @Provides
-    @Singleton
-    fun provideAuthRepository(
-        api: AuthApi,
-        tokenStore: TokenStore,
-        tokenProvider: TokenProvider
-    ): AuthRepository {
-        return AuthRepository(api, tokenStore, tokenProvider)
     }
 }

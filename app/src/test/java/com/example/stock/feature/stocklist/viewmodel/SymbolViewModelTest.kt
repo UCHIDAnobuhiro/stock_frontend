@@ -5,6 +5,7 @@ import com.example.stock.feature.stocklist.data.remote.SymbolDto
 import com.example.stock.feature.stocklist.data.repository.SymbolRepository
 import com.example.stock.feature.stocklist.ui.SymbolItem
 import com.example.stock.util.MainDispatcherRule
+import com.example.stock.util.TestDispatcherProvider
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -27,12 +28,14 @@ class SymbolViewModelTest {
     val mainRule = MainDispatcherRule()
 
     private lateinit var repo: SymbolRepository
+    private lateinit var dispatcherProvider: TestDispatcherProvider
     private lateinit var vm: SymbolViewModel
 
     @Before
     fun setup() {
         repo = mockk()
-        vm = SymbolViewModel(repo)
+        dispatcherProvider = TestDispatcherProvider(mainRule.scheduler)
+        vm = SymbolViewModel(repo, dispatcherProvider)
     }
 
     @Test
