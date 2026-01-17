@@ -36,10 +36,10 @@ candlestick charts (daily/weekly/monthly) with JWT authentication and a Go backe
 ./gradlew testDebugUnitTest
 
 # Run tests for a specific class
-./gradlew testDebugUnitTest --tests "com.example.stock.viewmodel.AuthViewModelTest"
+./gradlew testDebugUnitTest --tests "com.example.stock.feature.auth.viewmodel.LoginViewModelTest"
 
 # Run tests with coverage
-./gradlew testDebugUnitTest --tests "*.AuthViewModelTest.*"
+./gradlew testDebugUnitTest --tests "*.LoginViewModelTest.*"
 
 # Run instrumented tests (requires emulator/device)
 ./gradlew connectedAndroidTest
@@ -79,7 +79,7 @@ DataStore persistence). `AuthInterceptor` automatically adds JWT Bearer token to
 
 ### Navigation Flow
 
-1. `LoginScreen` (Routes.LOGIN) → validates email/password → calls `AuthViewModel.login()`
+1. `LoginScreen` (Routes.LOGIN) → validates email/password → calls `LoginViewModel.login()`
 2. On success → navigates to `StockListScreen` (Routes.STOCK) with back stack cleared
 3. Selecting a stock → navigates to `chart/{name}/{code}` with URL parameters
 4. Logout from any screen → clears tokens → navigates back to login
@@ -127,19 +127,23 @@ com.example.stock/
 ├── feature/
 │   ├── auth/                    # Authentication feature
 │   │   ├── data/
-│   │   │   ├── remote/          # AuthApi (Retrofit), LoginRequest/Response DTOs
+│   │   │   ├── remote/          # AuthApi (Retrofit), AuthModels (Request/Response DTOs)
 │   │   │   └── repository/      # AuthRepository
 │   │   ├── ui/
-│   │   │   └── login/           # LoginScreen, LoginUiState
+│   │   │   ├── login/           # LoginScreen, LoginUiState
+│   │   │   └── signup/          # SignupScreen, SignupUiState
 │   │   └── viewmodel/           # LoginViewModel, LogoutViewModel, SignupViewModel
 │   ├── stocklist/               # Stock list feature
 │   │   ├── data/
-│   │   │   ├── remote/          # StockApi (Retrofit), SymbolItem/CandleDto DTOs
-│   │   │   └── repository/      # StockRepository
-│   │   ├── ui/                  # StockListScreen, SymbolUiState
+│   │   │   ├── remote/          # SymbolApi (Retrofit), SymbolDto
+│   │   │   └── repository/      # SymbolRepository
+│   │   ├── ui/                  # SymbolListScreen, SymbolUiState, SymbolItem
 │   │   └── viewmodel/           # SymbolViewModel
 │   └── chart/                   # Chart display feature
-│       ├── ui/                  # ChartScreen, CandleUiState, MPAndroidChart views
+│       ├── data/
+│       │   ├── remote/          # ChartApi (Retrofit), CandleDto
+│       │   └── repository/      # CandleRepository
+│       ├── ui/                  # ChartScreen, CandleUiState, CandleItem
 │       │   └── chart/           # CandleChartView, VolumeChartView, ChartSync
 │       └── viewmodel/           # CandlesViewModel
 ├── core/
@@ -153,6 +157,7 @@ com.example.stock/
 │   │   └── util/                # ClickGuard for preventing double-clicks
 │   └── util/                    # Shared utilities
 ├── config/                      # ApiConfig (BASE_URL from BuildConfig)
+├── di/                          # Hilt modules (DataModule, NetworkModule, DispatcherModule)
 └── navigation/                  # AppNavGraph and Routes
 ```
 
