@@ -1,8 +1,11 @@
 package com.example.stock.feature.chart.viewmodel
 
+import com.example.stock.R
+import com.example.stock.core.util.DispatcherProvider
 import com.example.stock.feature.chart.data.remote.CandleDto
 import com.example.stock.feature.chart.data.repository.CandleRepository
 import com.example.stock.util.MainDispatcherRule
+import com.google.common.truth.Truth.assertThat
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -10,14 +13,10 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertFalse
-import junit.framework.TestCase.assertNotNull
-import junit.framework.TestCase.assertNull
-import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -33,6 +32,7 @@ class CandlesViewModelTest {
     val mainRule = MainDispatcherRule()
 
     private lateinit var repo: CandleRepository
+    private lateinit var dispatcherProvider: DispatcherProvider
     private lateinit var vm: CandlesViewModel
 
     // ViewModel から見えるローソク足のストリームをテスト用に差し込み
@@ -43,12 +43,20 @@ class CandlesViewModelTest {
         repo = mockk(relaxed = true)
         candlesFlow = MutableStateFlow(emptyList())
 
+        // テスト用ディスパッチャを設定
+        val testDispatcher = StandardTestDispatcher(mainRule.scheduler)
+        dispatcherProvider = mockk {
+            every { main } returns testDispatcher
+            every { io } returns testDispatcher
+            every { default } returns testDispatcher
+        }
+
         // repository のプロパティ getter を差し替え
         every { repo.candles } returns candlesFlow
         coEvery { repo.fetchCandles(any(), any(), any()) } just Runs
         every { repo.clearCandles() } just Runs
 
-        vm = CandlesViewModel(repo)
+        vm = CandlesViewModel(repo, dispatcherProvider)
     }
 
     @Test
@@ -70,7 +78,7 @@ class CandlesViewModelTest {
 
             // launch が走って isLoading が true になるまで現在キューを消化
             runCurrent()
-            assertTrue(vm.ui.value.isLoading)   // ← ここが安定して true になる
+            assertThat(vm.ui.value.isLoading).isTrue()
 
             // fetch 完了を解放
             gate.complete(Unit)
@@ -79,21 +87,19 @@ class CandlesViewModelTest {
 
             // then
             val ui = vm.ui.value
-            assertFalse(ui.isLoading)
-            assertNull(ui.error)
-            assertEquals(2, ui.items.size)
-            assertEquals("t1", ui.items[0].time)
-            assertEquals(1.5, ui.items[0].close, 0.0001)
-            assertEquals(120L, ui.items[1].volume)
+            assertThat(ui.isLoading).isFalse()
+            assertThat(ui.errorResId).isNull()
+            assertThat(ui.items).hasSize(2)
+            assertThat(ui.items[0].time).isEqualTo("t1")
+            assertThat(ui.items[0].close).isWithin(0.0001).of(1.5)
+            assertThat(ui.items[1].volume).isEqualTo(120L)
         }
 
     @Test
-    fun `load sets error when repository throws and clears loading`() =
+    fun `load sets error when repository throws IOException`() =
         runTest(mainRule.scheduler) {
             // given
-            coEvery { repo.fetchCandles(any(), any(), any()) } throws IOException(
-                "network"
-            )
+            coEvery { repo.fetchCandles(any(), any(), any()) } throws IOException("network")
 
             // when
             vm.load("AAPL")
@@ -101,10 +107,9 @@ class CandlesViewModelTest {
 
             // then
             val ui = vm.ui.value
-            assertFalse(ui.isLoading)
-            assertNotNull(ui.error)
-            assertTrue(ui.error!!.contains("Communication error"))
-            assertTrue(ui.items.isEmpty())
+            assertThat(ui.isLoading).isFalse()
+            assertThat(ui.errorResId).isEqualTo(R.string.error_network)
+            assertThat(ui.items).isEmpty()
         }
 
     @Test
@@ -116,8 +121,8 @@ class CandlesViewModelTest {
             // then
             runCurrent()
             val ui = vm.ui.value
-            assertFalse(ui.isLoading)
-            assertNotNull(ui.error)
+            assertThat(ui.isLoading).isFalse()
+            assertThat(ui.errorResId).isEqualTo(R.string.error_empty_stock_code)
             coVerify(exactly = 0) { repo.fetchCandles(any(), any(), any()) }
         }
 
@@ -140,9 +145,8 @@ class CandlesViewModelTest {
         vm.clear()
         verify(exactly = 1) { repo.clearCandles() }
         val ui = vm.ui.value
-        assertFalse(ui.isLoading)
-        assertTrue(ui.items.isEmpty())
-        assertNull(ui.error)
+        assertThat(ui.isLoading).isFalse()
+        assertThat(ui.items).isEmpty()
+        assertThat(ui.errorResId).isNull()
     }
-
 }
