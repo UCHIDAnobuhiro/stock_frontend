@@ -44,7 +44,7 @@ object ChartPalette {
  *
  * Configuration includes:
  * - Disables description and legend
- * - Enables pinch zoom, disables double-tap zoom
+ * - Enables pinch zoom, disables double-tap zoom and inertia scrolling
  * - Positions X-axis at bottom without labels
  * - Uses only right Y-axis with grid lines
  * - Sets viewport offsets from [ChartTokens.Dimens]
@@ -54,6 +54,7 @@ fun CandleStickChart.applyCandleDefaults() = apply {
     setDrawGridBackground(false)
     setPinchZoom(true)
     isDoubleTapToZoomEnabled = false
+    isDragDecelerationEnabled = false
 
     xAxis.apply {
         isEnabled = true
@@ -87,7 +88,7 @@ fun CandleStickChart.applyCandleDefaults() = apply {
  *
  * Configuration includes:
  * - Disables description and legend
- * - Enables pinch zoom, disables double-tap zoom
+ * - Enables pinch zoom, disables double-tap zoom and inertia scrolling
  * - Uses only right Y-axis with minimum at 0
  * - Positions X-axis at bottom with date labels
  * - Sets viewport offsets from [ChartTokens.Dimens]
@@ -97,6 +98,7 @@ fun BarChart.applyVolumeDefaults() = apply {
     setDrawGridBackground(false)
     setPinchZoom(true)
     isDoubleTapToZoomEnabled = false
+    isDragDecelerationEnabled = false
 
     xAxis.apply {
         position = XAxis.XAxisPosition.BOTTOM

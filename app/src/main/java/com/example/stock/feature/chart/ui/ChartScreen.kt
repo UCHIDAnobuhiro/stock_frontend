@@ -107,6 +107,24 @@ fun ChartScreenContent(
 ) {
     val dataAsc = remember(uiState.items) { uiState.items.sortedBy { it.time } }
     val labels = remember(dataAsc) { dataAsc.map { it.time } }
+    val candleEntries = remember(dataAsc) {
+        dataAsc.mapIndexed { i, c ->
+            CandleEntry(
+                i.toFloat(),
+                c.high.toFloat(),
+                c.low.toFloat(),
+                c.open.toFloat(),
+                c.close.toFloat()
+            )
+        }
+    }
+    val volumeEntries = remember(dataAsc) {
+        dataAsc.mapIndexed { i, c ->
+            BarEntry(i.toFloat(), c.volume.toFloat())
+        }
+    }
+    val lows = remember(dataAsc) { dataAsc.map { it.low } }
+    val highs = remember(dataAsc) { dataAsc.map { it.high } }
 
     var candleChartRef by remember { mutableStateOf<CandleStickChart?>(null) }
     var volumeChartRef by remember { mutableStateOf<BarChart?>(null) }
@@ -160,17 +178,9 @@ fun ChartScreenContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(3f, fill = true),
-                    entries = dataAsc.mapIndexed { i, c ->
-                        CandleEntry(
-                            i.toFloat(),
-                            c.high.toFloat(),
-                            c.low.toFloat(),
-                            c.open.toFloat(),
-                            c.close.toFloat()
-                        )
-                    },
-                    lows = dataAsc.map { it.low },
-                    highs = dataAsc.map { it.high },
+                    entries = candleEntries,
+                    lows = lows,
+                    highs = highs,
                     onReady = { candleChartRef = it }
                 )
 
@@ -178,12 +188,7 @@ fun ChartScreenContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1.2f, fill = true),
-                    entries = dataAsc.mapIndexed { i, c ->
-                        BarEntry(
-                            i.toFloat(),
-                            c.volume.toFloat()
-                        )
-                    },
+                    entries = volumeEntries,
                     labels = labels,
                     onReady = { volumeChartRef = it }
                 )
