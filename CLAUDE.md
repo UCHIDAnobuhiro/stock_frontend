@@ -146,7 +146,7 @@ com.example.stock/
 │   ├── data/                    # Shared data components
 │   │   ├── auth/                # TokenProvider interface, InMemoryTokenProvider
 │   │   └── local/               # TokenStore (DataStore persistence)
-│   ├── network/                 # ApiClient singleton, AuthInterceptor
+│   ├── network/                 # AuthInterceptor
 │   ├── ui/
 │   │   ├── component/           # Reusable composables (headers, dropdowns)
 │   │   ├── theme/               # Material3 theme, typography, dimensions

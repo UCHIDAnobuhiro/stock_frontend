@@ -1,6 +1,5 @@
 package com.example.stock.feature.stocklist.data.repository
 
-import com.example.stock.core.network.ApiClient
 import com.example.stock.feature.stocklist.data.remote.SymbolApi
 import com.example.stock.feature.stocklist.data.remote.SymbolDto
 import kotlinx.coroutines.CoroutineDispatcher
@@ -17,7 +16,7 @@ import kotlinx.coroutines.withContext
  * @property io Coroutine dispatcher for IO thread
  */
 class SymbolRepository(
-    private val symbolApi: SymbolApi = ApiClient.symbolApi,
+    private val symbolApi: SymbolApi,
     private val io: CoroutineDispatcher = Dispatchers.IO
 ) {
     /**

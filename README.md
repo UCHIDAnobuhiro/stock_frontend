@@ -185,7 +185,7 @@ app/
     │   ├── data/                # Shared data components
     │   │   ├── auth/            # TokenProvider, InMemoryTokenProvider
     │   │   └── local/           # TokenStore (DataStore)
-    │   ├── network/             # ApiClient, AuthInterceptor
+    │   ├── network/             # AuthInterceptor
     │   └── ui/                  # Common UI
     │       ├── component/       # Reusable Composable
     │       ├── theme/           # Material3 theme, typography
