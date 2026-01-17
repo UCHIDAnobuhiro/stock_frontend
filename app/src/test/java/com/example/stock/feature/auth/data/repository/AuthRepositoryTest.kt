@@ -166,7 +166,8 @@ class AuthRepositoryTest {
     // region HasToken Tests
 
     @Test
-    fun `hasToken returns true when token exists`() {
+    fun `hasToken returns true when token exists`() = runTest(scheduler) {
+        coEvery { tokenProvider.awaitRestoration() } returns Unit
         every { tokenProvider.getToken() } returns "valid_token"
 
         val result = repo.hasToken()
@@ -175,7 +176,8 @@ class AuthRepositoryTest {
     }
 
     @Test
-    fun `hasToken returns false when token is null`() {
+    fun `hasToken returns false when token is null`() = runTest(scheduler) {
+        coEvery { tokenProvider.awaitRestoration() } returns Unit
         every { tokenProvider.getToken() } returns null
 
         val result = repo.hasToken()

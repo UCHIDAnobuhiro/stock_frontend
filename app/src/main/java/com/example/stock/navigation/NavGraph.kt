@@ -1,9 +1,8 @@
 package com.example.stock.navigation
 
-import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -18,6 +17,13 @@ object Routes {
     const val LOGIN = "login"
     const val SIGNUP = "signup"
     const val STOCK = "stock"
+    const val CHART = "chart/{name}/{code}"
+
+    fun chart(name: String, code: String): String {
+        val encodedName = android.net.Uri.encode(name)
+        val encodedCode = android.net.Uri.encode(code)
+        return "chart/$encodedName/$encodedCode"
+    }
 }
 
 /**
@@ -73,15 +79,12 @@ fun AppNavGraph() {
         composable(Routes.STOCK) {
             SymbolListScreen(
                 onNavigateToChart = { name, code ->
-                    // Encode parameters to handle special characters and spaces
-                    val encodedName = Uri.encode(name)
-                    val encodedCode = Uri.encode(code)
-                    navController.navigate("chart/$encodedName/$encodedCode")
+                    navController.navigate(Routes.chart(name, code))
                 },
                 onLogout = { logoutViewModel.logout() }
             )
         }
-        composable("chart/{name}/{code}") { backStackEntry ->
+        composable(Routes.CHART) { backStackEntry ->
             // Navigation component automatically decodes URI parameters
             val name = backStackEntry.arguments?.getString("name") ?: return@composable
             val code = backStackEntry.arguments?.getString("code") ?: return@composable

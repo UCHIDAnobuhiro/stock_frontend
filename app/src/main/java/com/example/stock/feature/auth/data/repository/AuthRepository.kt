@@ -74,8 +74,12 @@ class AuthRepository @Inject constructor(
 
     /**
      * Checks if a valid token exists in memory.
+     * Waits for token restoration from storage to complete before checking.
      *
      * @return true if a token exists, false otherwise
      */
-    fun hasToken(): Boolean = tokenProvider.getToken() != null
+    suspend fun hasToken(): Boolean {
+        tokenProvider.awaitRestoration()
+        return tokenProvider.getToken() != null
+    }
 }

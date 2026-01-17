@@ -2,9 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlin.kapt)
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.20"
 }
 
 android {
@@ -31,7 +31,8 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://api.stockviewapp.com/\"")
         }
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -64,18 +65,18 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    // Jetpack Compose用のNavigationライブラリ
+    // Navigation library for Jetpack Compose
     implementation(libs.navigation.compose)
-    // Retrofit本体
+    // Retrofit core library
     implementation(libs.retrofit)
-    // Kotlinx Serializationとの連携用コンバータ
+    // Kotlinx Serialization converter for Retrofit
     implementation(libs.retrofit.serialization.converter)
-    // Kotlinx SerializationのJSON処理ライブラリ
+    // Kotlinx Serialization JSON processing library
     implementation(libs.kotlinx.serialization.json)
-    // OkHttp
+    // OkHttp client
     implementation(libs.okhttp)
     implementation(libs.mpandroidchart)
-    // ViewModelテスト関連
+    // ViewModel testing dependencies
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
     testImplementation(libs.junit)

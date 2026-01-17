@@ -42,6 +42,8 @@ class StockApplication : Application() {
     /**
      * Restores the JWT token from persistent storage to memory.
      * This ensures the user remains logged in after app restart.
+     * Marks restoration as complete when done, allowing LoginViewModel
+     * to safely check auth state.
      */
     private fun restoreToken() {
         applicationScope.launch {
@@ -49,9 +51,14 @@ class StockApplication : Application() {
                 this@StockApplication,
                 TokenEntryPoint::class.java
             )
-            entryPoint.tokenStore().tokenFlow.first()?.let { token ->
-                entryPoint.tokenProvider().update(token)
-                Timber.d("Token restored from storage")
+            try {
+                entryPoint.tokenStore().tokenFlow.first()?.let { token ->
+                    entryPoint.tokenProvider().update(token)
+                    Timber.d("Token restored from storage")
+                }
+            } finally {
+                entryPoint.tokenProvider().markRestorationComplete()
+                Timber.d("Token restoration complete")
             }
         }
     }

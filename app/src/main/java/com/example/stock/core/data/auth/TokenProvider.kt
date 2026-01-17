@@ -1,5 +1,10 @@
 package com.example.stock.core.data.auth
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+
 /**
  * Interface for obtaining, updating, and clearing access tokens.
  */
@@ -20,6 +25,22 @@ interface TokenProvider {
      * Clears the held token.
      */
     fun clear()
+
+    /**
+     * StateFlow indicating whether token restoration from storage is complete.
+     */
+    val isRestorationComplete: StateFlow<Boolean>
+
+    /**
+     * Marks token restoration as complete.
+     * Called by Application after restoring token from persistent storage.
+     */
+    fun markRestorationComplete()
+
+    /**
+     * Suspends until token restoration is complete.
+     */
+    suspend fun awaitRestoration()
 }
 
 /**
@@ -28,7 +49,10 @@ interface TokenProvider {
  */
 class InMemoryTokenProvider : TokenProvider {
     @Volatile
-    private var token: String? = null // Token in memory
+    private var token: String? = null
+
+    private val _isRestorationComplete = MutableStateFlow(false)
+    override val isRestorationComplete: StateFlow<Boolean> = _isRestorationComplete.asStateFlow()
 
     /**
      * Returns the held token.
@@ -47,5 +71,19 @@ class InMemoryTokenProvider : TokenProvider {
      */
     override fun clear() {
         this.token = null
+    }
+
+    /**
+     * Marks token restoration as complete.
+     */
+    override fun markRestorationComplete() {
+        _isRestorationComplete.value = true
+    }
+
+    /**
+     * Suspends until token restoration is complete.
+     */
+    override suspend fun awaitRestoration() {
+        _isRestorationComplete.first { it }
     }
 }
