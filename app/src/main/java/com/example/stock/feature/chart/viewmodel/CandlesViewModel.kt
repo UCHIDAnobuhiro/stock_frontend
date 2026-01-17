@@ -9,6 +9,7 @@ import com.example.stock.feature.chart.data.repository.CandleRepository
 import com.example.stock.feature.chart.ui.CandleItem
 import com.example.stock.feature.chart.ui.CandleUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -78,6 +79,8 @@ class CandlesViewModel @Inject constructor(
                         _ui.update { it.copy(isLoading = false, items = list, errorResId = null) }
                     }
             }.onFailure { e ->
+                // Re-throw CancellationException to preserve cancellation semantics
+                if (e is CancellationException) throw e
                 val errorResId = when (e) {
                     is IOException -> R.string.error_network
                     is HttpException -> R.string.error_server
