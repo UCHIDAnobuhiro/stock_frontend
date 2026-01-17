@@ -1,6 +1,5 @@
 package com.example.stock.feature.chart.data.repository
 
-import com.example.stock.core.network.ApiClient
 import com.example.stock.feature.chart.data.remote.CandleDto
 import com.example.stock.feature.chart.data.remote.ChartApi
 import kotlinx.coroutines.CoroutineDispatcher
@@ -19,7 +18,7 @@ import kotlinx.coroutines.withContext
  * @property io Coroutine dispatcher for IO thread
  */
 class CandleRepository(
-    private val chartApi: ChartApi = ApiClient.chartApi,
+    private val chartApi: ChartApi,
     private val io: CoroutineDispatcher = Dispatchers.IO
 ) {
     // StateFlow for candlestick data (read-only)
