@@ -11,7 +11,6 @@ import com.example.stock.feature.auth.ui.login.LoginScreen
 import com.example.stock.feature.auth.ui.signup.SignupScreen
 import com.example.stock.feature.auth.viewmodel.LogoutViewModel
 import com.example.stock.feature.chart.ui.ChartScreen
-import com.example.stock.feature.chart.viewmodel.CandlesViewModel
 import com.example.stock.feature.stocklist.ui.SymbolListScreen
 
 // Routes are identifiers for screen navigation.
@@ -86,12 +85,10 @@ fun AppNavGraph() {
             // Navigation component automatically decodes URI parameters
             val name = backStackEntry.arguments?.getString("name") ?: return@composable
             val code = backStackEntry.arguments?.getString("code") ?: return@composable
-            val candlesViewModel: CandlesViewModel = hiltViewModel()
             ChartScreen(
-                navController,
-                name,
-                code,
-                candlesViewModel,
+                name = name,
+                code = code,
+                onNavigateBack = { navController.popBackStack() },
                 onLogout = { logoutViewModel.logout() }
             )
         }

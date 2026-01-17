@@ -165,7 +165,7 @@ app/
     ├── feature/                 # Feature modules
     │   ├── auth/                # Authentication feature
     │   │   ├── data/
-    │   │   │   ├── remote/      # AuthApi (Retrofit), LoginRequest/Response DTOs
+    │   │   │   ├── remote/      # AuthApi (Retrofit), AuthModels (Request/Response DTOs)
     │   │   │   └── repository/  # AuthRepository
     │   │   ├── ui/
     │   │   │   ├── login/       # LoginScreen, LoginUiState
@@ -173,14 +173,17 @@ app/
     │   │   └── viewmodel/       # LoginViewModel, LogoutViewModel, SignupViewModel
     │   ├── stocklist/           # Stock list feature
     │   │   ├── data/
-    │   │   │   ├── remote/      # StockApi (Retrofit), SymbolItem/CandleDto DTOs
-    │   │   │   └── repository/  # StockRepository
-    │   │   ├── ui/              # StockListScreen, SymbolUiState
-    │   │   └── viewmodel/       # SymbolViewModel, SymbolViewModelFactory
+    │   │   │   ├── remote/      # SymbolApi (Retrofit), SymbolDto
+    │   │   │   └── repository/  # SymbolRepository
+    │   │   ├── ui/              # SymbolListScreen, SymbolUiState, SymbolItem
+    │   │   └── viewmodel/       # SymbolViewModel
     │   └── chart/               # Chart display feature
-    │       ├── ui/              # ChartScreen, CandleUiState, MPAndroidChart views
+    │       ├── data/
+    │       │   ├── remote/      # ChartApi (Retrofit), CandleDto
+    │       │   └── repository/  # CandleRepository
+    │       ├── ui/              # ChartScreen, CandleUiState, CandleItem
     │       │   └── chart/       # CandleChartView, VolumeChartView, ChartSync
-    │       └── viewmodel/       # CandlesViewModel, CandlesViewModelFactory
+    │       └── viewmodel/       # CandlesViewModel
     ├── core/                    # Core components
     │   ├── data/                # Shared data components
     │   │   ├── auth/            # TokenProvider, InMemoryTokenProvider
@@ -202,7 +205,7 @@ Each feature module (`auth`, `stocklist`, `chart`) consists of:
 - **data/remote/** - Retrofit API interfaces and DTOs for network communication
 - **data/repository/** - Repository classes that coordinate data operations
 - **ui/** - Composable screens, UI state classes, feature-specific UI components
-- **viewmodel/** - ViewModel and ViewModelFactory
+- **viewmodel/** - ViewModel classes with `@HiltViewModel` annotation
 
 This structure provides:
 
@@ -255,10 +258,10 @@ cd stock_frontend
 ./gradlew testDebugUnitTest
 
 # Run specific test class
-./gradlew testDebugUnitTest --tests "com.example.stock.feature.auth.viewmodel.AuthViewModelTest"
+./gradlew testDebugUnitTest --tests "com.example.stock.feature.auth.viewmodel.LoginViewModelTest"
 
 # Run tests with coverage
-./gradlew testDebugUnitTest --tests "*.AuthViewModelTest.*"
+./gradlew testDebugUnitTest --tests "*.LoginViewModelTest.*"
 
 # Run lint checks
 ./gradlew lint

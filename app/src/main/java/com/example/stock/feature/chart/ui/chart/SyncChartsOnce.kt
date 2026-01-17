@@ -6,18 +6,14 @@ import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.CandleStickChart
 
 /**
- * ローソク足チャートと出来高チャートを一度だけ同期させるComposable。
+ * Composable that synchronizes candlestick and volume charts once both are ready.
  *
- * 2つのチャートインスタンスが揃ったタイミングで、
- * スクロールやズームなどの操作を連動させる。
- *
- * @param candle ローソク足チャートのインスタンス
- * @param volume 出来高チャートのインスタンス
+ * @param candle Candlestick chart instance
+ * @param volume Volume chart instance
  */
 @Composable
 fun SyncChartsOnce(candle: CandleStickChart?, volume: BarChart?) {
     LaunchedEffect(candle, volume) {
-        // 両方のチャートがnullでなければ同期処理を実行
         if (candle != null && volume != null) {
             attachSynchronizedPair(candle, volume)
         }
