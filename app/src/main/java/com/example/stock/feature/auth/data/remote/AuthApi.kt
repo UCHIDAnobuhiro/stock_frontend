@@ -15,7 +15,7 @@ interface AuthApi {
      * @param body Login request containing email and password
      * @return Authentication result containing token
      */
-    @POST("login")
+    @POST("v1/login")
     suspend fun login(@Body body: LoginRequest): LoginResponse
 
     /**
@@ -24,7 +24,7 @@ interface AuthApi {
      * @param body Signup request containing email and password
      * @return Authentication result containing token
      */
-    @POST("signup")
+    @POST("v1/signup")
     suspend fun signup(@Body body: SignupRequest): SignupResponse
 
 }

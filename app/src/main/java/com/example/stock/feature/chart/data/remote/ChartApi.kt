@@ -39,7 +39,7 @@ interface ChartApi {
      * @param outputsize Number of data points to fetch (default: 200)
      * @return List of candlestick data
      */
-    @GET("candles/{code}")
+    @GET("v1/candles/{code}")
     suspend fun getCandles(
         @Path("code") code: String,
         @Query("interval") interval: String = "1day",
