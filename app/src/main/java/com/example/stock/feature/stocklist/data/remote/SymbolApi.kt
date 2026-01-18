@@ -13,6 +13,6 @@ interface SymbolApi {
      *
      * @return List of symbol information
      */
-    @GET("symbols")
+    @GET("v1/symbols")
     suspend fun getSymbols(): List<SymbolDto>
 }
