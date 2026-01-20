@@ -28,7 +28,11 @@ class LogoutViewModel @Inject constructor(
     private val authEventManager: AuthEventManager
 ) : ViewModel() {
 
+    /**
+     * UI events emitted by LogoutViewModel for one-time actions.
+     */
     sealed interface UiEvent {
+        /** Emitted when logout completes or session expires. */
         data object LoggedOut : UiEvent
     }
 

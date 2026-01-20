@@ -22,6 +22,10 @@ import timber.log.Timber
 @HiltAndroidApp
 class StockApplication : Application() {
 
+    /**
+     * Hilt entry point for accessing token-related dependencies outside of injected classes.
+     * Used to restore tokens from persistent storage on app startup.
+     */
     @EntryPoint
     @InstallIn(SingletonComponent::class)
     interface TokenEntryPoint {
