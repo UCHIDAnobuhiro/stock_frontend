@@ -18,3 +18,12 @@ data class LoginUiState(
     val isLoading: Boolean = false,
     @StringRes val errorResId: Int? = null,
 )
+
+/**
+ * One-time events emitted by [com.example.stock.feature.auth.viewmodel.LoginViewModel].
+ *
+ * Used for navigation or actions that should only be handled once.
+ */
+sealed interface LoginUiEvent {
+    data object LoggedIn : LoginUiEvent
+}
