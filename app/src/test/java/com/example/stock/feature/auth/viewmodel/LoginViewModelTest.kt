@@ -190,7 +190,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `login failure - sets generic error message`() = runTest(mainRule.scheduler) {
+    fun `login failure - 401 error sets invalid credentials message`() = runTest(mainRule.scheduler) {
         viewModel.onEmailChange("test@example.com")
         viewModel.onPasswordChange("password")
         coEvery { repository.login(any(), any()) } throws httpError()
@@ -199,7 +199,7 @@ class LoginViewModelTest {
         advanceUntilIdle()
 
         assertThat(viewModel.ui.value.isLoading).isFalse()
-        assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_login_failed)
+        assertThat(viewModel.ui.value.errorResId).isEqualTo(R.string.error_invalid_credentials)
         coVerify(exactly = 1) { repository.login("test@example.com", "password") }
     }
 

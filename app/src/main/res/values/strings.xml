@@ -19,6 +19,7 @@
     <string name="error_invalid_email">メールアドレスの形式が正しくありません</string>
     <string name="error_password_too_short">パスワードは8文字以上で入力してください</string>
     <string name="error_login_failed">ログインに失敗しました</string>
+    <string name="error_invalid_credentials">メールアドレスまたはパスワードが正しくありません</string>
 
     <!--サインアップ-->
     <string name="signup">新規登録</string>

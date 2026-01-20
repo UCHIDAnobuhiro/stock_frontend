@@ -93,7 +93,17 @@ class LoginViewModel @Inject constructor(
                 .onSuccess { _events.emit(UiEvent.LoggedIn) }
                 .onFailure { e ->
                     ErrorHandler.logError(e, "Login")
-                    _ui.update { it.copy(errorResId = R.string.error_login_failed) }
+                    val errorResId = ErrorHandler.mapErrorToResource(
+                        exception = e,
+                        httpErrorMapper = { httpEx ->
+                            when (httpEx.code()) {
+                                401 -> R.string.error_invalid_credentials
+                                else -> R.string.error_login_failed
+                            }
+                        },
+                        defaultErrorResId = R.string.error_login_failed
+                    )
+                    _ui.update { it.copy(errorResId = errorResId) }
                 }
             _ui.update { it.copy(isLoading = false) }
         }
