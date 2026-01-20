@@ -72,7 +72,7 @@ class LoginViewModel @Inject constructor(
         // Prevent multiple rapid clicks
         if (_ui.value.isLoading) return
 
-        val (email, password) = _ui.value.let { it.email to it.password }
+        val (email, password) = _ui.value.let { it.email.trim() to it.password }
 
         InputValidator.validateLogin(email, password)?.let { errorResId ->
             _ui.update { it.copy(errorResId = errorResId) }
