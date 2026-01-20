@@ -2,6 +2,7 @@ package com.example.stock.feature.auth.viewmodel
 
 import com.example.stock.R
 import com.example.stock.feature.auth.data.repository.AuthRepository
+import com.example.stock.feature.auth.ui.login.LoginUiEvent
 import com.example.stock.util.MainDispatcherRule
 import com.example.stock.util.TestDispatcherProvider
 import com.google.common.truth.Truth.assertThat
@@ -172,7 +173,7 @@ class LoginViewModelTest {
         coEvery { repository.login("test@example.com", "password") } returns Unit
 
         // Collect events before triggering login
-        var received: LoginViewModel.UiEvent? = null
+        var received: LoginUiEvent? = null
         val job: Job = launch {
             received = viewModel.events.first()
         }
@@ -182,7 +183,7 @@ class LoginViewModelTest {
 
         assertThat(viewModel.ui.value.isLoading).isFalse()
         assertThat(viewModel.ui.value.errorResId).isNull()
-        assertThat(received).isEqualTo(LoginViewModel.UiEvent.LoggedIn)
+        assertThat(received).isEqualTo(LoginUiEvent.LoggedIn)
 
         job.cancelAndJoin()
 
@@ -220,7 +221,7 @@ class LoginViewModelTest {
     fun `checkAuthState emits LoggedIn when token exists`() = runTest(mainRule.scheduler) {
         coEvery { repository.hasToken() } returns true
 
-        var received: LoginViewModel.UiEvent? = null
+        var received: LoginUiEvent? = null
         val job: Job = launch {
             received = viewModel.events.first()
         }
@@ -228,7 +229,7 @@ class LoginViewModelTest {
         viewModel.checkAuthState()
         advanceUntilIdle()
 
-        assertThat(received).isEqualTo(LoginViewModel.UiEvent.LoggedIn)
+        assertThat(received).isEqualTo(LoginUiEvent.LoggedIn)
         job.cancelAndJoin()
 
         coVerify(exactly = 1) { repository.hasToken() }

@@ -70,7 +70,7 @@ fun LoginScreen(
     // Navigate on successful login (only once)
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
-            if (event is LoginViewModel.UiEvent.LoggedIn) {
+            if (event is LoginUiEvent.LoggedIn) {
                 onLoggedIn()
             }
         }

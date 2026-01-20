@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.stock.R
 import com.example.stock.core.util.DispatcherProvider
 import com.example.stock.feature.auth.data.repository.AuthRepository
+import com.example.stock.feature.auth.ui.login.LoginUiEvent
 import com.example.stock.feature.auth.ui.login.LoginUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -35,11 +36,7 @@ class LoginViewModel @Inject constructor(
     private val _ui = MutableStateFlow(LoginUiState())
     val ui: StateFlow<LoginUiState> = _ui
 
-    sealed interface UiEvent {
-        data object LoggedIn : UiEvent
-    }
-
-    private val _events = MutableSharedFlow<UiEvent>(replay = 0, extraBufferCapacity = 1)
+    private val _events = MutableSharedFlow<LoginUiEvent>(replay = 0, extraBufferCapacity = 1)
     val events = _events.asSharedFlow()
 
     /**
@@ -90,7 +87,7 @@ class LoginViewModel @Inject constructor(
                     repo.login(email, password)
                 }
             }
-                .onSuccess { _events.emit(UiEvent.LoggedIn) }
+                .onSuccess { _events.emit(LoginUiEvent.LoggedIn) }
                 .onFailure { e ->
                     ErrorHandler.logError(e, "Login")
                     val errorResId = ErrorHandler.mapErrorToResource(
@@ -112,7 +109,7 @@ class LoginViewModel @Inject constructor(
     /**
      * Checks if user is already authenticated.
      * Waits for token restoration from storage to complete before checking.
-     * If a valid token exists, emits [UiEvent.LoggedIn] to navigate to main screen.
+     * If a valid token exists, emits [LoginUiEvent.LoggedIn] to navigate to main screen.
      * Called on app startup to enable auto-login.
      */
     fun checkAuthState() {
@@ -121,7 +118,7 @@ class LoginViewModel @Inject constructor(
                 repo.hasToken()
             }
             if (hasToken) {
-                _events.emit(UiEvent.LoggedIn)
+                _events.emit(LoginUiEvent.LoggedIn)
             }
         }
     }
