@@ -85,20 +85,17 @@ class LoginViewModel @Inject constructor(
         // Perform login asynchronously
         viewModelScope.launch(dispatcherProvider.main) {
             _ui.update { it.copy(isLoading = true, errorResId = null) }
-            try {
-                runCatching {
-                    withContext(dispatcherProvider.io) {
-                        repo.login(email, password)
-                    }
+            runCatching {
+                withContext(dispatcherProvider.io) {
+                    repo.login(email, password)
                 }
-                    .onSuccess { _events.emit(UiEvent.LoggedIn) }
-                    .onFailure { e ->
-                        ErrorHandler.logError(e, "Login")
-                        _ui.update { it.copy(errorResId = R.string.error_login_failed) }
-                    }
-            } finally {
-                _ui.update { it.copy(isLoading = false) }
             }
+                .onSuccess { _events.emit(UiEvent.LoggedIn) }
+                .onFailure { e ->
+                    ErrorHandler.logError(e, "Login")
+                    _ui.update { it.copy(errorResId = R.string.error_login_failed) }
+                }
+            _ui.update { it.copy(isLoading = false) }
         }
     }
 
