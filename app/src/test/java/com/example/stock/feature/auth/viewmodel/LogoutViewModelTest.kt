@@ -1,5 +1,6 @@
 package com.example.stock.feature.auth.viewmodel
 
+import com.example.stock.core.data.auth.AuthEventManager
 import com.example.stock.feature.auth.data.repository.AuthRepository
 import com.example.stock.util.MainDispatcherRule
 import com.example.stock.util.TestDispatcherProvider
@@ -26,14 +27,16 @@ class LogoutViewModelTest {
     val mainRule = MainDispatcherRule()
 
     private lateinit var repository: AuthRepository
+    private lateinit var authEventManager: AuthEventManager
     private lateinit var dispatcherProvider: TestDispatcherProvider
     private lateinit var viewModel: LogoutViewModel
 
     @Before
     fun setUp() {
         repository = mockk(relaxed = true)
+        authEventManager = AuthEventManager()
         dispatcherProvider = TestDispatcherProvider(mainRule.scheduler)
-        viewModel = LogoutViewModel(repository, dispatcherProvider)
+        viewModel = LogoutViewModel(repository, dispatcherProvider, authEventManager)
     }
 
     @After
@@ -80,5 +83,23 @@ class LogoutViewModelTest {
             job.cancelAndJoin()
 
             coVerify(exactly = 1) { repository.logout() }
+        }
+
+    @Test
+    fun `session expired event - emits LoggedOut event`() =
+        runTest(mainRule.scheduler) {
+            // Collect events before triggering session expiration
+            var received: LogoutViewModel.UiEvent? = null
+            val job: Job = launch {
+                received = viewModel.events.first()
+            }
+
+            // Simulate 401 session expiration
+            authEventManager.emitSessionExpired()
+            advanceUntilIdle()
+
+            // Verify LoggedOut event is emitted
+            assertThat(received).isEqualTo(LogoutViewModel.UiEvent.LoggedOut)
+            job.cancelAndJoin()
         }
 }

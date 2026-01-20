@@ -1,9 +1,12 @@
 package com.example.stock.di
 
 import com.example.stock.config.ApiConfig
+import com.example.stock.core.data.auth.AuthEventManager
 import com.example.stock.core.data.auth.InMemoryTokenProvider
 import com.example.stock.core.data.auth.TokenProvider
+import com.example.stock.core.data.local.TokenStore
 import com.example.stock.core.network.AuthInterceptor
+import com.example.stock.core.network.TokenAuthenticator
 import com.example.stock.feature.auth.data.remote.AuthApi
 import com.example.stock.feature.chart.data.remote.ChartApi
 import com.example.stock.feature.stocklist.data.remote.SymbolApi
@@ -61,11 +64,14 @@ object NetworkModule {
     @Singleton
     fun provideOkHttpClient(
         tokenProvider: TokenProvider,
+        tokenStore: TokenStore,
+        authEventManager: AuthEventManager,
         loggingInterceptor: HttpLoggingInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(tokenProvider))
             .addInterceptor(loggingInterceptor)
+            .authenticator(TokenAuthenticator(tokenProvider, tokenStore, authEventManager))
             .build()
     }
 
