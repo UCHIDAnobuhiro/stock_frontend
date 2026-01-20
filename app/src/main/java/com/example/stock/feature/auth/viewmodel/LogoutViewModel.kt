@@ -2,9 +2,9 @@ package com.example.stock.feature.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.stock.core.data.auth.AuthEventManager
 import com.example.stock.core.util.DispatcherProvider
 import com.example.stock.feature.auth.data.repository.AuthRepository
-import com.example.stock.feature.auth.viewmodel.ErrorHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -17,11 +17,15 @@ import javax.inject.Inject
  *
  * Manages the logout process by clearing tokens from both memory and persistent storage.
  * Emits [UiEvent.LoggedOut] upon successful logout to trigger navigation.
+ *
+ * Also observes global auth events (e.g., session expiration from 401 responses)
+ * and emits [UiEvent.LoggedOut] to trigger navigation to login screen.
  */
 @HiltViewModel
 class LogoutViewModel @Inject constructor(
     private val repo: AuthRepository,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val authEventManager: AuthEventManager
 ) : ViewModel() {
 
     sealed interface UiEvent {
@@ -30,6 +34,19 @@ class LogoutViewModel @Inject constructor(
 
     private val _events = MutableSharedFlow<UiEvent>(replay = 0, extraBufferCapacity = 1)
     val events = _events.asSharedFlow()
+
+    init {
+        // Observe global auth events (e.g., 401 session expiration)
+        viewModelScope.launch {
+            authEventManager.events.collect { event ->
+                when (event) {
+                    AuthEventManager.AuthEvent.SessionExpired -> {
+                        _events.emit(UiEvent.LoggedOut)
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Executes logout processing.
