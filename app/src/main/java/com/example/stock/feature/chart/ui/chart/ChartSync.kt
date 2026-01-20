@@ -31,6 +31,13 @@ fun attachSynchronizedPair(
 
     val vpLock = AtomicBoolean(false)
 
+    /**
+     * Synchronizes viewport matrix from one chart to another.
+     * Uses [vpLock] to prevent infinite recursion between charts.
+     *
+     * @param from Source chart to copy viewport from
+     * @param to Target chart to apply viewport to
+     */
     fun syncViewport(from: Chart<*>, to: Chart<*>) {
         if (!vpLock.compareAndSet(false, true)) return
         try {
@@ -90,6 +97,14 @@ fun attachSynchronizedPair(
 
     val hlLock = AtomicBoolean(false)
 
+    /**
+     * Checks if the chart already has a highlight at the same X position.
+     * Used to prevent redundant highlight updates.
+     *
+     * @param chart Chart to check for existing highlight
+     * @param x X coordinate to compare
+     * @return true if the chart already has a highlight at the same X position
+     */
     fun sameXHighlighted(chart: Chart<*>?, x: Float): Boolean {
         val cur = chart?.highlighted?.firstOrNull() ?: return false
         return cur.x == x

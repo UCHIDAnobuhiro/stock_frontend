@@ -59,6 +59,12 @@ object NetworkModule {
 
     /**
      * Provides a singleton instance of OkHttpClient.
+     *
+     * @param tokenProvider Provider for authentication tokens
+     * @param tokenStore Persistent storage for tokens
+     * @param authEventManager Manager for authentication lifecycle events
+     * @param loggingInterceptor Interceptor for HTTP request/response logging
+     * @return Configured OkHttpClient with authentication and logging
      */
     @Provides
     @Singleton
@@ -88,6 +94,10 @@ object NetworkModule {
 
     /**
      * Provides a singleton instance of Retrofit.
+     *
+     * @param okHttpClient HTTP client for network requests
+     * @param json JSON serializer/deserializer configuration
+     * @return Configured Retrofit instance for API calls
      */
     @OptIn(ExperimentalSerializationApi::class)
     @Provides
@@ -105,6 +115,9 @@ object NetworkModule {
 
     /**
      * Provides a singleton instance of AuthApi.
+     *
+     * @param retrofit Retrofit instance for creating API implementation
+     * @return AuthApi implementation for authentication endpoints
      */
     @Provides
     @Singleton
@@ -114,6 +127,9 @@ object NetworkModule {
 
     /**
      * Provides a singleton instance of SymbolApi.
+     *
+     * @param retrofit Retrofit instance for creating API implementation
+     * @return SymbolApi implementation for stock symbol endpoints
      */
     @Provides
     @Singleton
@@ -123,6 +139,9 @@ object NetworkModule {
 
     /**
      * Provides a singleton instance of ChartApi.
+     *
+     * @param retrofit Retrofit instance for creating API implementation
+     * @return ChartApi implementation for candlestick chart data endpoints
      */
     @Provides
     @Singleton
