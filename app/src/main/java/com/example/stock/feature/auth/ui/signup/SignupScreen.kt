@@ -190,7 +190,7 @@ fun SignupScreenContent(
                 keyboardActions = KeyboardActions(
                     onDone = {
                         keyboardController?.hide()
-                        onSignup()
+                        if (!uiState.isLoading) onSignup()
                     }
                 ),
                 visualTransformation = if (uiState.isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),

@@ -154,7 +154,7 @@ fun LoginScreenContent(
                 keyboardActions = KeyboardActions(
                     onDone = {
                         keyboardController?.hide()
-                        onLogin()
+                        if (!uiState.isLoading) onLogin()
                     }
                 ),
                 visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
