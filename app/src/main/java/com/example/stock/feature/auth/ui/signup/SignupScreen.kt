@@ -165,8 +165,8 @@ fun SignupScreenContent(
                             } else {
                                 Icons.Default.VisibilityOff
                             },
-                            contentDescription = if (uiState.isPasswordVisible) stringResource(R.string.hide) else stringResource(
-                                R.string.show
+                            contentDescription = stringResource(
+                                if (uiState.isPasswordVisible) R.string.hide else R.string.show
                             )
                         )
                     }
@@ -190,7 +190,7 @@ fun SignupScreenContent(
                 keyboardActions = KeyboardActions(
                     onDone = {
                         keyboardController?.hide()
-                        onSignup()
+                        if (!uiState.isLoading) onSignup()
                     }
                 ),
                 visualTransformation = if (uiState.isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -202,8 +202,8 @@ fun SignupScreenContent(
                             } else {
                                 Icons.Default.VisibilityOff
                             },
-                            contentDescription = if (uiState.isConfirmPasswordVisible) stringResource(R.string.hide) else stringResource(
-                                R.string.show
+                            contentDescription = stringResource(
+                                if (uiState.isConfirmPasswordVisible) R.string.hide else R.string.show
                             )
                         )
                     }
