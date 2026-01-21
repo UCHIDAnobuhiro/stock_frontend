@@ -15,5 +15,5 @@ import androidx.annotation.StringRes
 data class SymbolUiState(
     val isLoading: Boolean = false,
     val symbols: List<SymbolItem> = emptyList(),
-    @StringRes val errorResId: Int? = null
+    @get:StringRes val errorResId: Int? = null
 )
