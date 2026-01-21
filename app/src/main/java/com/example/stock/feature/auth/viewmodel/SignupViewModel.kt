@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.stock.R
 import com.example.stock.core.util.DispatcherProvider
 import com.example.stock.feature.auth.data.repository.AuthRepository
+import com.example.stock.feature.auth.ui.signup.SignupUiEvent
 import com.example.stock.feature.auth.ui.signup.SignupUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -35,15 +36,7 @@ class SignupViewModel @Inject constructor(
     private val _ui = MutableStateFlow(SignupUiState())
     val ui: StateFlow<SignupUiState> = _ui
 
-    /**
-     * UI events emitted by SignupViewModel for one-time actions.
-     */
-    sealed interface UiEvent {
-        /** Emitted when signup completes successfully. */
-        data object SignedUp : UiEvent
-    }
-
-    private val _events = MutableSharedFlow<UiEvent>(replay = 0, extraBufferCapacity = 1)
+    private val _events = MutableSharedFlow<SignupUiEvent>(replay = 0, extraBufferCapacity = 1)
     val events = _events.asSharedFlow()
 
     /**
@@ -112,7 +105,7 @@ class SignupViewModel @Inject constructor(
                         repo.signup(email, password)
                     }
                 }
-                    .onSuccess { _events.emit(UiEvent.SignedUp) }
+                    .onSuccess { _events.emit(SignupUiEvent.SignedUp) }
                     .onFailure { e ->
                         ErrorHandler.logError(e, "Signup")
                         val errorResId = ErrorHandler.mapErrorToResource(

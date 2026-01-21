@@ -20,3 +20,12 @@ data class SignupUiState(
     val isLoading: Boolean = false,
     val errorResId: Int? = null,
 )
+
+/**
+ * One-time events emitted by [com.example.stock.feature.auth.viewmodel.SignupViewModel].
+ *
+ * Used for navigation or actions that should only be handled once.
+ */
+sealed interface SignupUiEvent {
+    data object SignedUp : SignupUiEvent
+}
