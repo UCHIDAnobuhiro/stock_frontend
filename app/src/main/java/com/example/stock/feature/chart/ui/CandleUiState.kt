@@ -15,5 +15,5 @@ import androidx.annotation.StringRes
 data class CandleUiState(
     val isLoading: Boolean = false,
     val items: List<CandleItem> = emptyList(),
-    @StringRes val errorResId: Int? = null
+    @get:StringRes val errorResId: Int? = null
 )
