@@ -79,11 +79,16 @@ fun AppNavGraph() {
         composable(Routes.SIGNUP) {
             SignupScreen(
                 onSignedUp = {
-                    // Navigate back to login screen on successful signup
-                    navController.popBackStack()
+                    // Navigate to login screen with fresh state on successful signup
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
+                    }
                 },
                 onNavigateToLogin = {
-                    navController.popBackStack()
+                    // Navigate to login screen with fresh state
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
+                    }
                 }
             )
         }
