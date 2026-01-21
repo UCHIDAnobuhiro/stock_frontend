@@ -99,28 +99,25 @@ class SignupViewModel @Inject constructor(
         // Perform signup asynchronously
         viewModelScope.launch(dispatcherProvider.main) {
             _ui.update { it.copy(isLoading = true, errorResId = null) }
-            try {
-                runCatching {
-                    withContext(dispatcherProvider.io) {
-                        repo.signup(email, password)
-                    }
+            runCatching {
+                withContext(dispatcherProvider.io) {
+                    repo.signup(email, password)
                 }
-                    .onSuccess { _events.emit(SignupUiEvent.SignedUp) }
-                    .onFailure { e ->
-                        ErrorHandler.logError(e, "Signup")
-                        val errorResId = ErrorHandler.mapErrorToResource(
-                            exception = e,
-                            httpErrorMapper = { httpException ->
-                                if (httpException.code() == 409) R.string.error_email_already_registered
-                                else R.string.error_signup_failed
-                            },
-                            defaultErrorResId = R.string.error_signup_failed
-                        )
-                        _ui.update { it.copy(errorResId = errorResId) }
-                    }
-            } finally {
-                _ui.update { it.copy(isLoading = false) }
             }
+                .onSuccess { _events.emit(SignupUiEvent.SignedUp) }
+                .onFailure { e ->
+                    ErrorHandler.logError(e, "Signup")
+                    val errorResId = ErrorHandler.mapErrorToResource(
+                        exception = e,
+                        httpErrorMapper = { httpException ->
+                            if (httpException.code() == 409) R.string.error_email_already_registered
+                            else R.string.error_signup_failed
+                        },
+                        defaultErrorResId = R.string.error_signup_failed
+                    )
+                    _ui.update { it.copy(errorResId = errorResId) }
+                }
+            _ui.update { it.copy(isLoading = false) }
         }
     }
 }
