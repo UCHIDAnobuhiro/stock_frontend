@@ -88,7 +88,7 @@ class SignupViewModel @Inject constructor(
         if (_ui.value.isLoading) return
 
         val (email, password, confirmPassword) = _ui.value.let {
-            Triple(it.email, it.password, it.confirmPassword)
+            Triple(it.email.trim(), it.password, it.confirmPassword)
         }
 
         InputValidator.validateSignup(email, password, confirmPassword)?.let { errorResId ->
