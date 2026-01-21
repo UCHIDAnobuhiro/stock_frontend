@@ -35,7 +35,11 @@ class SignupViewModel @Inject constructor(
     private val _ui = MutableStateFlow(SignupUiState())
     val ui: StateFlow<SignupUiState> = _ui
 
+    /**
+     * UI events emitted by SignupViewModel for one-time actions.
+     */
     sealed interface UiEvent {
+        /** Emitted when signup completes successfully. */
         data object SignedUp : UiEvent
     }
 

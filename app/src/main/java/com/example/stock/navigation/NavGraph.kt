@@ -12,13 +12,24 @@ import com.example.stock.feature.auth.viewmodel.LogoutViewModel
 import com.example.stock.feature.chart.ui.ChartScreen
 import com.example.stock.feature.stocklist.ui.SymbolListScreen
 
-// Routes are identifiers for screen navigation.
+/**
+ * Route constants for screen navigation.
+ *
+ * Contains all navigation destinations used in the app's navigation graph.
+ */
 object Routes {
     const val LOGIN = "login"
     const val SIGNUP = "signup"
     const val STOCK = "stock"
     const val CHART = "chart/{name}/{code}"
 
+    /**
+     * Builds chart route with encoded name and code parameters.
+     *
+     * @param name Stock name to encode
+     * @param code Stock code to encode
+     * @return Formatted route string for chart screen
+     */
     fun chart(name: String, code: String): String {
         val encodedName = android.net.Uri.encode(name)
         val encodedCode = android.net.Uri.encode(code)

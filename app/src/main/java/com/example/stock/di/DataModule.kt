@@ -22,7 +22,9 @@ object DataModule {
 
     /**
      * Provides a singleton instance of TokenStore.
-     * Uses @ApplicationContext to inject application context.
+     *
+     * @param context Application context for DataStore initialization
+     * @return TokenStore instance for persistent token storage
      */
     @Provides
     @Singleton

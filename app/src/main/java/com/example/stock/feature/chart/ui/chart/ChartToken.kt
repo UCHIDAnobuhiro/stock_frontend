@@ -2,6 +2,7 @@ package com.example.stock.feature.chart.ui.chart
 
 /** Design tokens for chart configuration. */
 object ChartTokens {
+    /** Dimension constants for chart layout and appearance. */
     object Dimens {
         // Candlestick chart viewport offsets
         const val CANDLE_LEFT = 20f
