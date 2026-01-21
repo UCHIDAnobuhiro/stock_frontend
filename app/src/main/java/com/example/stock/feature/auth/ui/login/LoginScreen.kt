@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -41,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.stock.R
 import com.example.stock.core.ui.theme.Sizes
 import com.example.stock.core.ui.theme.Spacing
+import com.example.stock.core.ui.theme.StockTheme
 import com.example.stock.feature.auth.viewmodel.LoginViewModel
 
 /**
@@ -209,5 +211,58 @@ fun LoginScreenContent(
                 Text(stringResource(R.string.no_account_signup))
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoginScreenContentPreview() {
+    StockTheme {
+        LoginScreenContent(
+            uiState = LoginUiState(),
+            onEmailChange = {},
+            onPasswordChange = {},
+            onTogglePassword = {},
+            onLogin = {},
+            onNavigateToSignup = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoginScreenContentLoadingPreview() {
+    StockTheme {
+        LoginScreenContent(
+            uiState = LoginUiState(
+                email = "test@example.com",
+                password = "password",
+                isLoading = true
+            ),
+            onEmailChange = {},
+            onPasswordChange = {},
+            onTogglePassword = {},
+            onLogin = {},
+            onNavigateToSignup = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoginScreenContentErrorPreview() {
+    StockTheme {
+        LoginScreenContent(
+            uiState = LoginUiState(
+                email = "test@example.com",
+                password = "password",
+                errorResId = R.string.error_invalid_credentials
+            ),
+            onEmailChange = {},
+            onPasswordChange = {},
+            onTogglePassword = {},
+            onLogin = {},
+            onNavigateToSignup = {}
+        )
     }
 }
