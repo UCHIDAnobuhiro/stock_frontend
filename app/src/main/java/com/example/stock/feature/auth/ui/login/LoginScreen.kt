@@ -168,8 +168,8 @@ fun LoginScreenContent(
                             } else {
                                 Icons.Default.VisibilityOff
                             },
-                            contentDescription = if (uiState.isPasswordVisible) stringResource(R.string.hide) else stringResource(
-                                R.string.show
+                            contentDescription = stringResource(
+                                if (uiState.isPasswordVisible) R.string.hide else R.string.show
                             )
                         )
                     }
