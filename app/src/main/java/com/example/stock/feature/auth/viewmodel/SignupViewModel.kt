@@ -106,6 +106,7 @@ class SignupViewModel @Inject constructor(
             }
                 .onSuccess { _events.emit(SignupUiEvent.SignedUp) }
                 .onFailure { e ->
+                    if (e is kotlinx.coroutines.CancellationException) throw e
                     ErrorHandler.logError(e, "Signup")
                     val errorResId = ErrorHandler.mapErrorToResource(
                         exception = e,
