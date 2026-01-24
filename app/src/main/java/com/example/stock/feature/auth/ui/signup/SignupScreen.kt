@@ -65,7 +65,7 @@ fun SignupScreen(
     // Navigate on successful signup (only once)
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
-            if (event is SignupViewModel.UiEvent.SignedUp) {
+            if (event is SignupUiEvent.SignedUp) {
                 onSignedUp()
             }
         }

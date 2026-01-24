@@ -3,6 +3,7 @@ package com.example.stock.feature.auth.viewmodel
 import com.example.stock.R
 import com.example.stock.feature.auth.data.remote.SignupResponse
 import com.example.stock.feature.auth.data.repository.AuthRepository
+import com.example.stock.feature.auth.ui.signup.SignupUiEvent
 import com.example.stock.util.MainDispatcherRule
 import com.example.stock.util.TestDispatcherProvider
 import com.google.common.truth.Truth.assertThat
@@ -216,7 +217,7 @@ class SignupViewModelTest {
         coEvery { repository.signup("test@example.com", "password123") } returns SignupResponse("User registered successfully")
 
         // Collect events before triggering signup
-        var received: SignupViewModel.UiEvent? = null
+        var received: SignupUiEvent? = null
         val job: Job = launch {
             received = viewModel.events.first()
         }
@@ -226,7 +227,7 @@ class SignupViewModelTest {
 
         assertThat(viewModel.ui.value.isLoading).isFalse()
         assertThat(viewModel.ui.value.errorResId).isNull()
-        assertThat(received).isEqualTo(SignupViewModel.UiEvent.SignedUp)
+        assertThat(received).isEqualTo(SignupUiEvent.SignedUp)
 
         job.cancelAndJoin()
 

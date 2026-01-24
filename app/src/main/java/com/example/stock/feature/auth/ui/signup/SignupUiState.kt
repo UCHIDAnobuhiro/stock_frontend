@@ -1,5 +1,7 @@
 package com.example.stock.feature.auth.ui.signup
 
+import androidx.annotation.StringRes
+
 /**
  * Data class holding the state of the signup screen.
  *
@@ -18,5 +20,14 @@ data class SignupUiState(
     val isPasswordVisible: Boolean = false,
     val isConfirmPasswordVisible: Boolean = false,
     val isLoading: Boolean = false,
-    val errorResId: Int? = null,
+    @get:StringRes val errorResId: Int? = null,
 )
+
+/**
+ * One-time events emitted by [com.example.stock.feature.auth.viewmodel.SignupViewModel].
+ *
+ * Used for navigation or actions that should only be handled once.
+ */
+sealed interface SignupUiEvent {
+    data object SignedUp : SignupUiEvent
+}
