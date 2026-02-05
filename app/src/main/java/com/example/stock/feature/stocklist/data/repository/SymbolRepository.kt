@@ -3,6 +3,7 @@ package com.example.stock.feature.stocklist.data.repository
 import com.example.stock.core.util.DispatcherProvider
 import com.example.stock.feature.stocklist.data.remote.SymbolApi
 import com.example.stock.feature.stocklist.data.remote.SymbolDto
+import com.example.stock.feature.stocklist.domain.model.Symbol
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,7 +29,12 @@ class SymbolRepository @Inject constructor(
      *
      * @return Symbol list fetched from the API
      */
-    suspend fun fetchSymbols(): List<SymbolDto> = withContext(dispatcherProvider.io) {
-        symbolApi.getSymbols()
+    suspend fun fetchSymbols(): List<Symbol> = withContext(dispatcherProvider.io) {
+        symbolApi.getSymbols().map { it.toEntity() }
     }
 }
+
+private fun SymbolDto.toEntity() = Symbol(
+    code = code,
+    name = name
+)

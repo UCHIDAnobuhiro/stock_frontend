@@ -2,6 +2,7 @@ package com.example.stock.feature.chart.data.repository
 
 import com.example.stock.feature.chart.data.remote.CandleDto
 import com.example.stock.feature.chart.data.remote.ChartApi
+import com.example.stock.feature.chart.domain.model.Candle
 import com.example.stock.util.TestDispatcherProvider
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -14,7 +15,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.assertEquals
+import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
 
@@ -65,8 +66,26 @@ class CandleRepositoryTest {
         repo.fetchCandles("AAPL", "1day", 200)
         advanceUntilIdle()
 
+        val expectedCandles = listOf(
+            Candle(
+                time = "2024-01-01",
+                open = 100.00,
+                high = 110.00,
+                low = 90.00,
+                close = 105.00,
+                volume = 1000
+            ),
+            Candle(
+                time = "2024-01-02",
+                open = 105.00,
+                high = 120.00,
+                low = 100.00,
+                close = 115.00,
+                volume = 1500
+            )
+        )
         coVerify(exactly = 1) { chartApi.getCandles("AAPL", "1day", 200) }
-        assertEquals(mockCandles, repo.candles.value)
+        assertThat(repo.candles.value).isEqualTo(expectedCandles)
     }
 
     @Test
@@ -77,7 +96,7 @@ class CandleRepositoryTest {
         advanceUntilIdle()
 
         repo.clearCandles()
-        assertEquals(emptyList<CandleDto>(), repo.candles.value)
+        assertThat(repo.candles.value).isEmpty()
     }
 
     @Test

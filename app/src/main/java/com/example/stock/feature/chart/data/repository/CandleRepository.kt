@@ -3,6 +3,7 @@ package com.example.stock.feature.chart.data.repository
 import com.example.stock.core.util.DispatcherProvider
 import com.example.stock.feature.chart.data.remote.CandleDto
 import com.example.stock.feature.chart.data.remote.ChartApi
+import com.example.stock.feature.chart.domain.model.Candle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
@@ -24,8 +25,8 @@ class CandleRepository @Inject constructor(
     private val dispatcherProvider: DispatcherProvider
 ) {
     // StateFlow for candlestick data (read-only)
-    private val _candles = MutableStateFlow<List<CandleDto>>(emptyList())
-    val candles: StateFlow<List<CandleDto>> = _candles
+    private val _candles = MutableStateFlow<List<Candle>>(emptyList())
+    val candles: StateFlow<List<Candle>> = _candles
 
     /**
      * Fetches candlestick data for a specified symbol code, interval, and count, and updates StateFlow.
@@ -39,7 +40,7 @@ class CandleRepository @Inject constructor(
         interval: String = "1day",
         outputsize: Int = 200
     ) = withContext(dispatcherProvider.io) {
-        _candles.value = chartApi.getCandles(code, interval, outputsize)
+        _candles.value = chartApi.getCandles(code, interval, outputsize).map { it.toEntity() }
     }
 
     /**
@@ -49,3 +50,12 @@ class CandleRepository @Inject constructor(
         _candles.value = emptyList()
     }
 }
+
+private fun CandleDto.toEntity() = Candle(
+    time = time,
+    open = open,
+    high = high,
+    low = low,
+    close = close,
+    volume = volume
+)

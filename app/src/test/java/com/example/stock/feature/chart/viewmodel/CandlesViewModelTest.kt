@@ -2,8 +2,8 @@ package com.example.stock.feature.chart.viewmodel
 
 import com.example.stock.R
 import com.example.stock.core.util.DispatcherProvider
-import com.example.stock.feature.chart.data.remote.CandleDto
 import com.example.stock.feature.chart.data.repository.CandleRepository
+import com.example.stock.feature.chart.domain.model.Candle
 import com.example.stock.util.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
 import io.mockk.Runs
@@ -36,7 +36,7 @@ class CandlesViewModelTest {
     private lateinit var vm: CandlesViewModel
 
     // ViewModel から見えるローソク足のストリームをテスト用に差し込み
-    private lateinit var candlesFlow: MutableStateFlow<List<CandleDto>>
+    private lateinit var candlesFlow: MutableStateFlow<List<Candle>>
 
     @Before
     fun setup() {
@@ -63,8 +63,8 @@ class CandlesViewModelTest {
     fun `load success puts transformed items into ui and clears loading`() =
         runTest(mainRule.scheduler) {
             // given
-            val c1 = CandleDto("t1", 1.0, 2.0, 0.5, 1.5, 100)
-            val c2 = CandleDto("t2", 1.2, 2.2, 0.7, 1.7, 120)
+            val c1 = Candle("t1", 1.0, 2.0, 0.5, 1.5, 100)
+            val c2 = Candle("t2", 1.2, 2.2, 0.7, 1.7, 120)
             candlesFlow.value = listOf(c1, c2)
 
             // fetch を明示的にブロックする
