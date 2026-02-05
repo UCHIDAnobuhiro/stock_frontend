@@ -1,8 +1,8 @@
 package com.example.stock.feature.stocklist.viewmodel
 
 import com.example.stock.R
-import com.example.stock.feature.stocklist.data.remote.SymbolDto
 import com.example.stock.feature.stocklist.data.repository.SymbolRepository
+import com.example.stock.feature.stocklist.domain.model.Symbol
 import com.example.stock.feature.stocklist.ui.SymbolItem
 import com.example.stock.util.MainDispatcherRule
 import com.example.stock.util.TestDispatcherProvider
@@ -42,15 +42,15 @@ class SymbolViewModelTest {
     fun `load success - updates symbols and clears error`() =
         runTest(mainRule.scheduler) {
             // given
-            val dtos = listOf(
-                SymbolDto("AAPL", "Apple Inc."),
-                SymbolDto("GOOG", "Alphabet Inc.")
+            val entities = listOf(
+                Symbol("AAPL", "Apple Inc."),
+                Symbol("GOOG", "Alphabet Inc.")
             )
             val expected = listOf(
                 SymbolItem("AAPL", "Apple Inc."),
                 SymbolItem("GOOG", "Alphabet Inc.")
             )
-            coEvery { repo.fetchSymbols() } returns dtos
+            coEvery { repo.fetchSymbols() } returns entities
 
             // when
             vm.load()
@@ -139,9 +139,9 @@ class SymbolViewModelTest {
         assertThat(vm.ui.value.errorResId).isEqualTo(R.string.error_network)
 
         // given - second request succeeds
-        val dtos = listOf(SymbolDto("MSFT", "Microsoft"))
+        val entities = listOf(Symbol("MSFT", "Microsoft"))
         val expected = listOf(SymbolItem("MSFT", "Microsoft"))
-        coEvery { repo.fetchSymbols() } returns dtos
+        coEvery { repo.fetchSymbols() } returns entities
 
         // when
         vm.load()

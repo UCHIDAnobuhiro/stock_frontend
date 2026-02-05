@@ -2,6 +2,7 @@ package com.example.stock.feature.stocklist.data.repository
 
 import com.example.stock.feature.stocklist.data.remote.SymbolApi
 import com.example.stock.feature.stocklist.data.remote.SymbolDto
+import com.example.stock.feature.stocklist.domain.model.Symbol
 import com.example.stock.util.MainDispatcherRule
 import com.example.stock.util.TestDispatcherProvider
 import com.google.common.truth.Truth.assertThat
@@ -39,11 +40,15 @@ class SymbolRepositoryTest {
     @Test
     fun `fetchSymbols returns symbols from api`() = runTest(mainRule.scheduler) {
         // given
-        val expected = listOf(
+        val dtos = listOf(
             SymbolDto("AAPL", "Apple Inc."),
             SymbolDto("GOOG", "Alphabet Inc.")
         )
-        coEvery { symbolApi.getSymbols() } returns expected
+        val expected = listOf(
+            Symbol("AAPL", "Apple Inc."),
+            Symbol("GOOG", "Alphabet Inc.")
+        )
+        coEvery { symbolApi.getSymbols() } returns dtos
 
         // when
         val result = repo.fetchSymbols()

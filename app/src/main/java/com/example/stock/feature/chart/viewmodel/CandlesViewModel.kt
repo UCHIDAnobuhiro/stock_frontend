@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stock.R
 import com.example.stock.core.util.DispatcherProvider
-import com.example.stock.feature.chart.data.remote.CandleDto
 import com.example.stock.feature.chart.data.repository.CandleRepository
+import com.example.stock.feature.chart.domain.model.Candle
 import com.example.stock.feature.chart.ui.CandleItem
 import com.example.stock.feature.chart.ui.CandleUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -74,7 +74,7 @@ class CandlesViewModel @Inject constructor(
                 }
             }.onSuccess {
                 repo.candles.firstOrNull().orEmpty()
-                    .map { dto -> dto.toUi() }
+                    .map { entity -> entity.toUi() }
                     .let { list ->
                         _ui.update { it.copy(isLoading = false, items = list, errorResId = null) }
                     }
@@ -104,12 +104,12 @@ class CandlesViewModel @Inject constructor(
     }
 
     /**
-     * Converts DTO to UI display model.
+     * Converts domain entity to UI display model.
      *
-     * @receiver CandleDto API response model
+     * @receiver Candle Domain entity
      * @return CandleItem Lightweight model for UI
      */
-    private fun CandleDto.toUi() = CandleItem(
+    private fun Candle.toUi() = CandleItem(
         time = time, open = open, high = high, low = low, close = close, volume = volume
     )
 }

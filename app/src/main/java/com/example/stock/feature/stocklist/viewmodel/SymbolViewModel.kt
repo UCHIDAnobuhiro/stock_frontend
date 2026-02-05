@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stock.R
 import com.example.stock.core.util.DispatcherProvider
-import com.example.stock.feature.stocklist.data.remote.SymbolDto
 import com.example.stock.feature.stocklist.data.repository.SymbolRepository
+import com.example.stock.feature.stocklist.domain.model.Symbol
 import com.example.stock.feature.stocklist.ui.SymbolItem
 import com.example.stock.feature.stocklist.ui.SymbolUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -49,7 +49,7 @@ class SymbolViewModel @Inject constructor(
             withContext(dispatcherProvider.io) { repo.fetchSymbols() }
         }
             .onSuccess { list ->
-                _ui.update { it.copy(symbols = list.map { dto -> dto.toUi() }, isLoading = false) }
+                _ui.update { it.copy(symbols = list.map { entity -> entity.toUi() }, isLoading = false) }
             }
             .onFailure { e ->
                 val errorResId = when (e) {
@@ -63,12 +63,12 @@ class SymbolViewModel @Inject constructor(
     }
 
     /**
-     * Converts DTO to UI display model.
+     * Converts domain entity to UI display model.
      *
-     * @receiver SymbolDto API response model
+     * @receiver Symbol Domain entity
      * @return SymbolItem Lightweight model for UI
      */
-    private fun SymbolDto.toUi() = SymbolItem(
+    private fun Symbol.toUi() = SymbolItem(
         code = code,
         name = name
     )
