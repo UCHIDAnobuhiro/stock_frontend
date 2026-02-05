@@ -51,7 +51,7 @@ class CandlesViewModel @Inject constructor(
      * Fetches candlestick data for the specified stock code, interval, and quantity.
      *
      * During processing, updates the UI to a loading state, and on success,
-     * converts CandleDto to CandleItem and applies it.
+     * converts Candle to CandleItem and applies it.
      * When an error occurs, notifies the UI with an error message.
      *
      * @param code Stock code

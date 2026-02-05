@@ -15,7 +15,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.assertEquals
+import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
 
@@ -85,7 +85,7 @@ class CandleRepositoryTest {
             )
         )
         coVerify(exactly = 1) { chartApi.getCandles("AAPL", "1day", 200) }
-        assertEquals(expectedCandles, repo.candles.value)
+        assertThat(repo.candles.value).isEqualTo(expectedCandles)
     }
 
     @Test
@@ -96,7 +96,7 @@ class CandleRepositoryTest {
         advanceUntilIdle()
 
         repo.clearCandles()
-        assertEquals(emptyList<Candle>(), repo.candles.value)
+        assertThat(repo.candles.value).isEmpty()
     }
 
     @Test

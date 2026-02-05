@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.io.IOException
 
 /**
  * Unit tests for [SymbolRepository].
@@ -56,5 +57,28 @@ class SymbolRepositoryTest {
         // then
         assertThat(result).isEqualTo(expected)
         coVerify(exactly = 1) { symbolApi.getSymbols() }
+    }
+
+    @Test
+    fun `fetchSymbols returns empty list when api returns empty`() = runTest(mainRule.scheduler) {
+        // given
+        coEvery { symbolApi.getSymbols() } returns emptyList()
+
+        // when
+        val result = repo.fetchSymbols()
+
+        // then
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun `fetchSymbols propagates api exception`() = runTest(mainRule.scheduler) {
+        // given
+        coEvery { symbolApi.getSymbols() } throws IOException("Network error")
+
+        // when / then
+        val result = runCatching { repo.fetchSymbols() }
+        assertThat(result.exceptionOrNull()).isInstanceOf(IOException::class.java)
+        assertThat(result.exceptionOrNull()).hasMessageThat().isEqualTo("Network error")
     }
 }
