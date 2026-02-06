@@ -214,9 +214,39 @@ com.example.stock/
 - **状態管理**: Repositoryは内部で`MutableStateFlow`を使用し、リアクティブな更新のために`StateFlow`を公開する
 - **エラーハンドリング**: ViewModelは例外をキャッチしてマッピング（HttpException → ユーザーフレンドリーなメッセージ、IOException → ネットワークエラー、SerializationException → JSONエラー）
 
+## コミットメッセージ
+
+コミットメッセージは**日本語**で作成する。以下の形式に従う：
+
+```
+<type>: <subject>
+
+<body>（任意）
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+```
+
+**type**の種類：
+- `feat`: 新機能
+- `fix`: バグ修正
+- `docs`: ドキュメントのみの変更
+- `refactor`: リファクタリング（機能追加やバグ修正を含まない）
+- `test`: テストの追加・修正
+- `chore`: ビルドプロセスやツールの変更
+
+**例**：
+```
+feat: ログイン画面にパスワード表示切り替え機能を追加
+
+- パスワードフィールドに目のアイコンを追加
+- タップで表示/非表示を切り替え可能に
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+```
+
 ## プルリクエストの作成
 
-プルリクエストを作成する際は、以下を含む明確で簡潔なPR説明を記述する：
+プルリクエストは**日本語**で作成する。以下を含む明確で簡潔なPR説明を記述する：
 
 1. **概要**: PRが何をするか、なぜそれを行うかの簡潔な説明
 2. **変更点**: 主な変更の箇条書きリスト
