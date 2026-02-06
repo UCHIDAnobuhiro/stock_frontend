@@ -25,7 +25,7 @@ class LoginScreenContentTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    // Helper function to reduce boilerplate when setting up LoginScreenContent
+    // LoginScreenContentセットアップ時のボイラープレートを削減するヘルパー関数
     private fun setLoginScreen(
         uiState: LoginUiState = LoginUiState(),
         onEmailChange: (String) -> Unit = {},
@@ -50,7 +50,7 @@ class LoginScreenContentTest {
     fun initialState_displaysEmptyFields() {
         setLoginScreen()
 
-        // Title "ログイン" (not clickable)
+        // タイトル「ログイン」（クリック不可）
         composeTestRule.onNode(hasText("ログイン") and !hasClickAction()).assertIsDisplayed()
         composeTestRule.onNodeWithText("メールアドレス").assertIsDisplayed()
         composeTestRule.onNodeWithText("パスワード").assertIsDisplayed()
@@ -60,7 +60,7 @@ class LoginScreenContentTest {
     fun existingEmail_displaysInTextField() {
         setLoginScreen(uiState = LoginUiState(email = "existing@example.com"))
 
-        // Email value from UiState is displayed in the text field
+        // UiStateのメールアドレス値がテキストフィールドに表示されること
         composeTestRule.onNodeWithText("existing@example.com").assertIsDisplayed()
     }
 
@@ -68,7 +68,7 @@ class LoginScreenContentTest {
     fun existingPassword_displaysInTextField() {
         setLoginScreen(uiState = LoginUiState(password = "secret123", isPasswordVisible = true))
 
-        // Password value from UiState is displayed when visible
+        // UiStateのパスワード値が表示時に表示されること
         composeTestRule.onNodeWithText("secret123").assertIsDisplayed()
     }
 
@@ -107,7 +107,7 @@ class LoginScreenContentTest {
         var loginCalled = false
         setLoginScreen(onLogin = { loginCalled = true })
 
-        // Login button (clickable) not the title
+        // ログインボタン（クリック可能）タイトルではない
         composeTestRule.onNode(hasText("ログイン") and hasClickAction()).performClick()
         assertThat(loginCalled).isTrue()
     }
@@ -125,7 +125,7 @@ class LoginScreenContentTest {
     fun loadingState_disablesSignupButton() {
         setLoginScreen(uiState = LoginUiState(isLoading = true))
 
-        // Signup button is disabled during loading
+        // ローディング中はサインアップボタンが無効化されること
         composeTestRule.onNodeWithText("アカウントをお持ちでない方はこちら").assertIsNotEnabled()
     }
 
@@ -133,7 +133,7 @@ class LoginScreenContentTest {
     fun loadingState_showsProgressIndicator() {
         setLoginScreen(uiState = LoginUiState(isLoading = true))
 
-        // CircularProgressIndicator is displayed instead of login button text
+        // ログインボタンのテキストの代わりにCircularProgressIndicatorが表示されること
         composeTestRule.onNode(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate))
             .assertIsDisplayed()
     }
@@ -142,7 +142,7 @@ class LoginScreenContentTest {
     fun notLoadingState_showsLoginButtonText() {
         setLoginScreen(uiState = LoginUiState(isLoading = false))
 
-        // Login button text is displayed when not loading
+        // ローディング中でない場合はログインボタンのテキストが表示されること
         composeTestRule.onNode(hasText("ログイン") and hasClickAction()).assertIsDisplayed()
     }
 

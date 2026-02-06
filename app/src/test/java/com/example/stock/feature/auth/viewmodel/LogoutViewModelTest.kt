@@ -47,7 +47,7 @@ class LogoutViewModelTest {
     @Test
     fun `logout success - calls repository and emits LoggedOut event`() =
         runTest(mainRule.scheduler) {
-            // Collect events before triggering logout
+            // ログアウトをトリガーする前にイベントを収集
             var received: LogoutViewModel.UiEvent? = null
             val job: Job = launch {
                 received = viewModel.events.first()
@@ -56,7 +56,7 @@ class LogoutViewModelTest {
             viewModel.logout()
             advanceUntilIdle()
 
-            // Verify LoggedOut event is emitted
+            // LoggedOutイベントが発行されることを検証
             assertThat(received).isEqualTo(LogoutViewModel.UiEvent.LoggedOut)
             job.cancelAndJoin()
 
@@ -66,10 +66,10 @@ class LogoutViewModelTest {
     @Test
     fun `logout failure - emits LoggedOut event even when repository throws exception`() =
         runTest(mainRule.scheduler) {
-            // Simulate network error during logout
+            // ログアウト中のネットワークエラーをシミュレート
             coEvery { repository.logout() } throws IOException("Network error")
 
-            // Collect events before triggering logout
+            // ログアウトをトリガーする前にイベントを収集
             var received: LogoutViewModel.UiEvent? = null
             val job: Job = launch {
                 received = viewModel.events.first()
@@ -78,7 +78,7 @@ class LogoutViewModelTest {
             viewModel.logout()
             advanceUntilIdle()
 
-            // Verify LoggedOut event is still emitted despite the exception
+            // 例外にもかかわらずLoggedOutイベントが発行されることを検証
             assertThat(received).isEqualTo(LogoutViewModel.UiEvent.LoggedOut)
             job.cancelAndJoin()
 
@@ -88,17 +88,17 @@ class LogoutViewModelTest {
     @Test
     fun `session expired event - emits LoggedOut event`() =
         runTest(mainRule.scheduler) {
-            // Collect events before triggering session expiration
+            // セッション期限切れをトリガーする前にイベントを収集
             var received: LogoutViewModel.UiEvent? = null
             val job: Job = launch {
                 received = viewModel.events.first()
             }
 
-            // Simulate 401 session expiration
+            // 401セッション期限切れをシミュレート
             authEventManager.emitSessionExpired()
             advanceUntilIdle()
 
-            // Verify LoggedOut event is emitted
+            // LoggedOutイベントが発行されることを検証
             assertThat(received).isEqualTo(LogoutViewModel.UiEvent.LoggedOut)
             job.cancelAndJoin()
         }

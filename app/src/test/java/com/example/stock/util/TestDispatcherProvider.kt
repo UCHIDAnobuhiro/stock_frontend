@@ -6,13 +6,13 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 
 /**
- * Test implementation of [DispatcherProvider] for unit testing.
+ * ユニットテスト用の[DispatcherProvider]テスト実装。
  *
- * Uses [StandardTestDispatcher] for all dispatchers, enabling deterministic
- * control over coroutine execution in tests.
+ * すべてのディスパッチャに[StandardTestDispatcher]を使用し、
+ * テストでのコルーチン実行を決定論的に制御できるようにする。
  *
- * @param scheduler The test scheduler to use for all dispatchers.
- *                  If not provided, a new scheduler is created.
+ * @param scheduler すべてのディスパッチャに使用するテストスケジューラ。
+ *                  指定しない場合は新しいスケジューラが作成される。
  */
 class TestDispatcherProvider(
     scheduler: TestCoroutineScheduler = TestCoroutineScheduler()
