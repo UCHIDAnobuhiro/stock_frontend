@@ -14,14 +14,14 @@ import com.example.stock.R
 import com.example.stock.core.ui.util.rememberClickGuard
 
 /**
- * Common top bar (header) for the app.
+ * アプリ共通のトップバー（ヘッダー）。
  *
- * Displays a title, back button, and logout button.
- * The back button includes guard against rapid clicks.
+ * タイトル、戻るボタン、ログアウトボタンを表示する。
+ * 戻るボタンには連打防止ガードが含まれる。
  *
- * @param titleText Title string to display in the header
- * @param onBack Callback when back button is pressed
- * @param onLogout Callback when logout button is pressed
+ * @param titleText ヘッダーに表示するタイトル文字列
+ * @param onBack 戻るボタン押下時のコールバック
+ * @param onLogout ログアウトボタン押下時のコールバック
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,12 +30,12 @@ fun CommonHeader(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
-    val canClick = rememberClickGuard() // Guard against rapid clicks
+    val canClick = rememberClickGuard() // 連打防止ガード
 
     TopAppBar(
-        title = { Text(titleText) }, // Display title
+        title = { Text(titleText) }, // タイトルを表示
         navigationIcon = {
-            // Back button (with guard)
+            // 戻るボタン（ガード付き）
             IconButton(
                 onClick = { if (canClick()) onBack() },
             ) {
@@ -46,7 +46,7 @@ fun CommonHeader(
             }
         },
         actions = {
-            // Logout button (icon)
+            // ログアウトボタン（アイコン）
             IconButton(onClick = onLogout) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ExitToApp,

@@ -6,21 +6,21 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Global authentication event manager.
+ * グローバル認証イベントマネージャー。
  *
- * Emits authentication-related events that can be observed app-wide,
- * such as forced logout due to token expiration (401 errors).
+ * トークン期限切れによる強制ログアウト（401エラー）など、
+ * アプリ全体で監視可能な認証関連イベントを発行する。
  */
 @Singleton
 class AuthEventManager @Inject constructor() {
 
     /**
-     * Authentication events that can occur globally.
+     * グローバルに発生しうる認証イベント。
      */
     sealed interface AuthEvent {
         /**
-         * Emitted when the user's session has expired (401 Unauthorized).
-         * Observers should navigate to the login screen.
+         * ユーザーセッションが期限切れになった際に発行される（401 Unauthorized）。
+         * 監視者はログイン画面へ遷移すべき。
          */
         data object SessionExpired : AuthEvent
     }
@@ -28,14 +28,14 @@ class AuthEventManager @Inject constructor() {
     private val _events = MutableSharedFlow<AuthEvent>(replay = 0, extraBufferCapacity = 1)
 
     /**
-     * Flow of authentication events.
-     * Observe this to handle global auth state changes like session expiration.
+     * 認証イベントのFlow。
+     * セッション期限切れなどのグローバルな認証状態変化を処理するために監視する。
      */
     val events = _events.asSharedFlow()
 
     /**
-     * Emits a session expired event.
-     * Called by [TokenAuthenticator] when a 401 response is received.
+     * セッション期限切れイベントを発行する。
+     * 401レスポンスを受信した際に[TokenAuthenticator]から呼び出される。
      */
     fun emitSessionExpired() {
         _events.tryEmit(AuthEvent.SessionExpired)

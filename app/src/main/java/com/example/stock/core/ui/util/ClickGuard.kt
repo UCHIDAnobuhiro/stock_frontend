@@ -8,14 +8,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
 /**
- * Composable utility to prevent rapid button clicks.
+ * ボタンの連打を防止するComposableユーティリティ。
  *
- * Usage example:
+ * 使用例：
  * val canClick = rememberClickGuard()
  * if (canClick()) { onClick() }
  *
- * @param delayMillis Cooldown period in milliseconds before next click is allowed
- * @return Function that returns true if click is allowed, false if still in cooldown
+ * @param delayMillis 次のクリックが許可されるまでのクールダウン期間（ミリ秒）
+ * @return クリックが許可されている場合はtrue、クールダウン中の場合はfalseを返す関数
  */
 @Composable
 fun rememberClickGuard(delayMillis: Long = 500L): (() -> Boolean) {

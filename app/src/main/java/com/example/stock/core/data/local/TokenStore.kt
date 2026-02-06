@@ -12,23 +12,23 @@ import kotlinx.coroutines.flow.map
 import java.io.IOException
 
 /**
- * Extension property that provides a DataStore for saving JWT tokens to the application [Context].
- * The DataStore file name is "token".
+ * JWTトークンを保存するためのDataStoreを[Context]に提供する拡張プロパティ。
+ * DataStoreのファイル名は"token"。
  */
 private val Context.dataStore by preferencesDataStore(name = "token")
 
 /**
- * Object that groups together the keys stored in DataStore.
- * - [TOKEN]: Key for storing the JWT access token.
+ * DataStoreに保存するキーをまとめたオブジェクト。
+ * - [TOKEN]: JWTアクセストークンを保存するためのキー。
  */
 object TokenStoreKeys {
     val TOKEN = stringPreferencesKey("jwt_token")
 }
 
 /**
- * Class for persisting JWT tokens through DataStore.
- * Using this class enables saving, retrieving, and deleting tokens within the application.
- * @property context Application context. Used to access DataStore.
+ * DataStoreを通じてJWTトークンを永続化するクラス。
+ * このクラスを使用することで、アプリ内でのトークンの保存・取得・削除が可能になる。
+ * @property context アプリケーションコンテキスト。DataStoreへのアクセスに使用。
  */
 class TokenStore(private val context: Context) {
     private val appContext = context.applicationContext

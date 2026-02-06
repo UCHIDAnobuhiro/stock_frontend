@@ -8,13 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 /**
- * App-wide Material3 theme composable.
+ * アプリ全体のMaterial3テーマComposable。
  *
- * Applies dynamic color schemes based on system theme preference.
- * Uses [dynamicDarkColorScheme] for dark mode and [dynamicLightColorScheme] for light mode.
+ * システムのテーマ設定に基づいて動的なカラースキームを適用する。
+ * ダークモードには[dynamicDarkColorScheme]、ライトモードには[dynamicLightColorScheme]を使用。
  *
- * @param darkTheme Whether to use dark theme, defaults to system preference
- * @param content The composable content to be themed
+ * @param darkTheme ダークテーマを使用するかどうか。デフォルトはシステム設定に従う
+ * @param content テーマを適用するComposableコンテンツ
  */
 @Composable
 fun StockTheme(
