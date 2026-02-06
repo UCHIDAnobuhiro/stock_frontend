@@ -1,23 +1,23 @@
-# Stock List Feature
+# 銘柄一覧機能
 
-## Summary
+## 概要
 
-The `stocklist` feature module displays a list of stock symbols fetched from the API. It follows the
-MVVM architecture pattern with clear separation between data, UI, and ViewModel layers.
+`stocklist`機能モジュールは、APIから取得した銘柄リストを表示する。
+データ層、UI層、ViewModel層を明確に分離したMVVMアーキテクチャパターンに従う。
 
-### Key Features
+### 主な機能
 
-- **Symbol List Display**: Shows a list of stock symbols with name and code
-- **Loading State**: Displays progress indicator while fetching data
-- **Error Handling**: Shows error message with retry button on failure
-- **Empty State**: Displays message when no symbols are available
-- **Navigation**: Tapping a symbol navigates to the chart screen
+- **銘柄リスト表示**: 銘柄名とコードを含むリストを表示
+- **ローディング状態**: データ取得中にプログレスインジケータを表示
+- **エラーハンドリング**: 失敗時にリトライボタン付きのエラーメッセージを表示
+- **空状態**: 銘柄がない場合にメッセージを表示
+- **ナビゲーション**: 銘柄をタップするとチャート画面に遷移
 
-## Dependency Diagram
+## 依存関係図
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                              UI Layer                                   │
+│                              UI層                                        │
 │  ┌─────────────────────────────────────────────────────────────────┐    │
 │  │                     SymbolListScreen                            │    │
 │  │  ┌─────────────────────────────────────────────────────────┐    │    │
@@ -31,7 +31,7 @@ MVVM architecture pattern with clear separation between data, UI, and ViewModel 
                                   │ observes
                                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                           ViewModel Layer                               │
+│                           ViewModel層                                    │
 │                    ┌─────────────────────┐                              │
 │                    │   SymbolViewModel   │                              │
 │                    │  - ui: StateFlow    │                              │
@@ -41,7 +41,7 @@ MVVM architecture pattern with clear separation between data, UI, and ViewModel 
                                 │ calls
                                 ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                          Repository Layer                               │
+│                          Repository層                                    │
 │                    ┌─────────────────────┐                              │
 │                    │  SymbolRepository   │                              │
 │                    │  - fetchSymbols()   │                              │
@@ -57,81 +57,84 @@ MVVM architecture pattern with clear separation between data, UI, and ViewModel 
                               │
                               ▼
                     ┌─────────────────────┐
-                    │    Backend API      │
+                    │   バックエンドAPI     │
                     │   GET /symbols      │
                     └─────────────────────┘
 ```
 
-## Directory Structure
+## ディレクトリ構成
 
 ```
 feature/stocklist/
 ├── data/
 │   ├── remote/
-│   │   ├── SymbolApi.kt        # Retrofit interface for symbol endpoints
-│   │   └── SymbolDto.kt        # DTO for symbol data
+│   │   ├── SymbolApi.kt        # 銘柄エンドポイント用Retrofitインターフェース
+│   │   └── SymbolDto.kt        # 銘柄データ用DTO
 │   └── repository/
-│       └── SymbolRepository.kt # Fetches symbol list from API
+│       └── SymbolRepository.kt # APIから銘柄リストを取得
+│
+├── domain/
+│   └── model/
+│       └── Symbol.kt           # 銘柄ドメインエンティティ
 │
 ├── ui/
-│   ├── SymbolListScreen.kt     # Symbol list composable with Hilt ViewModel injection
-│   └── SymbolUiState.kt        # Symbol list screen state data class
+│   ├── SymbolListScreen.kt     # Hilt ViewModel注入を使用した銘柄リストComposable
+│   └── SymbolUiState.kt        # 銘柄リスト画面の状態データクラス
 │
 ├── viewmodel/
-│   └── SymbolViewModel.kt      # Manages symbol list state and business logic
+│   └── SymbolViewModel.kt      # 銘柄リストの状態とビジネスロジックを管理
 │
-└── README.md                   # This file
+└── README.md                   # このファイル
 ```
 
-## Testing
+## テスト
 
-### Test Location
+### テストの場所
 
-Tests are located at:
+テストは以下に配置：
 
-| Test Type  | Location                                           |
-|------------|----------------------------------------------------|
-| Unit Tests | `app/src/test/java/com/example/stock/feature/stocklist/` |
+| テスト種類 | 場所                                                      |
+|----------|----------------------------------------------------------|
+| 単体テスト | `app/src/test/java/com/example/stock/feature/stocklist/` |
 
-### Test Files
+### テストファイル
 
-#### Unit Tests
+#### 単体テスト
 
-| File                                        | Description                                          |
-|---------------------------------------------|------------------------------------------------------|
-| `viewmodel/SymbolViewModelTest.kt`          | Tests for SymbolViewModel including load success/failure |
-| `data/repository/SymbolRepositoryTest.kt`   | Tests for SymbolRepository API calls                 |
+| ファイル                                        | 説明                                           |
+|------------------------------------------------|-----------------------------------------------|
+| `viewmodel/SymbolViewModelTest.kt`             | ロード成功/失敗を含むSymbolViewModelのテスト     |
+| `data/repository/SymbolRepositoryTest.kt`      | SymbolRepositoryのAPI呼び出しテスト             |
 
-### Running Tests
+### テストの実行
 
 ```bash
-# Run all unit tests for stocklist feature
+# stocklist機能の全単体テストを実行
 ./gradlew testDebugUnitTest --tests "*.SymbolViewModelTest.*"
 ./gradlew testDebugUnitTest --tests "*.SymbolRepositoryTest.*"
 ```
 
-### Test Coverage
+### テストカバレッジ
 
-#### SymbolViewModel Tests
+#### SymbolViewModelテスト
 
-- Load success - updates symbols and clears error
-- Load failure - sets error and keeps symbols unchanged
-- Load clears previous error on new request start
+- ロード成功 - 銘柄を更新しエラーをクリア
+- ロード失敗 - エラーを設定し銘柄は変更なし
+- ロードは新しいリクエスト開始時に以前のエラーをクリア
 
-#### SymbolRepository Tests
+#### SymbolRepositoryテスト
 
-- fetchSymbols returns symbols from API
+- fetchSymbolsはAPIから銘柄を返す
 
-### Testing Patterns
+### テストパターン
 
-The feature uses the following testing patterns:
+この機能では以下のテストパターンを使用：
 
-1. **MainDispatcherRule**: Replaces `Dispatchers.Main` with `StandardTestDispatcher` for
-   deterministic coroutine testing
-2. **MockK**: Mocking framework with `relaxed = true` for simple mocks
-3. **Truth**: Assertion library using `assertThat()` style
+1. **MainDispatcherRule**: 決定論的なコルーチンテストのため`Dispatchers.Main`を`StandardTestDispatcher`に置換
+2. **MockK**: シンプルなモック用に`relaxed = true`を使用するモックフレームワーク
+3. **Truth**: `assertThat()`スタイルを使用するアサーションライブラリ
 
-Example test pattern:
+テストパターンの例：
 
 ```kotlin
 @Test
