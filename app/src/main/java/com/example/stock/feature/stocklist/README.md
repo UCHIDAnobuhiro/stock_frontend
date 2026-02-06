@@ -79,6 +79,7 @@ feature/stocklist/
 │
 ├── ui/
 │   ├── SymbolListScreen.kt     # Hilt ViewModel注入を使用した銘柄リストComposable
+│   ├── SymbolItem.kt           # 銘柄リストアイテムのComposable
 │   └── SymbolUiState.kt        # 銘柄リスト画面の状態データクラス
 │
 ├── viewmodel/
