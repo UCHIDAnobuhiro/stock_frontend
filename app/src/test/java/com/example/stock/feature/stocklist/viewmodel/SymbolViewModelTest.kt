@@ -41,7 +41,7 @@ class SymbolViewModelTest {
     @Test
     fun `load success - updates symbols and clears error`() =
         runTest(mainRule.scheduler) {
-            // given
+            // 準備
             val entities = listOf(
                 Symbol("AAPL", "Apple Inc."),
                 Symbol("GOOG", "Alphabet Inc.")
@@ -52,11 +52,11 @@ class SymbolViewModelTest {
             )
             coEvery { repo.fetchSymbols() } returns entities
 
-            // when
+            // 実行
             vm.load()
             advanceUntilIdle()
 
-            // then
+            // 検証
             val state = vm.ui.value
             assertThat(state.isLoading).isFalse()
             assertThat(state.errorResId).isNull()
@@ -67,14 +67,14 @@ class SymbolViewModelTest {
     @Test
     fun `load failure with IOException - sets network error`() =
         runTest(mainRule.scheduler) {
-            // given
+            // 準備
             coEvery { repo.fetchSymbols() } throws IOException("Network down")
 
-            // when
+            // 実行
             vm.load()
             advanceUntilIdle()
 
-            // then
+            // 検証
             val state = vm.ui.value
             assertThat(state.isLoading).isFalse()
             assertThat(state.symbols).isEmpty()
@@ -85,15 +85,15 @@ class SymbolViewModelTest {
     @Test
     fun `load failure with HttpException - sets server error`() =
         runTest(mainRule.scheduler) {
-            // given
+            // 準備
             val response = Response.error<Any>(500, okhttp3.ResponseBody.create(null, ""))
             coEvery { repo.fetchSymbols() } throws HttpException(response)
 
-            // when
+            // 実行
             vm.load()
             advanceUntilIdle()
 
-            // then
+            // 検証
             val state = vm.ui.value
             assertThat(state.isLoading).isFalse()
             assertThat(state.errorResId).isEqualTo(R.string.error_server)
@@ -102,14 +102,14 @@ class SymbolViewModelTest {
     @Test
     fun `load failure with SerializationException - sets json error`() =
         runTest(mainRule.scheduler) {
-            // given
+            // 準備
             coEvery { repo.fetchSymbols() } throws SerializationException("Invalid JSON")
 
-            // when
+            // 実行
             vm.load()
             advanceUntilIdle()
 
-            // then
+            // 検証
             val state = vm.ui.value
             assertThat(state.isLoading).isFalse()
             assertThat(state.errorResId).isEqualTo(R.string.error_json)
@@ -118,36 +118,36 @@ class SymbolViewModelTest {
     @Test
     fun `load failure with unknown exception - sets unknown error`() =
         runTest(mainRule.scheduler) {
-            // given
+            // 準備
             coEvery { repo.fetchSymbols() } throws RuntimeException("Unknown")
 
-            // when
+            // 実行
             vm.load()
             advanceUntilIdle()
 
-            // then
+            // 検証
             val state = vm.ui.value
             assertThat(state.errorResId).isEqualTo(R.string.error_unknown)
         }
 
     @Test
     fun `load clears previous error on new request start`() = runTest(mainRule.scheduler) {
-        // given - first request fails
+        // 準備 - 最初のリクエストが失敗
         coEvery { repo.fetchSymbols() } throws IOException("first failure")
         vm.load()
         advanceUntilIdle()
         assertThat(vm.ui.value.errorResId).isEqualTo(R.string.error_network)
 
-        // given - second request succeeds
+        // 準備 - 2回目のリクエストが成功
         val entities = listOf(Symbol("MSFT", "Microsoft"))
         val expected = listOf(SymbolItem("MSFT", "Microsoft"))
         coEvery { repo.fetchSymbols() } returns entities
 
-        // when
+        // 実行
         vm.load()
         runCurrent()
 
-        // then - error is cleared on request start
+        // 検証 - リクエスト開始時にエラーがクリアされること
         assertThat(vm.ui.value.errorResId).isNull()
 
         advanceUntilIdle()

@@ -1,10 +1,10 @@
 package com.example.stock.feature.stocklist.domain.model
 
 /**
- * Domain entity representing a stock symbol.
+ * 株式銘柄を表すドメインエンティティ。
  *
- * @property code Symbol code (e.g., "AAPL", "GOOG")
- * @property name Symbol name (e.g., "Apple Inc.", "Alphabet Inc.")
+ * @property code 銘柄コード（例："AAPL", "GOOG"）
+ * @property name 銘柄名（例："Apple Inc.", "Alphabet Inc."）
  */
 data class Symbol(
     val code: String,

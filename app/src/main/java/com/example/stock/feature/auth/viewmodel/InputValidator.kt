@@ -4,20 +4,20 @@ import android.util.Patterns
 import com.example.stock.R
 
 /**
- * Utility object for validating user input in authentication flows.
+ * 認証フローにおけるユーザー入力を検証するユーティリティオブジェクト。
  *
- * Provides reusable validation logic for email, password, and other input fields.
+ * メール、パスワード、その他の入力フィールドの再利用可能なバリデーションロジックを提供する。
  */
 object InputValidator {
 
     private const val MIN_PASSWORD_LENGTH = 8
 
     /**
-     * Validates email and password for login.
+     * ログイン用のメールとパスワードを検証する。
      *
-     * @param email The email address to validate
-     * @param password The password to validate
-     * @return Error message resource ID if validation fails, null if valid
+     * @param email 検証するメールアドレス
+     * @param password 検証するパスワード
+     * @return バリデーション失敗時はエラーメッセージのリソースID、有効な場合はnull
      */
     fun validateLogin(email: String, password: String): Int? = when {
         email.isBlank() || password.isBlank() -> R.string.error_empty_fields
@@ -27,12 +27,12 @@ object InputValidator {
     }
 
     /**
-     * Validates email, password, and confirm password for signup.
+     * サインアップ用のメール、パスワード、確認用パスワードを検証する。
      *
-     * @param email The email address to validate
-     * @param password The password to validate
-     * @param confirmPassword The confirm password to validate
-     * @return Error message resource ID if validation fails, null if valid
+     * @param email 検証するメールアドレス
+     * @param password 検証するパスワード
+     * @param confirmPassword 検証する確認用パスワード
+     * @return バリデーション失敗時はエラーメッセージのリソースID、有効な場合はnull
      */
     fun validateSignup(email: String, password: String, confirmPassword: String): Int? = when {
         email.isBlank() || password.isBlank() || confirmPassword.isBlank() -> R.string.error_empty_fields
@@ -43,31 +43,31 @@ object InputValidator {
     }
 
     /**
-     * Validates email format using Android's built-in email pattern matcher.
+     * Androidの組み込みメールパターンマッチャーを使用してメール形式を検証する。
      *
-     * @param email The email address to validate
-     * @return true if email format is valid, false otherwise
+     * @param email 検証するメールアドレス
+     * @return メール形式が有効な場合はtrue、それ以外はfalse
      */
     fun isValidEmail(email: String): Boolean {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
     /**
-     * Validates password length meets minimum requirements.
+     * パスワードの長さが最小要件を満たしているかを検証する。
      *
-     * @param password The password to validate
-     * @return true if password length is valid, false otherwise
+     * @param password 検証するパスワード
+     * @return パスワードの長さが有効な場合はtrue、それ以外はfalse
      */
     fun isValidPasswordLength(password: String): Boolean {
         return password.length >= MIN_PASSWORD_LENGTH
     }
 
     /**
-     * Checks if password and confirm password match.
+     * パスワードと確認用パスワードが一致するかを確認する。
      *
-     * @param password The password
-     * @param confirmPassword The confirm password
-     * @return true if passwords match, false otherwise
+     * @param password パスワード
+     * @param confirmPassword 確認用パスワード
+     * @return パスワードが一致する場合はtrue、それ以外はfalse
      */
     fun doPasswordsMatch(password: String, confirmPassword: String): Boolean {
         return password == confirmPassword

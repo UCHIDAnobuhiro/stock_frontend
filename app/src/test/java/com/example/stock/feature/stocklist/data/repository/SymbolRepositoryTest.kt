@@ -17,9 +17,9 @@ import org.junit.Test
 import java.io.IOException
 
 /**
- * Unit tests for [SymbolRepository].
+ * [SymbolRepository]のユニットテスト。
  *
- * Verifies that the repository correctly fetches symbols from the API.
+ * リポジトリがAPIから銘柄を正しく取得することを検証。
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class SymbolRepositoryTest {
@@ -40,7 +40,7 @@ class SymbolRepositoryTest {
 
     @Test
     fun `fetchSymbols returns symbols from api`() = runTest(mainRule.scheduler) {
-        // given
+        // 準備
         val dtos = listOf(
             SymbolDto("AAPL", "Apple Inc."),
             SymbolDto("GOOG", "Alphabet Inc.")
@@ -51,32 +51,32 @@ class SymbolRepositoryTest {
         )
         coEvery { symbolApi.getSymbols() } returns dtos
 
-        // when
+        // 実行
         val result = repo.fetchSymbols()
 
-        // then
+        // 検証
         assertThat(result).isEqualTo(expected)
         coVerify(exactly = 1) { symbolApi.getSymbols() }
     }
 
     @Test
     fun `fetchSymbols returns empty list when api returns empty`() = runTest(mainRule.scheduler) {
-        // given
+        // 準備
         coEvery { symbolApi.getSymbols() } returns emptyList()
 
-        // when
+        // 実行
         val result = repo.fetchSymbols()
 
-        // then
+        // 検証
         assertThat(result).isEmpty()
     }
 
     @Test
     fun `fetchSymbols propagates api exception`() = runTest(mainRule.scheduler) {
-        // given
+        // 準備
         coEvery { symbolApi.getSymbols() } throws IOException("Network error")
 
-        // when / then
+        // 実行 / 検証
         val result = runCatching { repo.fetchSymbols() }
         assertThat(result.exceptionOrNull()).isInstanceOf(IOException::class.java)
         assertThat(result.exceptionOrNull()).hasMessageThat().isEqualTo("Network error")

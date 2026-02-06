@@ -3,15 +3,15 @@ package com.example.stock.feature.auth.ui.signup
 import androidx.annotation.StringRes
 
 /**
- * Data class holding the state of the signup screen.
+ * サインアップ画面の状態を保持するデータクラス。
  *
- * @property email Entered email address
- * @property password Entered password
- * @property confirmPassword Entered confirm password
- * @property isPasswordVisible Flag for password visibility toggle
- * @property isConfirmPasswordVisible Flag for confirm password visibility toggle
- * @property isLoading Whether signup process is in progress
- * @property errorResId Error message resource ID (null if no error)
+ * @property email 入力されたメールアドレス
+ * @property password 入力されたパスワード
+ * @property confirmPassword 入力された確認用パスワード
+ * @property isPasswordVisible パスワード表示/非表示の切り替えフラグ
+ * @property isConfirmPasswordVisible 確認用パスワード表示/非表示の切り替えフラグ
+ * @property isLoading サインアップ処理中かどうか
+ * @property errorResId エラーメッセージのリソースID（エラーがない場合はnull）
  */
 data class SignupUiState(
     val email: String = "",
@@ -24,9 +24,9 @@ data class SignupUiState(
 )
 
 /**
- * One-time events emitted by [com.example.stock.feature.auth.viewmodel.SignupViewModel].
+ * [com.example.stock.feature.auth.viewmodel.SignupViewModel]から発行される一度きりのイベント。
  *
- * Used for navigation or actions that should only be handled once.
+ * 画面遷移など、一度だけ処理すべきアクションに使用する。
  */
 sealed interface SignupUiEvent {
     data object SignedUp : SignupUiEvent

@@ -10,21 +10,21 @@ import okhttp3.Response
 import okhttp3.Route
 
 /**
- * OkHttp Authenticator that handles 401 Unauthorized responses.
+ * 401 Unauthorizedレスポンスを処理するOkHttp Authenticator。
  *
- * When a 401 response is received:
- * 1. Clears the token from memory and persistent storage
- * 2. Emits a session expired event via [AuthEventManager]
- * 3. Returns null to indicate no retry (user must re-login)
+ * 401レスポンスを受信した際：
+ * 1. メモリと永続ストレージからトークンをクリア
+ * 2. [AuthEventManager]経由でセッション期限切れイベントを発行
+ * 3. リトライしないことを示すためにnullを返す（ユーザーは再ログインが必要）
  *
- * In the future, this can be extended to support refresh tokens:
- * - Attempt to refresh the access token
- * - If successful, retry the original request with the new token
- * - If refresh fails, proceed with logout
+ * 将来的にはリフレッシュトークンのサポートに拡張可能：
+ * - アクセストークンのリフレッシュを試行
+ * - 成功した場合、新しいトークンで元のリクエストをリトライ
+ * - リフレッシュ失敗時はログアウト処理を実行
  *
- * @property tokenProvider In-memory token manager
- * @property tokenStore Persistent token storage
- * @property authEventManager Global auth event emitter
+ * @property tokenProvider メモリ上のトークンマネージャー
+ * @property tokenStore 永続トークンストレージ
+ * @property authEventManager グローバル認証イベント発行者
  */
 class TokenAuthenticator(
     private val tokenProvider: TokenProvider,
@@ -33,28 +33,28 @@ class TokenAuthenticator(
 ) : Authenticator {
 
     /**
-     * Called when a 401 response is received.
+     * 401レスポンスを受信した際に呼び出される。
      *
-     * @param route The route of the request (nullable)
-     * @param response The 401 response
-     * @return null to indicate no retry, or a new Request to retry with updated credentials
+     * @param route リクエストのルート（nullable）
+     * @param response 401レスポンス
+     * @return リトライしない場合はnull、更新された認証情報でリトライする場合は新しいRequest
      */
     override fun authenticate(route: Route?, response: Response): Request? {
-        // Prevent infinite retry loops - if we've already tried authenticating, give up
+        // 認証ヘッダーなしのリクエストが401を受けた場合は対処不要
         if (response.request.header("Authorization") == null) {
             return null
         }
 
-        // Clear tokens from memory and storage
+        // メモリとストレージからトークンをクリア
         tokenProvider.clear()
         runBlocking {
             tokenStore.clear()
         }
 
-        // Emit session expired event to trigger navigation to login
+        // ログイン画面への遷移をトリガーするためセッション期限切れイベントを発行
         authEventManager.emitSessionExpired()
 
-        // Return null to indicate no retry - user must re-login
+        // リトライしないことを示すためにnullを返す - ユーザーは再ログインが必要
         return null
     }
 }

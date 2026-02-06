@@ -20,10 +20,10 @@ import java.io.IOException
 import javax.inject.Inject
 
 /**
- * ViewModel that manages symbol list data.
+ * 銘柄リストデータを管理するViewModel。
  *
- * @property repo Repository for fetching symbol data
- * @property dispatcherProvider Provider for coroutine dispatchers, enabling testability
+ * @property repo 銘柄データ取得用のリポジトリ
+ * @property dispatcherProvider コルーチンディスパッチャーのプロバイダー。テスト容易性を実現。
  */
 @HiltViewModel
 class SymbolViewModel @Inject constructor(
@@ -35,13 +35,13 @@ class SymbolViewModel @Inject constructor(
     val ui: StateFlow<SymbolUiState> = _ui
 
     /**
-     * Loads the symbol list.
+     * 銘柄リストを読み込む。
      *
-     * - Sets isLoading to true at the start to notify loading state
-     * - Fetches the symbol list from Repository and updates UI state on success
-     * - Sets appropriate error message resource ID on failure
+     * - 開始時にisLoadingをtrueに設定し、読み込み状態を通知
+     * - Repositoryから銘柄リストを取得し、成功時にUI状態を更新
+     * - 失敗時に適切なエラーメッセージリソースIDを設定
      *
-     * Executed asynchronously in ViewModelScope, so it remains safe even if the screen is recreated due to rotation.
+     * ViewModelScope内で非同期実行されるため、画面回転で再生成されても安全。
      */
     fun load() = viewModelScope.launch(dispatcherProvider.main) {
         _ui.update { it.copy(isLoading = true, errorResId = null) }
@@ -63,10 +63,10 @@ class SymbolViewModel @Inject constructor(
     }
 
     /**
-     * Converts domain entity to UI display model.
+     * ドメインエンティティをUI表示用モデルに変換する。
      *
-     * @receiver Symbol Domain entity
-     * @return SymbolItem Lightweight model for UI
+     * @receiver Symbol ドメインエンティティ
+     * @return SymbolItem UI用の軽量モデル
      */
     private fun Symbol.toUi() = SymbolItem(
         code = code,

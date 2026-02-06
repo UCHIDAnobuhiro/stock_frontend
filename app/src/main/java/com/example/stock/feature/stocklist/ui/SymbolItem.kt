@@ -1,13 +1,13 @@
 package com.example.stock.feature.stocklist.ui
 
 /**
- * Symbol data model for UI display.
+ * UI表示用の銘柄データモデル。
  *
- * Instead of directly passing the DTO from the API response to the UI,
- * a lightweight data structure formatted for UI consumption is defined.
+ * APIレスポンスのDTOを直接UIに渡すのではなく、
+ * UI向けにフォーマットされた軽量なデータ構造を定義する。
  *
- * @property code Symbol code (e.g., "7203")
- * @property name Symbol name (e.g., "Toyota Motor")
+ * @property code 銘柄コード（例："7203"）
+ * @property name 銘柄名（例："トヨタ自動車"）
  */
 data class SymbolItem(
     val code: String,

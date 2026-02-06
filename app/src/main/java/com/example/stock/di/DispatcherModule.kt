@@ -9,17 +9,17 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 /**
- * Hilt module for providing coroutine dispatcher dependencies.
+ * コルーチンディスパッチャーの依存関係を提供するHiltモジュール。
  *
- * This module binds the [DispatcherProvider] interface to its default implementation,
- * allowing for easy testing by swapping out the implementation in tests.
+ * このモジュールは[DispatcherProvider]インターフェースをデフォルト実装にバインドし、
+ * テスト時に実装を差し替えることでテストを容易にする。
  */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DispatcherModule {
 
     /**
-     * Binds [DefaultDispatcherProvider] as the implementation of [DispatcherProvider].
+     * [DefaultDispatcherProvider]を[DispatcherProvider]の実装としてバインドする。
      */
     @Binds
     @Singleton

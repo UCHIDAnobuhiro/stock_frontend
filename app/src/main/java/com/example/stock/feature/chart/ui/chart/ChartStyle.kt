@@ -20,7 +20,7 @@ import com.github.mikephil.charting.data.CandleDataSet
 import com.github.mikephil.charting.data.CandleEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 
-/** Color palette for MPAndroidChart components requiring @ColorInt values. */
+/** @ColorInt値を必要とするMPAndroidChartコンポーネント用のカラーパレット。 */
 object ChartPalette {
     val Grid = "#E5E7EB".toColorInt()
     val CandleUp = "#2ECC71".toColorInt()
@@ -40,14 +40,14 @@ object ChartPalette {
 }
 
 /**
- * Applies default styling to a CandleStickChart.
+ * CandleStickChartにデフォルトスタイルを適用する。
  *
- * Configuration includes:
- * - Disables description and legend
- * - Enables pinch zoom, disables double-tap zoom and inertia scrolling
- * - Positions X-axis at bottom without labels
- * - Uses only right Y-axis with grid lines
- * - Sets viewport offsets from [ChartTokens.Dimens]
+ * 設定内容：
+ * - 説明と凡例を無効化
+ * - ピンチズームを有効化、ダブルタップズームと慣性スクロールを無効化
+ * - X軸を下部に配置しラベルなし
+ * - 右Y軸のみ使用しグリッド線を表示
+ * - [ChartTokens.Dimens]からビューポートオフセットを設定
  */
 fun CandleStickChart.applyCandleDefaults() = apply {
     description.isEnabled = false
@@ -84,14 +84,14 @@ fun CandleStickChart.applyCandleDefaults() = apply {
 }
 
 /**
- * Applies default styling to a BarChart for volume display.
+ * 出来高表示用のBarChartにデフォルトスタイルを適用する。
  *
- * Configuration includes:
- * - Disables description and legend
- * - Enables pinch zoom, disables double-tap zoom and inertia scrolling
- * - Uses only right Y-axis with minimum at 0
- * - Positions X-axis at bottom with date labels
- * - Sets viewport offsets from [ChartTokens.Dimens]
+ * 設定内容：
+ * - 説明と凡例を無効化
+ * - ピンチズームを有効化、ダブルタップズームと慣性スクロールを無効化
+ * - 右Y軸のみ使用し最小値を0に設定
+ * - X軸を下部に配置し日付ラベルを表示
+ * - [ChartTokens.Dimens]からビューポートオフセットを設定
  */
 fun BarChart.applyVolumeDefaults() = apply {
     description.isEnabled = false
@@ -126,10 +126,10 @@ fun BarChart.applyVolumeDefaults() = apply {
 }
 
 /**
- * Displays a loading indicator when the chart has no data.
+ * チャートにデータがない時にローディングインジケーターを表示する。
  *
- * @param chart Target chart
- * @param context Context for accessing string resources
+ * @param chart 対象のチャート
+ * @param context 文字列リソースアクセス用のContext
  */
 fun <T : Chart<*>> showLoading(chart: T, context: Context) {
     chart.clear()
@@ -138,13 +138,13 @@ fun <T : Chart<*>> showLoading(chart: T, context: Context) {
 }
 
 /**
- * Updates an existing CandleDataSet or creates a new one.
+ * 既存のCandleDataSetを更新するか、新規作成する。
  *
- * Reuses existing DataSet when available to reduce GC pressure.
+ * GC負荷を軽減するため、利用可能な場合は既存のDataSetを再利用する。
  *
- * @param chart Target candlestick chart
- * @param entries List of candle entries
- * @return The updated or newly created CandleDataSet
+ * @param chart 対象のローソク足チャート
+ * @param entries ローソク足エントリーのリスト
+ * @return 更新または新規作成されたCandleDataSet
  */
 fun updateOrCreateCandleData(
     chart: CandleStickChart,
@@ -162,12 +162,12 @@ fun updateOrCreateCandleData(
 }
 
 /**
- * Creates a styled CandleDataSet.
+ * スタイル適用済みのCandleDataSetを作成する。
  *
- * Colors: green for up, red for down, gray for neutral.
+ * 色：上昇は緑、下落は赤、変化なしは灰色。
  *
- * @param entries List of candle entries
- * @return Configured [CandleDataSet]
+ * @param entries ローソク足エントリーのリスト
+ * @return 設定済みの[CandleDataSet]
  */
 fun makeCandleDataSet(entries: List<CandleEntry>) =
     CandleDataSet(entries, "Price").apply {
@@ -181,13 +181,13 @@ fun makeCandleDataSet(entries: List<CandleEntry>) =
     }
 
 /**
- * Updates an existing BarDataSet or creates a new one.
+ * 既存のBarDataSetを更新するか、新規作成する。
  *
- * Reuses existing DataSet when available to reduce GC pressure.
+ * GC負荷を軽減するため、利用可能な場合は既存のDataSetを再利用する。
  *
- * @param chart Target volume chart
- * @param entries List of bar entries
- * @return The updated or newly created BarDataSet
+ * @param chart 対象の出来高チャート
+ * @param entries バーエントリーのリスト
+ * @return 更新または新規作成されたBarDataSet
  */
 fun updateOrCreateBarData(
     chart: BarChart,
@@ -205,10 +205,10 @@ fun updateOrCreateBarData(
 }
 
 /**
- * Creates a styled BarDataSet for volume display.
+ * 出来高表示用のスタイル適用済みBarDataSetを作成する。
  *
- * @param entries List of volume entries
- * @return Configured [BarDataSet]
+ * @param entries 出来高エントリーのリスト
+ * @return 設定済みの[BarDataSet]
  */
 fun makeVolumeDataSet(entries: List<BarEntry>) =
     BarDataSet(entries, "Volume").apply {
@@ -219,12 +219,12 @@ fun makeVolumeDataSet(entries: List<BarEntry>) =
 
 
 /**
- * Configures common X-axis settings for charts.
+ * チャートの共通X軸設定を構成する。
  *
- * Sets axis bounds, scrolls to show recent data, and adds stride-based limit lines.
+ * 軸の範囲を設定し、最新データを表示するようスクロールし、間隔ベースのリミットラインを追加する。
  *
- * @param chart Target chart
- * @param totalEntries Total number of data entries
+ * @param chart 対象のチャート
+ * @param totalEntries データエントリーの総数
  */
 fun setupXAxisCommon(
     chart: BarLineChartBase<*>,
@@ -244,10 +244,10 @@ fun setupXAxisCommon(
 }
 
 /**
- * Adds limit lines to X-axis at regular intervals.
+ * 一定間隔でX軸にリミットラインを追加する。
  *
- * @param total Total number of entries
- * @param stride Interval between limit lines (default: 10)
+ * @param total エントリーの総数
+ * @param stride リミットライン間の間隔（デフォルト：10）
  */
 fun XAxis.refreshStrideLimitLines(
     total: Int,
@@ -269,12 +269,12 @@ fun XAxis.refreshStrideLimitLines(
 }
 
 /**
- * Creates a formatter that displays date labels on the X-axis.
+ * X軸に日付ラベルを表示するフォーマッターを作成する。
  *
- * Shows labels at stride intervals, converting "-" to "/" (e.g., "2025-09-21" to "2025/09/21").
+ * 間隔ごとにラベルを表示し、"-"を"/"に変換する（例："2025-09-21"→"2025/09/21"）。
  *
- * @param labels List of date strings corresponding to X-axis positions
- * @param stride Interval between displayed labels (default: 10)
+ * @param labels X軸位置に対応する日付文字列のリスト
+ * @param stride 表示するラベル間の間隔（デフォルト：10）
  */
 fun makeDateAxisFormatter(
     labels: List<String>,
@@ -291,16 +291,16 @@ fun makeDateAxisFormatter(
 }
 
 /**
- * Configures the right Y-axis for candlestick charts.
+ * ローソク足チャート用の右Y軸を構成する。
  *
- * Calculates axis range from low/high values with padding.
- * Rounds axis bounds to multiples of 5 and displays integer labels.
+ * 安値/高値からパディング付きで軸範囲を計算する。
+ * 軸の境界を5の倍数に丸め、整数ラベルを表示する。
  *
- * @param chart Target candlestick chart
- * @param lows List of low prices
- * @param highs List of high prices
- * @param padRatio Padding ratio for axis bounds (default: [ChartTokens.Dimens.Y_PAD_RATIO])
- * @param labelCount Number of Y-axis labels (default: [ChartTokens.Dimens.Y_LABEL_COUNT])
+ * @param chart 対象のローソク足チャート
+ * @param lows 安値のリスト
+ * @param highs 高値のリスト
+ * @param padRatio 軸境界のパディング比率（デフォルト：[ChartTokens.Dimens.Y_PAD_RATIO]）
+ * @param labelCount Y軸ラベルの数（デフォルト：[ChartTokens.Dimens.Y_LABEL_COUNT]）
  */
 fun setupRightAxisForCandle(
     chart: CandleStickChart,
@@ -347,9 +347,9 @@ fun setupRightAxisForCandle(
 }
 
 /**
- * Configures the right Y-axis for volume charts.
+ * 出来高チャート用の右Y軸を構成する。
  *
- * Uses nice step values for readable intervals and formats labels with K/M notation.
+ * 読みやすい間隔のためnice stepを使用し、K/M表記でラベルをフォーマットする。
  */
 fun setupRightAxisForVolume(
     chart: BarChart,
@@ -373,10 +373,10 @@ fun setupRightAxisForVolume(
 }
 
 /**
- * Regenerates limit lines for Y-axis based on current axis range and label settings.
+ * 現在の軸範囲とラベル設定に基づいてY軸のリミットラインを再生成する。
  *
- * Uses axisMinimum/axisMaximum values and respects labelCount and granularity.
- * Handles floating-point precision to prevent duplicate or missing lines.
+ * axisMinimum/axisMaximum値を使用し、labelCountとgranularityを尊重する。
+ * 重複や欠落を防ぐため浮動小数点精度を処理する。
  */
 fun YAxis.refreshGridLimitLinesFromAxis(
     labelCountOverride: Int? = null,

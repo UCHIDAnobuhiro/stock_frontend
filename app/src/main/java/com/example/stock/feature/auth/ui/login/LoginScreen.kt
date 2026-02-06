@@ -46,15 +46,15 @@ import com.example.stock.core.ui.theme.StockTheme
 import com.example.stock.feature.auth.viewmodel.LoginViewModel
 
 /**
- * Login screen with ViewModel.
+ * ViewModelを使用したログイン画面。
  *
- * Wrapper composable that connects [LoginViewModel] to [LoginScreenContent].
- * Handles event collection and state observation.
- * Uses Hilt to automatically inject the LoginViewModel.
+ * [LoginViewModel]と[LoginScreenContent]を接続するラッパーComposable。
+ * イベント収集と状態監視を処理する。
+ * HiltによりLoginViewModelが自動的に注入される。
  *
- * @param onLoggedIn Callback invoked upon successful login
- * @param onNavigateToSignup Callback to navigate to signup screen
- * @param viewModel Login ViewModel (injected by Hilt)
+ * @param onLoggedIn ログイン成功時に呼び出されるコールバック
+ * @param onNavigateToSignup サインアップ画面への遷移コールバック
+ * @param viewModel ログインViewModel（Hiltにより注入）
  */
 @Composable
 fun LoginScreen(
@@ -64,12 +64,12 @@ fun LoginScreen(
 ) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
 
-    // Check if already authenticated on startup
+    // 起動時に既に認証済みかを確認
     LaunchedEffect(Unit) {
         viewModel.checkAuthState()
     }
 
-    // Navigate on successful login (only once)
+    // ログイン成功時に遷移（一度だけ）
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             if (event is LoginUiEvent.LoggedIn) {
@@ -89,17 +89,17 @@ fun LoginScreen(
 }
 
 /**
- * Stateless login screen content.
+ * ステートレスなログイン画面コンテンツ。
  *
- * Provides email/password input, password visibility toggle,
- * login button, error display, and progress indicator.
+ * メール/パスワード入力、パスワード表示切り替え、
+ * ログインボタン、エラー表示、プログレスインジケーターを提供する。
  *
- * @param uiState Current UI state
- * @param onEmailChange Callback when email input changes
- * @param onPasswordChange Callback when password input changes
- * @param onTogglePassword Callback to toggle password visibility
- * @param onLogin Callback to execute login
- * @param onNavigateToSignup Callback to navigate to signup screen
+ * @param uiState 現在のUI状態
+ * @param onEmailChange メール入力変更時のコールバック
+ * @param onPasswordChange パスワード入力変更時のコールバック
+ * @param onTogglePassword パスワード表示切り替え時のコールバック
+ * @param onLogin ログイン実行時のコールバック
+ * @param onNavigateToSignup サインアップ画面への遷移コールバック
  */
 @Composable
 fun LoginScreenContent(
@@ -122,11 +122,11 @@ fun LoginScreenContent(
                 .padding(Spacing.ScreenLarge),
             verticalArrangement = Arrangement.Center
         ) {
-            // Title
+            // タイトル
             Text(stringResource(R.string.login), style = MaterialTheme.typography.headlineMedium)
             Spacer(Modifier.height(Spacing.ScreenLarge))
 
-            // Email input field
+            // メール入力フィールド
             OutlinedTextField(
                 value = uiState.email,
                 onValueChange = onEmailChange,
@@ -143,7 +143,7 @@ fun LoginScreenContent(
             )
             Spacer(Modifier.height(Spacing.GapSm))
 
-            // Password input field (with visibility toggle icon)
+            // パスワード入力フィールド（表示切り替えアイコン付き）
             OutlinedTextField(
                 value = uiState.password,
                 onValueChange = onPasswordChange,
@@ -179,7 +179,7 @@ fun LoginScreenContent(
                     .focusRequester(passwordFocusRequester)
             )
 
-            // Error display
+            // エラー表示
             uiState.errorResId?.let { errorResId ->
                 Spacer(Modifier.height(Spacing.GapSm))
                 Text(stringResource(errorResId), color = MaterialTheme.colorScheme.error)
@@ -187,7 +187,7 @@ fun LoginScreenContent(
 
             Spacer(Modifier.height(Spacing.GapMd))
 
-            // Login button (with progress indicator)
+            // ログインボタン（プログレスインジケーター付き）
             Button(
                 onClick = onLogin,
                 enabled = !uiState.isLoading,
@@ -202,7 +202,7 @@ fun LoginScreenContent(
 
             Spacer(Modifier.height(Spacing.GapSm))
 
-            // Navigate to signup
+            // サインアップへ遷移
             TextButton(
                 onClick = onNavigateToSignup,
                 enabled = !uiState.isLoading,

@@ -3,10 +3,10 @@ package com.example.stock.feature.stocklist.data.remote
 import kotlinx.serialization.Serializable
 
 /**
- * Data Transfer Object representing symbol information from the API.
+ * APIからの銘柄情報を表すデータ転送オブジェクト。
  *
- * @property code Symbol code (e.g., "7203")
- * @property name Symbol name (e.g., "Toyota Motor")
+ * @property code 銘柄コード（例："7203"）
+ * @property name 銘柄名（例："トヨタ自動車"）
  */
 @Serializable
 data class SymbolDto(

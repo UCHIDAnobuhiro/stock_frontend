@@ -62,7 +62,7 @@ class CandlesViewModelTest {
     @Test
     fun `load success puts transformed items into ui and clears loading`() =
         runTest(mainRule.scheduler) {
-            // given
+            // 準備
             val c1 = Candle("t1", 1.0, 2.0, 0.5, 1.5, 100)
             val c2 = Candle("t2", 1.2, 2.2, 0.7, 1.7, 120)
             candlesFlow.value = listOf(c1, c2)
@@ -73,7 +73,7 @@ class CandlesViewModelTest {
                 gate.await() // ここで待機 → isLoadingの検証が可能になる
             }
 
-            // when
+            // 実行
             vm.load("AAPL")
 
             // launch が走って isLoading が true になるまで現在キューを消化
@@ -85,7 +85,7 @@ class CandlesViewModelTest {
             // 完了まで進める
             advanceUntilIdle()
 
-            // then
+            // 検証
             val ui = vm.ui.value
             assertThat(ui.isLoading).isFalse()
             assertThat(ui.errorResId).isNull()
@@ -98,14 +98,14 @@ class CandlesViewModelTest {
     @Test
     fun `load sets error when repository throws IOException`() =
         runTest(mainRule.scheduler) {
-            // given
+            // 準備
             coEvery { repo.fetchCandles(any(), any(), any()) } throws IOException("network")
 
-            // when
+            // 実行
             vm.load("AAPL")
             advanceUntilIdle()
 
-            // then
+            // 検証
             val ui = vm.ui.value
             assertThat(ui.isLoading).isFalse()
             assertThat(ui.errorResId).isEqualTo(R.string.error_network)
@@ -115,10 +115,10 @@ class CandlesViewModelTest {
     @Test
     fun `load with blank code sets validation error and does not call repo`() =
         runTest(mainRule.scheduler) {
-            // when
+            // 実行
             vm.load("")
 
-            // then
+            // 検証
             runCurrent()
             val ui = vm.ui.value
             assertThat(ui.isLoading).isFalse()

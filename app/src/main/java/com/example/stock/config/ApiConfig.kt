@@ -3,10 +3,10 @@ package com.example.stock.config
 import com.example.stock.BuildConfig
 
 /**
- * Configuration object for API settings.
+ * API設定オブジェクト。
  *
- * Provides centralized access to API configuration values from BuildConfig.
- * Different build variants (debug, staging, release) have different BASE_URL values.
+ * BuildConfigからAPI設定値への集約的なアクセスを提供する。
+ * ビルドバリアント（debug、staging、release）ごとに異なるBASE_URL値を持つ。
  */
 object ApiConfig {
     const val BASE_URL: String = BuildConfig.BASE_URL

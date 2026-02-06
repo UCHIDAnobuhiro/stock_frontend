@@ -18,14 +18,14 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
- * Manages signup processing and signup screen state for [ViewModel].
+ * サインアップ処理とサインアップ画面状態を管理する[ViewModel]。
  *
- * - Validates input values
- * - Performs signup processing using [AuthRepository]
- * - Updates [SignupUiState]
+ * - 入力値のバリデーション
+ * - [AuthRepository]を使用したサインアップ処理の実行
+ * - [SignupUiState]の更新
  *
- * @param repo Authentication repository responsible for calling the signup API.
- * @param dispatcherProvider Provider for coroutine dispatchers, enabling testability.
+ * @param repo サインアップAPIを呼び出す認証リポジトリ
+ * @param dispatcherProvider コルーチンディスパッチャーのプロバイダー。テスト容易性を実現。
  */
 @HiltViewModel
 class SignupViewModel @Inject constructor(
@@ -40,51 +40,51 @@ class SignupViewModel @Inject constructor(
     val events = _events.asSharedFlow()
 
     /**
-     * Updates state when email input changes.
-     * @param email The entered email address
+     * メール入力変更時に状態を更新する。
+     * @param email 入力されたメールアドレス
      */
     fun onEmailChange(email: String) {
         _ui.update { it.copy(email = email, errorResId = null) }
     }
 
     /**
-     * Updates state when password input changes.
-     * @param password The entered password
+     * パスワード入力変更時に状態を更新する。
+     * @param password 入力されたパスワード
      */
     fun onPasswordChange(password: String) {
         _ui.update { it.copy(password = password, errorResId = null) }
     }
 
     /**
-     * Toggles password visibility on/off.
+     * パスワードの表示/非表示を切り替える。
      */
     fun togglePassword() {
         _ui.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
     }
 
     /**
-     * Updates state when confirm password input changes.
-     * @param confirmPassword The entered confirm password
+     * 確認用パスワード入力変更時に状態を更新する。
+     * @param confirmPassword 入力された確認用パスワード
      */
     fun onConfirmPasswordChange(confirmPassword: String) {
         _ui.update { it.copy(confirmPassword = confirmPassword, errorResId = null) }
     }
 
     /**
-     * Toggles confirm password visibility on/off.
+     * 確認用パスワードの表示/非表示を切り替える。
      */
     fun toggleConfirmPassword() {
         _ui.update { it.copy(isConfirmPasswordVisible = !it.isConfirmPasswordVisible) }
     }
 
     /**
-     * Executes the signup process.
+     * サインアップ処理を実行する。
      *
-     * After validating inputs, performs signup via [AuthRepository],
-     * and updates [SignupUiState] based on success/failure.
+     * 入力値をバリデーション後、[AuthRepository]経由でサインアップを実行し、
+     * 成功/失敗に応じて[SignupUiState]を更新する。
      */
     fun signup() {
-        // Prevent multiple rapid clicks
+        // 連打防止
         if (_ui.value.isLoading) return
 
         val (email, password, confirmPassword) = _ui.value.let {
@@ -96,7 +96,7 @@ class SignupViewModel @Inject constructor(
             return
         }
 
-        // Perform signup asynchronously
+        // 非同期でサインアップを実行
         viewModelScope.launch(dispatcherProvider.main) {
             _ui.update { it.copy(isLoading = true, errorResId = null) }
             runCatching {

@@ -7,13 +7,13 @@ import com.github.mikephil.charting.charts.CandleStickChart
 import com.github.mikephil.charting.data.CandleEntry
 
 /**
- * Composable that displays a candlestick chart using MPAndroidChart.
+ * MPAndroidChartを使用してローソク足チャートを表示するComposable。
  *
- * @param modifier Layout modifier
- * @param entries List of candlestick entries
- * @param lows List of low prices for Y-axis range calculation
- * @param highs List of high prices for Y-axis range calculation
- * @param onReady Callback invoked when the chart is initialized
+ * @param modifier レイアウトモディファイア
+ * @param entries ローソク足エントリーのリスト
+ * @param lows Y軸範囲計算用の安値リスト
+ * @param highs Y軸範囲計算用の高値リスト
+ * @param onReady チャート初期化時に呼び出されるコールバック
  */
 @Composable
 fun CandleChartView(

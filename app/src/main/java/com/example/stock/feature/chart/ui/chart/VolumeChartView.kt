@@ -7,12 +7,12 @@ import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.data.BarEntry
 
 /**
- * Composable that displays a volume bar chart using MPAndroidChart.
+ * MPAndroidChartを使用して出来高バーチャートを表示するComposable。
  *
- * @param modifier Layout modifier
- * @param entries List of bar entries representing volume data
- * @param labels List of date strings for X-axis labels
- * @param onReady Callback invoked when the chart is initialized
+ * @param modifier レイアウトモディファイア
+ * @param entries 出来高データを表すバーエントリーのリスト
+ * @param labels X軸ラベル用の日付文字列リスト
+ * @param onReady チャート初期化時に呼び出されるコールバック
  */
 @Composable
 fun VolumeChartView(

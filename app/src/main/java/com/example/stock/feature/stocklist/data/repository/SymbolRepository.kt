@@ -9,13 +9,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Repository responsible for fetching symbol information.
+ * 銘柄情報の取得を担当するリポジトリ。
  *
- * - Fetches symbol lists via API
- * - Data fetching is executed on the IO thread
+ * - API経由で銘柄リストを取得
+ * - データ取得はIOスレッドで実行
  *
- * @property symbolApi Symbol information API
- * @property dispatcherProvider Provider for coroutine dispatchers
+ * @property symbolApi 銘柄情報API
+ * @property dispatcherProvider コルーチンディスパッチャーのプロバイダー
  */
 @Singleton
 class SymbolRepository @Inject constructor(
@@ -23,11 +23,11 @@ class SymbolRepository @Inject constructor(
     private val dispatcherProvider: DispatcherProvider
 ) {
     /**
-     * Fetches the symbol list from the API.
+     * APIから銘柄リストを取得する。
      *
-     * - Network communication is executed on the IO thread
+     * - ネットワーク通信はIOスレッドで実行
      *
-     * @return Symbol list fetched from the API
+     * @return APIから取得した銘柄リスト
      */
     suspend fun fetchSymbols(): List<Symbol> = withContext(dispatcherProvider.io) {
         symbolApi.getSymbols().map { it.toEntity() }

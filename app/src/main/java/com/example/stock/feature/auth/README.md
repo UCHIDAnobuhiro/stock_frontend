@@ -1,25 +1,24 @@
-# Authentication Feature
+# 認証機能
 
-## Summary
+## 概要
 
-The `auth` feature module handles user authentication for the Stock app, providing login and signup
-functionality with JWT-based authentication. It follows the MVVM architecture pattern with clear
-separation between data, UI, and ViewModel layers.
+`auth`機能モジュールは、StockアプリのユーザーJWT認証を処理し、ログインとサインアップ機能を提供する。
+データ層、UI層、ViewModel層を明確に分離したMVVMアーキテクチャパターンに従う。
 
-### Key Features
+### 主な機能
 
-- **Login**: Email/password authentication with JWT token storage
-- **Signup**: New user registration with password confirmation
-- **Logout**: Token clearing with proper separation of concerns (dedicated ViewModel)
-- **Token Management**: Dual-layer token storage (in-memory + persistent DataStore)
-- **Input Validation**: Email format, password length, and password match validation
-- **Error Handling**: User-friendly error messages for various failure scenarios
+- **ログイン**: JWTトークン保存を伴うメール/パスワード認証
+- **サインアップ**: パスワード確認付きの新規ユーザー登録
+- **ログアウト**: 関心の分離を考慮したトークンクリア（専用ViewModel）
+- **トークン管理**: 二層構造のトークン保存（インメモリ + DataStore永続化）
+- **入力バリデーション**: メール形式、パスワード長、パスワード一致の検証
+- **エラーハンドリング**: 様々な失敗シナリオに対するユーザーフレンドリーなエラーメッセージ
 
-## Dependency Diagram
+## 依存関係図
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                              UI Layer                                   │
+│                              UI層                                        │
 │  ┌─────────────────────┐         ┌─────────────────────┐                │
 │  │    LoginScreen      │         │    SignupScreen     │                │
 │  │  ┌───────────────┐  │         │  ┌───────────────┐  │                │
@@ -30,7 +29,7 @@ separation between data, UI, and ViewModel layers.
               │ observes                      │ observes
               ▼                               ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                           ViewModel Layer                               │
+│                           ViewModel層                                    │
 │  ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────┐  │
 │  │   LoginViewModel    │  │   SignupViewModel   │  │ LogoutViewModel │  │
 │  │  - ui: StateFlow    │  │  - ui: StateFlow    │  │ - events: Flow  │  │
@@ -49,7 +48,7 @@ separation between data, UI, and ViewModel layers.
               └───────────────┬───────────────┘               │
                               ▼                               ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                          Repository Layer                               │
+│                          Repository層                                    │
 │                    ┌─────────────────────┐                              │
 │                    │   AuthRepository    │                              │
 │                    │  - login()          │                              │
@@ -62,7 +61,7 @@ separation between data, UI, and ViewModel layers.
               ▼                ▼                ▼
 ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
 │     AuthApi     │  │  TokenProvider  │  │   TokenStore    │
-│   (Retrofit)    │  │  (In-memory)    │  │  (DataStore)    │
+│   (Retrofit)    │  │  (インメモリ)    │  │  (DataStore)    │
 │  - login()      │  │  - update()     │  │  - save()       │
 │  - signup()     │  │  - clear()      │  │  - clear()      │
 └─────────────────┘  └─────────────────┘  └─────────────────┘
@@ -70,133 +69,132 @@ separation between data, UI, and ViewModel layers.
         │                    └────────┬───────────┘
         ▼                             ▼
 ┌─────────────────┐         ┌─────────────────────┐
-│   Backend API   │         │    core module      │
-│  POST /login    │         │ (shared components) │
+│  バックエンドAPI  │         │     coreモジュール    │
+│  POST /login    │         │   （共有コンポーネント） │
 │  POST /signup   │         └─────────────────────┘
 └─────────────────┘
 ```
 
-## Directory Structure
+## ディレクトリ構成
 
 ```
 feature/auth/
 ├── data/
 │   ├── remote/
-│   │   ├── AuthApi.kt           # Retrofit interface for login/signup endpoints
-│   │   └── AuthModels.kt        # DTOs: LoginRequest, LoginResponse,
-│   │                            #       SignupRequest, SignupResponse
+│   │   ├── AuthApi.kt           # ログイン/サインアップエンドポイント用Retrofitインターフェース
+│   │   └── AuthDto.kt           # DTO: LoginRequest, LoginResponse,
+│   │                            #      SignupRequest, SignupResponse
 │   └── repository/
-│       └── AuthRepository.kt    # Coordinates API calls and token management
+│       └── AuthRepository.kt    # API呼び出しとトークン管理を調整
 │
 ├── ui/
 │   ├── login/
-│   │   ├── LoginScreen.kt       # Login composable with Hilt ViewModel injection
-│   │   └── LoginUiState.kt      # Login screen state data class
+│   │   ├── LoginScreen.kt       # Hilt ViewModel注入を使用したログインComposable
+│   │   └── LoginUiState.kt      # ログイン画面の状態データクラス
 │   └── signup/
-│       ├── SignupScreen.kt      # Signup composable with Hilt ViewModel injection
-│       └── SignupUiState.kt     # Signup screen state data class
+│       ├── SignupScreen.kt      # Hilt ViewModel注入を使用したサインアップComposable
+│       └── SignupUiState.kt     # サインアップ画面の状態データクラス
 │
 ├── viewmodel/
-│   ├── LoginViewModel.kt        # Manages login state and business logic
-│   ├── LogoutViewModel.kt       # Manages logout with event-based navigation
-│   ├── SignupViewModel.kt       # Manages signup state and business logic
-│   ├── InputValidator.kt        # Reusable input validation utilities
-│   └── ErrorHandler.kt          # Error logging and mapping utilities
+│   ├── LoginViewModel.kt        # ログイン状態とビジネスロジックを管理
+│   ├── LogoutViewModel.kt       # イベントベースのナビゲーションでログアウトを管理
+│   ├── SignupViewModel.kt       # サインアップ状態とビジネスロジックを管理
+│   ├── InputValidator.kt        # 再利用可能な入力バリデーションユーティリティ
+│   └── ErrorHandler.kt          # エラーログとマッピングユーティリティ
 │
-└── README.md                    # This file
+└── README.md                    # このファイル
 ```
 
-## Testing
+## テスト
 
-### Test Location
+### テストの場所
 
-Tests are organized by type:
+テストは種類別に整理されている：
 
-| Test Type  | Location                                                   |
-|------------|------------------------------------------------------------|
-| Unit Tests | `app/src/test/java/com/example/stock/`                     |
-| UI Tests   | `app/src/androidTest/java/com/example/stock/feature/auth/` |
+| テスト種類 | 場所                                                       |
+|----------|-----------------------------------------------------------|
+| 単体テスト | `app/src/test/java/com/example/stock/`                    |
+| UIテスト  | `app/src/androidTest/java/com/example/stock/feature/auth/` |
 
-### Test Files
+### テストファイル
 
-#### Unit Tests
+#### 単体テスト
 
-| File                                    | Description                                                                               |
-|-----------------------------------------|-------------------------------------------------------------------------------------------|
-| `viewmodel/LoginViewModelTest.kt`       | Tests for LoginViewModel including validation, login success/failure                      |
-| `viewmodel/LogoutViewModelTest.kt`      | Tests for LogoutViewModel including logout and event emission                             |
-| `viewmodel/SignupViewModelTest.kt`      | Tests for SignupViewModel including validation, signup success/failure, and error mapping |
-| `data/repository/AuthRepositoryTest.kt` | Tests for AuthRepository including token management                                       |
+| ファイル                                    | 説明                                                                  |
+|--------------------------------------------|----------------------------------------------------------------------|
+| `viewmodel/LoginViewModelTest.kt`          | バリデーション、ログイン成功/失敗を含むLoginViewModelのテスト            |
+| `viewmodel/LogoutViewModelTest.kt`         | ログアウトとイベント発行を含むLogoutViewModelのテスト                   |
+| `viewmodel/SignupViewModelTest.kt`         | バリデーション、サインアップ成功/失敗、エラーマッピングを含むSignupViewModelのテスト |
+| `data/repository/AuthRepositoryTest.kt`    | トークン管理を含むAuthRepositoryのテスト                               |
 
-#### UI Tests (Instrumented)
+#### UIテスト（インストルメンテッド）
 
-| File                                              | Description                                 |
-|---------------------------------------------------|---------------------------------------------|
-| `feature/auth/ui/login/LoginScreenContentTest.kt` | Compose UI tests for LoginScreen components |
+| ファイル                                              | 説明                                    |
+|------------------------------------------------------|----------------------------------------|
+| `feature/auth/ui/login/LoginScreenContentTest.kt`    | LoginScreen用のCompose UIテスト         |
 
-### Running Tests
+### テストの実行
 
 ```bash
-# Run all unit tests for auth feature
+# auth機能の全単体テストを実行
 ./gradlew testDebugUnitTest --tests "*.LoginViewModelTest.*"
 ./gradlew testDebugUnitTest --tests "*.LogoutViewModelTest.*"
 ./gradlew testDebugUnitTest --tests "*.SignupViewModelTest.*"
 ./gradlew testDebugUnitTest --tests "*.AuthRepositoryTest.*"
 
-# Run UI tests (requires emulator/device)
+# UIテストを実行（エミュレータ/デバイスが必要）
 ./gradlew connectedAndroidTest --tests "*.LoginScreenContentTest.*"
 ```
 
-### Test Coverage
+### テストカバレッジ
 
-#### LoginViewModel Tests
+#### LoginViewModelテスト
 
-- Input state updates (`onEmailChange`, `onPasswordChange`, `togglePassword`)
-- Validation (empty fields, invalid email, short password)
-- Login success/failure handling
-- Loading state management
-- Auto-login check (`checkAuthState`)
+- 入力状態の更新（`onEmailChange`、`onPasswordChange`、`togglePassword`）
+- バリデーション（空欄、無効なメール、短いパスワード）
+- ログイン成功/失敗のハンドリング
+- ローディング状態の管理
+- 自動ログインチェック（`checkAuthState`）
 
-#### LogoutViewModel Tests
+#### LogoutViewModelテスト
 
-- Logout calls repository
-- Event emission (`UiEvent.LoggedOut`)
+- ログアウトがリポジトリを呼び出す
+- イベント発行（`UiEvent.LoggedOut`）
 
-#### SignupViewModel Tests
+#### SignupViewModelテスト
 
-- Input state updates (email, password, confirm password)
-- Validation (empty fields, invalid email, short password, password mismatch)
-- Signup success/failure handling
-- HTTP 409 conflict handling (email already registered)
-- Loading state management
+- 入力状態の更新（メール、パスワード、確認パスワード）
+- バリデーション（空欄、無効なメール、短いパスワード、パスワード不一致）
+- サインアップ成功/失敗のハンドリング
+- HTTP 409コンフリクトのハンドリング（メール既登録）
+- ローディング状態の管理
 
-#### AuthRepository Tests
+#### AuthRepositoryテスト
 
-- Login flow with token persistence
-- Token provider and store coordination
-- Logout with token clearing
+- トークン永続化を伴うログインフロー
+- TokenProviderとTokenStoreの連携
+- トークンクリアを伴うログアウト
 
-#### LoginScreenContent UI Tests
+#### LoginScreenContent UIテスト
 
-- Initial state display
-- Input field interactions
-- Button click callbacks
-- Loading state (button disabled)
-- Error message display
-- Password visibility toggle
+- 初期状態の表示
+- 入力フィールドのインタラクション
+- ボタンクリックのコールバック
+- ローディング状態（ボタン無効化）
+- エラーメッセージの表示
+- パスワード表示切り替え
 
-### Testing Patterns
+### テストパターン
 
-The feature uses the following testing patterns:
+この機能では以下のテストパターンを使用：
 
-1. **MainDispatcherRule**: Replaces `Dispatchers.Main` with `StandardTestDispatcher` for
-   deterministic coroutine testing
-2. **TestDispatcherProvider**: Provides test dispatchers for ViewModel testing
-3. **MockK**: Mocking framework with `relaxed = true` for simple mocks
-4. **Truth**: Assertion library using `assertThat()` style
-5. **Compose Test Rule**: For UI testing with `createComposeRule()`
+1. **MainDispatcherRule**: 決定論的なコルーチンテストのため`Dispatchers.Main`を`StandardTestDispatcher`に置換
+2. **TestDispatcherProvider**: ViewModelテスト用のテストディスパッチャを提供
+3. **MockK**: シンプルなモック用に`relaxed = true`を使用するモックフレームワーク
+4. **Truth**: `assertThat()`スタイルを使用するアサーションライブラリ
+5. **Compose Test Rule**: `createComposeRule()`を使用したUIテスト
 
-Example test pattern:
+テストパターンの例：
 
 ```kotlin
 @Test

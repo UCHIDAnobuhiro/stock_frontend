@@ -1,17 +1,17 @@
 package com.example.stock.feature.chart.ui
 
 /**
- * Candlestick data model for UI display.
+ * UI表示用のローソク足データモデル。
  *
- * Instead of directly passing the DTO from the API response to the UI,
- * a lightweight data structure formatted for UI consumption is defined.
+ * APIレスポンスのDTOを直接UIに渡すのではなく、
+ * UI向けにフォーマットされた軽量なデータ構造を定義する。
  *
- * @property time Date and time (e.g., "2025-11-03")
- * @property open Opening price
- * @property high High price
- * @property low Low price
- * @property close Closing price
- * @property volume Trading volume
+ * @property time 日時（例："2025-11-03"）
+ * @property open 始値
+ * @property high 高値
+ * @property low 安値
+ * @property close 終値
+ * @property volume 出来高
  */
 data class CandleItem(
     val time: String,

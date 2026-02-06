@@ -1,25 +1,24 @@
-# Chart Feature
+# チャート機能
 
-## Summary
+## 概要
 
-The `chart` feature module displays candlestick charts for stock price data using MPAndroidChart
-library. It follows the MVVM architecture pattern with clear separation between data, UI, and
-ViewModel layers.
+`chart`機能モジュールは、MPAndroidChartライブラリを使用して株価のローソク足チャートを表示する。
+データ層、UI層、ViewModel層を明確に分離したMVVMアーキテクチャパターンに従う。
 
-### Key Features
+### 主な機能
 
-- **Candlestick Chart**: Displays OHLC (Open, High, Low, Close) data with color-coded candles
-- **Volume Chart**: Displays trading volume as bar chart below the candlestick chart
-- **Chart Synchronization**: Bidirectional sync for zoom, scroll, and highlight between charts
-- **Interval Selection**: Supports daily, weekly, and monthly data intervals
-- **Loading State**: Shows loading indicator while fetching data
-- **Error Handling**: Displays localized error messages using string resources
+- **ローソク足チャート**: 色分けされたローソクでOHLC（始値、高値、安値、終値）データを表示
+- **出来高チャート**: ローソク足チャートの下に取引量を棒グラフで表示
+- **チャート同期**: チャート間のズーム、スクロール、ハイライトの双方向同期
+- **期間選択**: 日足、週足、月足のデータ間隔をサポート
+- **ローディング状態**: データ取得中にローディングインジケータを表示
+- **エラーハンドリング**: 文字列リソースを使用したローカライズされたエラーメッセージを表示
 
-## Dependency Diagram
+## 依存関係図
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                              UI Layer                                   │
+│                              UI層                                        │
 │  ┌─────────────────────────────────────────────────────────────────┐    │
 │  │                       ChartScreen                               │    │
 │  │  ┌───────────────┐  ┌─────────────────┐  ┌─────────────────┐    │    │
@@ -30,15 +29,15 @@ ViewModel layers.
 │  │                                       │                          │    │
 │  │                              ┌────────▼────────┐                 │    │
 │  │                              │   ChartSync     │                 │    │
-│  │                              │ (Synchronizes   │                 │    │
-│  │                              │  zoom/scroll)   │                 │    │
+│  │                              │ （ズーム/スクロール │                 │    │
+│  │                              │  を同期）        │                 │    │
 │  │                              └─────────────────┘                 │    │
 │  └──────────────────────────────┬──────────────────────────────────┘    │
 └─────────────────────────────────┼───────────────────────────────────────┘
                                   │ observes
                                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                           ViewModel Layer                               │
+│                           ViewModel層                                    │
 │                    ┌─────────────────────┐                              │
 │                    │  CandlesViewModel   │                              │
 │                    │  - ui: StateFlow    │                              │
@@ -49,7 +48,7 @@ ViewModel layers.
                                 │ calls
                                 ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                          Repository Layer                               │
+│                          Repository層                                    │
 │                    ┌─────────────────────┐                              │
 │                    │  CandleRepository   │                              │
 │                    │  - candles: Flow    │                              │
@@ -67,112 +66,115 @@ ViewModel layers.
                               │
                               ▼
                     ┌─────────────────────┐
-                    │    Backend API      │
+                    │   バックエンドAPI     │
                     │ GET /candles/{code} │
                     └─────────────────────┘
 ```
 
-## Directory Structure
+## ディレクトリ構成
 
 ```
 feature/chart/
 ├── data/
 │   ├── remote/
-│   │   └── ChartApi.kt          # Retrofit interface + CandleDto
+│   │   └── ChartApi.kt          # Retrofitインターフェース + CandleDto
 │   └── repository/
-│       └── CandleRepository.kt  # Fetches and caches candle data
+│       └── CandleRepository.kt  # ローソク足データを取得しキャッシュ
+│
+├── domain/
+│   └── model/
+│       └── Candle.kt            # ローソク足ドメインエンティティ
 │
 ├── ui/
-│   ├── CandleItem.kt            # UI model for candle data
-│   ├── CandleUiState.kt         # Chart screen state data class
-│   ├── ChartScreen.kt           # Main chart composable
-│   └── chart/                   # Chart components subdirectory
-│       ├── CandleChartView.kt   # Candlestick chart (MPAndroidChart)
-│       ├── VolumeChartView.kt   # Volume bar chart (MPAndroidChart)
-│       ├── ChartSync.kt         # Bidirectional sync logic
-│       ├── SyncChartsOnce.kt    # Composable wrapper for sync setup
-│       ├── ChartStyle.kt        # Chart styling and theming
-│       ├── ChartToken.kt        # Design tokens and constants
-│       └── ChartUtils.kt        # Axis formatting utilities
+│   ├── CandleItem.kt            # ローソク足データ用UIモデル
+│   ├── CandleUiState.kt         # チャート画面の状態データクラス
+│   ├── ChartScreen.kt           # メインチャートComposable
+│   └── chart/                   # チャートコンポーネントサブディレクトリ
+│       ├── CandleChartView.kt   # ローソク足チャート（MPAndroidChart）
+│       ├── VolumeChartView.kt   # 出来高バーチャート（MPAndroidChart）
+│       ├── ChartSync.kt         # 双方向同期ロジック
+│       ├── SyncChartsOnce.kt    # 同期セットアップ用Composableラッパー
+│       ├── ChartStyle.kt        # チャートのスタイリングとテーマ
+│       ├── ChartToken.kt        # デザイントークンと定数
+│       └── ChartUtils.kt        # 軸フォーマットユーティリティ
 │
 ├── viewmodel/
-│   └── CandlesViewModel.kt      # Manages chart state and data loading
+│   └── CandlesViewModel.kt      # チャートの状態とデータ読み込みを管理
 │
-└── README.md                    # This file
+└── README.md                    # このファイル
 ```
 
-## Chart Synchronization
+## チャート同期
 
-The chart feature implements sophisticated bidirectional synchronization between candlestick and
-volume charts:
+チャート機能は、ローソク足チャートと出来高チャート間の高度な双方向同期を実装：
 
-### How It Works
+### 動作の仕組み
 
-1. **AtomicBoolean Locks**: `vpLock` and `hlLock` prevent infinite callback loops
-2. **Viewport Sync**: When one chart is zoomed/scrolled, the other follows
-3. **Highlight Sync**: Selecting a candle highlights the corresponding volume bar
-4. **Disabled Inertia**: `isDragDecelerationEnabled = false` prevents scroll lag
+1. **AtomicBooleanロック**: `vpLock`と`hlLock`が無限コールバックループを防止
+2. **ビューポート同期**: 一方のチャートをズーム/スクロールすると、もう一方が追従
+3. **ハイライト同期**: ローソクを選択すると対応する出来高バーがハイライト
+4. **慣性スクロール無効化**: `isDragDecelerationEnabled = false`でスクロールラグを防止
 
-### Key Components
+### 主要コンポーネント
 
-| Component         | Purpose                                          |
-|-------------------|--------------------------------------------------|
-| `ChartSync.kt`    | Contains `attachSynchronizedPair()` function     |
-| `SyncChartsOnce`  | Composable ensuring one-time sync attachment     |
-| `ChartStyle.kt`   | Applies consistent styling to both charts        |
+| コンポーネント      | 目的                                          |
+|-------------------|----------------------------------------------|
+| `ChartSync.kt`    | `attachSynchronizedPair()`関数を含む          |
+| `SyncChartsOnce`  | 1回限りの同期アタッチを保証するComposable        |
+| `ChartStyle.kt`   | 両チャートに一貫したスタイリングを適用            |
 
-## Testing
+## テスト
 
-### Test Location
+### テストの場所
 
-Tests are located at:
+テストは以下に配置：
 
-| Test Type  | Location                                              |
-|------------|-------------------------------------------------------|
-| Unit Tests | `app/src/test/java/com/example/stock/feature/chart/`  |
+| テスト種類 | 場所                                                     |
+|----------|----------------------------------------------------------|
+| 単体テスト | `app/src/test/java/com/example/stock/feature/chart/`     |
 
-### Test Files
+### テストファイル
 
-#### Unit Tests
+#### 単体テスト
 
-| File                                        | Description                                            |
-|---------------------------------------------|--------------------------------------------------------|
-| `viewmodel/CandlesViewModelTest.kt`         | Tests for CandlesViewModel load/clear/error handling   |
-| `data/repository/CandleRepositoryTest.kt`   | Tests for CandleRepository API calls                   |
+| ファイル                                        | 説明                                                   |
+|------------------------------------------------|-------------------------------------------------------|
+| `viewmodel/CandlesViewModelTest.kt`            | ロード/クリア/エラーハンドリングを含むCandlesViewModelのテスト |
+| `data/repository/CandleRepositoryTest.kt`      | CandleRepositoryのAPI呼び出しテスト                      |
 
-### Running Tests
+### テストの実行
 
 ```bash
-# Run all unit tests for chart feature
+# chart機能の全単体テストを実行
 ./gradlew testDebugUnitTest --tests "*.CandlesViewModelTest.*"
 ./gradlew testDebugUnitTest --tests "*.CandleRepositoryTest.*"
 ```
 
-### Test Coverage
+### テストカバレッジ
 
-#### CandlesViewModel Tests
+#### CandlesViewModelテスト
 
-- Load success - transforms DTOs to UI items and clears loading
-- Load failure (IOException) - sets network error resource ID
-- Load with blank code - sets validation error without calling repository
-- Load calls fetchCandles with correct parameters
-- Clear resets UI state and cancels in-flight requests
+- ロード成功 - DTOをUIアイテムに変換しローディングをクリア
+- ロード失敗（IOException）- ネットワークエラーリソースIDを設定
+- 空のコードでロード - リポジトリを呼び出さずにバリデーションエラーを設定
+- ロードは正しいパラメータでfetchCandlesを呼び出す
+- クリアはUI状態をリセットし実行中のリクエストをキャンセル
 
-#### CandleRepository Tests
+#### CandleRepositoryテスト
 
-- fetchCandles stores data in StateFlow
-- clearCandles resets the flow to empty list
+- fetchCandlesはデータをStateFlowに保存
+- clearCandlesはフローを空リストにリセット
 
-### Testing Patterns
+### テストパターン
 
-The feature uses the following testing patterns:
+この機能では以下のテストパターンを使用：
 
-1. **MainDispatcherRule**: Replaces `Dispatchers.Main` with `StandardTestDispatcher`
-2. **DispatcherProvider Mock**: Injects test dispatchers for deterministic testing
-3. **MockK**: Mocking framework with `relaxed = true` for simple mocks
-4. **Truth**: Assertion library using `assertThat()` style
+1. **MainDispatcherRule**: `Dispatchers.Main`を`StandardTestDispatcher`に置換
+2. **DispatcherProviderモック**: 決定論的テストのためテストディスパッチャを注入
+3. **MockK**: シンプルなモック用に`relaxed = true`を使用するモックフレームワーク
+4. **Truth**: `assertThat()`スタイルを使用するアサーションライブラリ
 
-Example test pattern:
+テストパターンの例：
 
 ```kotlin
 @Test

@@ -23,14 +23,14 @@ import java.io.IOException
 import javax.inject.Inject
 
 /**
- * ViewModel that manages candlestick data for stock prices.
+ * 株価ローソク足データを管理するViewModel。
  *
- * Fetches candlestick data from the Repository and exposes it via StateFlow
- * in a state that is easy to use in the UI.
- * Additionally, centrally manages UI state such as loading, error, and data.
+ * Repositoryからローソク足データを取得し、UIで使いやすい状態で
+ * StateFlow経由で公開する。
+ * さらに、読み込み、エラー、データなどのUI状態を一元管理する。
  *
- * @property repo Repository for fetching candlestick data
- * @property dispatcherProvider Provider for coroutine dispatchers, enabling testability
+ * @property repo ローソク足データ取得用のリポジトリ
+ * @property dispatcherProvider コルーチンディスパッチャーのプロバイダー。テスト容易性を実現。
  */
 @HiltViewModel
 class CandlesViewModel @Inject constructor(
@@ -43,27 +43,27 @@ class CandlesViewModel @Inject constructor(
 
 
     /**
-     * Currently executing data fetch job.
+     * 現在実行中のデータ取得ジョブ。
      */
     private var loadJob: Job? = null
 
     /**
-     * Fetches candlestick data for the specified stock code, interval, and quantity.
+     * 指定された銘柄コード、間隔、件数のローソク足データを取得する。
      *
-     * During processing, updates the UI to a loading state, and on success,
-     * converts Candle to CandleItem and applies it.
-     * When an error occurs, notifies the UI with an error message.
+     * 処理中はUIを読み込み状態に更新し、成功時は
+     * CandleをCandleItemに変換して適用する。
+     * エラー発生時はUIにエラーメッセージを通知する。
      *
-     * @param code Stock code
-     * @param interval Data fetch interval (e.g., "1day")
-     * @param outputsize Number of records to fetch (default: 200)
+     * @param code 銘柄コード
+     * @param interval データ取得間隔（例："1day"）
+     * @param outputsize 取得するレコード数（デフォルト：200）
      */
     fun load(code: String, interval: String = "1day", outputsize: Int = 200) {
         if (code.isBlank()) {
             _ui.update { it.copy(errorResId = R.string.error_empty_stock_code) }
             return
         }
-        // Cancel the previous job and keep only the latest request active
+        // 前のジョブをキャンセルし、最新のリクエストのみをアクティブに保つ
         loadJob?.cancel()
         loadJob = viewModelScope.launch(dispatcherProvider.main) {
             _ui.update { it.copy(isLoading = true, errorResId = null) }
@@ -79,7 +79,7 @@ class CandlesViewModel @Inject constructor(
                         _ui.update { it.copy(isLoading = false, items = list, errorResId = null) }
                     }
             }.onFailure { e ->
-                // Re-throw CancellationException to preserve cancellation semantics
+                // キャンセルのセマンティクスを維持するためCancellationExceptionを再スロー
                 if (e is CancellationException) throw e
                 val errorResId = when (e) {
                     is IOException -> R.string.error_network
@@ -93,9 +93,9 @@ class CandlesViewModel @Inject constructor(
     }
 
     /**
-     * Clears the candlestick data being held.
+     * 保持しているローソク足データをクリアする。
      *
-     * Cancels the executing job and initializes the repository and UI state.
+     * 実行中のジョブをキャンセルし、リポジトリとUI状態を初期化する。
      */
     fun clear() {
         loadJob?.cancel()
@@ -104,10 +104,10 @@ class CandlesViewModel @Inject constructor(
     }
 
     /**
-     * Converts domain entity to UI display model.
+     * ドメインエンティティをUI表示用モデルに変換する。
      *
-     * @receiver Candle Domain entity
-     * @return CandleItem Lightweight model for UI
+     * @receiver Candle ドメインエンティティ
+     * @return CandleItem UI用の軽量モデル
      */
     private fun Candle.toUi() = CandleItem(
         time = time, open = open, high = high, low = low, close = close, volume = volume

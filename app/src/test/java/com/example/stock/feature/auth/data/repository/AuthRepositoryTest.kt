@@ -26,10 +26,10 @@ import retrofit2.Response
 import java.io.IOException
 
 /**
- * Unit tests for [AuthRepository].
+ * [AuthRepository]のユニットテスト。
  *
- * Tests cover login, logout, signup, and token checking functionality.
- * Uses MockK for mocking dependencies and Truth for assertions.
+ * ログイン、ログアウト、サインアップ、トークンチェック機能をテスト。
+ * 依存関係のモックにMockK、アサーションにTruthを使用。
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AuthRepositoryTest {
@@ -53,7 +53,7 @@ class AuthRepositoryTest {
         )
     }
 
-    // region Login Tests
+    // region ログインテスト
 
     @Test
     fun `login success - updates provider and saves token`() =
@@ -86,7 +86,7 @@ class AuthRepositoryTest {
 
         assertThat(result.isFailure).isTrue()
         assertThat(result.exceptionOrNull()).isInstanceOf(HttpException::class.java)
-        // Token should not be updated when API fails
+        // API失敗時はトークンが更新されないこと
         verify { tokenProvider wasNot Called }
         verify { tokenStore wasNot Called }
     }
@@ -94,7 +94,7 @@ class AuthRepositoryTest {
     @Test
     fun `login fails when token store save throws - provider remains updated in current impl`() =
         runTest(scheduler) {
-            // In current implementation, if save fails, exception propagates without rollback
+            // 現在の実装では、保存が失敗した場合、ロールバックせずに例外が伝播する
             val email = "test@example.com"
             val pass = "password"
             val response = LoginResponse(token = "token123")
@@ -107,28 +107,28 @@ class AuthRepositoryTest {
             assertThat(result.isFailure).isTrue()
             assertThat(result.exceptionOrNull()).isInstanceOf(IOException::class.java)
             assertThat(result.exceptionOrNull()?.message).isEqualTo("disk full")
-            // tokenProvider.update is called (no rollback expected)
+            // tokenProvider.updateは呼ばれる（ロールバックは期待されない）
             coVerify(exactly = 1) { tokenProvider.update("token123") }
             coVerify(exactly = 1) { tokenStore.save("token123") }
         }
 
     // endregion
 
-    // region Logout Tests
+    // region ログアウトテスト
 
     @Test
     fun `logout - clears provider and store`() = runTest(scheduler) {
-        // when
+        // 実行
         repo.logout()
 
-        // then
+        // 検証
         coVerify(exactly = 1) { tokenProvider.clear() }
         coVerify(exactly = 1) { tokenStore.clear() }
     }
 
     // endregion
 
-    // region Signup Tests
+    // region サインアップテスト
 
     @Test
     fun `signup success - returns response message`() = runTest(scheduler) {
@@ -163,7 +163,7 @@ class AuthRepositoryTest {
 
     // endregion
 
-    // region HasToken Tests
+    // region HasTokenテスト
 
     @Test
     fun `hasToken returns true when token exists`() = runTest(scheduler) {

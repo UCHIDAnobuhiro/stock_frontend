@@ -39,17 +39,17 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
 
 /**
- * Chart screen with ViewModel.
+ * ViewModelを使用したチャート画面。
  *
- * Wrapper composable that connects [CandlesViewModel] to [ChartScreenContent].
- * Handles state observation and data loading.
- * Uses Hilt to automatically inject the CandlesViewModel.
+ * [CandlesViewModel]と[ChartScreenContent]を接続するラッパーComposable。
+ * 状態監視とデータ読み込みを処理する。
+ * HiltによりCandlesViewModelが自動的に注入される。
  *
- * @param name Stock name
- * @param code Stock symbol code
- * @param onNavigateBack Callback to navigate back to previous screen
- * @param onLogout Callback invoked when logout button is pressed
- * @param viewModel Candles ViewModel (injected by Hilt)
+ * @param name 銘柄名
+ * @param code 銘柄コード
+ * @param onNavigateBack 前の画面へ戻るコールバック
+ * @param onLogout ログアウトボタン押下時に呼び出されるコールバック
+ * @param viewModel ローソク足ViewModel（Hiltにより注入）
  */
 @Composable
 fun ChartScreen(
@@ -82,18 +82,18 @@ fun ChartScreen(
 }
 
 /**
- * Stateless chart screen content.
+ * ステートレスなチャート画面コンテンツ。
  *
- * Displays candlestick and volume charts for a stock.
- * Shows stock name, code, interval selector, and synchronized charts.
+ * 銘柄のローソク足チャートと出来高チャートを表示する。
+ * 銘柄名、コード、間隔セレクター、同期されたチャートを表示する。
  *
- * @param uiState Current UI state
- * @param name Stock name
- * @param code Stock symbol code
- * @param interval Current interval selection
- * @param onIntervalChange Callback when interval selection changes
- * @param onNavigateBack Callback to navigate back
- * @param onLogout Callback when logout button is pressed
+ * @param uiState 現在のUI状態
+ * @param name 銘柄名
+ * @param code 銘柄コード
+ * @param interval 現在の間隔選択
+ * @param onIntervalChange 間隔選択が変更された時のコールバック
+ * @param onNavigateBack 戻るコールバック
+ * @param onLogout ログアウトボタン押下時のコールバック
  */
 @Composable
 fun ChartScreenContent(

@@ -11,29 +11,29 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Repository responsible for fetching and managing candlestick data.
+ * ローソク足データの取得と管理を担当するリポジトリ。
  *
- * - Fetches candlestick data via API and exposes it via StateFlow
- * - Data fetching is executed on the IO thread
+ * - API経由でローソク足データを取得し、StateFlowで公開
+ * - データ取得はIOスレッドで実行
  *
- * @property chartApi Chart data API
- * @property dispatcherProvider Provider for coroutine dispatchers
+ * @property chartApi チャートデータAPI
+ * @property dispatcherProvider コルーチンディスパッチャーのプロバイダー
  */
 @Singleton
 class CandleRepository @Inject constructor(
     private val chartApi: ChartApi,
     private val dispatcherProvider: DispatcherProvider
 ) {
-    // StateFlow for candlestick data (read-only)
+    // ローソク足データ用のStateFlow（読み取り専用）
     private val _candles = MutableStateFlow<List<Candle>>(emptyList())
     val candles: StateFlow<List<Candle>> = _candles
 
     /**
-     * Fetches candlestick data for a specified symbol code, interval, and count, and updates StateFlow.
+     * 指定された銘柄コード、間隔、件数のローソク足データを取得し、StateFlowを更新する。
      *
-     * @param code Symbol code
-     * @param interval Data fetching interval (e.g., "1day")
-     * @param outputsize Number of data points to fetch (default: 200)
+     * @param code 銘柄コード
+     * @param interval データ取得間隔（例："1day"）
+     * @param outputsize 取得するデータ件数（デフォルト：200）
      */
     suspend fun fetchCandles(
         code: String,
@@ -44,7 +44,7 @@ class CandleRepository @Inject constructor(
     }
 
     /**
-     * Clears the stored candlestick data.
+     * 保存されているローソク足データをクリアする。
      */
     fun clearCandles() {
         _candles.value = emptyList()

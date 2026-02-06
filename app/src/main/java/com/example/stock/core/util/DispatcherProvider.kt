@@ -6,29 +6,29 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Interface for providing coroutine dispatchers.
+ * コルーチンディスパッチャーを提供するインターフェース。
  *
- * This abstraction allows for easy testing by enabling the injection
- * of test dispatchers in unit tests while using real dispatchers in production.
+ * この抽象化により、本番環境では実際のディスパッチャーを使用しながら、
+ * ユニットテストではテスト用ディスパッチャーを注入することでテストが容易になる。
  */
 interface DispatcherProvider {
-    /** Main dispatcher for UI operations */
+    /** UI操作用のMainディスパッチャー */
     val main: CoroutineDispatcher
 
-    /** IO dispatcher for disk and network operations */
+    /** ディスクとネットワーク操作用のIOディスパッチャー */
     val io: CoroutineDispatcher
 
-    /** Default dispatcher for CPU-intensive operations */
+    /** CPU負荷の高い操作用のDefaultディスパッチャー */
     val default: CoroutineDispatcher
 }
 
 /**
- * Default implementation of [DispatcherProvider] that uses the standard Android dispatchers.
+ * 標準のAndroidディスパッチャーを使用する[DispatcherProvider]のデフォルト実装。
  *
- * This implementation is used in production and provides the real dispatchers:
- * - [Dispatchers.Main] for UI operations
- * - [Dispatchers.IO] for disk and network operations
- * - [Dispatchers.Default] for CPU-intensive operations
+ * この実装は本番環境で使用され、実際のディスパッチャーを提供する：
+ * - UI操作用の[Dispatchers.Main]
+ * - ディスクとネットワーク操作用の[Dispatchers.IO]
+ * - CPU負荷の高い操作用の[Dispatchers.Default]
  */
 @Singleton
 class DefaultDispatcherProvider @Inject constructor() : DispatcherProvider {

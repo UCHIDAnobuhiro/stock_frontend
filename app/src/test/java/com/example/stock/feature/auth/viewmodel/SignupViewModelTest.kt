@@ -62,7 +62,7 @@ class SignupViewModelTest {
 
     @Test
     fun `onEmailChange updates state and clears error`() = runTest(mainRule.scheduler) {
-        // Trigger error state by attempting signup with empty fields
+        // 空のフィールドでサインアップを試みてエラー状態をトリガー
         viewModel.onEmailChange("")
         viewModel.onPasswordChange("")
         viewModel.onConfirmPasswordChange("")
@@ -71,7 +71,7 @@ class SignupViewModelTest {
         assertThat(viewModel.ui.value.errorResId)
             .isEqualTo(R.string.error_empty_fields)
 
-        // Changing email should clear the error
+        // メールアドレスを変更するとエラーがクリアされること
         viewModel.onEmailChange("test@example.com")
 
         assertThat(viewModel.ui.value.email).isEqualTo("test@example.com")
@@ -80,7 +80,7 @@ class SignupViewModelTest {
 
     @Test
     fun `onPasswordChange updates state and clears error`() = runTest(mainRule.scheduler) {
-        // Trigger error state by attempting signup with empty fields
+        // 空のフィールドでサインアップを試みてエラー状態をトリガー
         viewModel.onEmailChange("")
         viewModel.onPasswordChange("")
         viewModel.onConfirmPasswordChange("")
@@ -89,7 +89,7 @@ class SignupViewModelTest {
         assertThat(viewModel.ui.value.errorResId)
             .isEqualTo(R.string.error_empty_fields)
 
-        // Changing password should clear the error
+        // パスワードを変更するとエラーがクリアされること
         viewModel.onPasswordChange("secret123")
 
         assertThat(viewModel.ui.value.password).isEqualTo("secret123")
@@ -98,7 +98,7 @@ class SignupViewModelTest {
 
     @Test
     fun `onConfirmPasswordChange updates state and clears error`() = runTest(mainRule.scheduler) {
-        // Trigger error state by attempting signup with empty fields
+        // 空のフィールドでサインアップを試みてエラー状態をトリガー
         viewModel.onEmailChange("")
         viewModel.onPasswordChange("")
         viewModel.onConfirmPasswordChange("")
@@ -107,7 +107,7 @@ class SignupViewModelTest {
         assertThat(viewModel.ui.value.errorResId)
             .isEqualTo(R.string.error_empty_fields)
 
-        // Changing confirm password should clear the error
+        // 確認パスワードを変更するとエラーがクリアされること
         viewModel.onConfirmPasswordChange("secret123")
 
         assertThat(viewModel.ui.value.confirmPassword).isEqualTo("secret123")
@@ -140,23 +140,23 @@ class SignupViewModelTest {
             SignupResponse("User registered successfully")
         }
 
-        // Start first signup
+        // 最初のサインアップを開始
         backgroundScope.launch { viewModel.signup() }
 
-        // Wait until loading state is true
+        // ローディング状態がtrueになるまで待機
         withTimeout(1_000) {
             viewModel.ui.first { it.isLoading }
         }
 
-        // Attempt second signup while first is still in progress
+        // 最初のサインアップがまだ進行中に2回目のサインアップを試みる
         backgroundScope.launch { viewModel.signup() }
 
-        // Complete the first signup
+        // 最初のサインアップを完了
         gate.trySend(Unit)
 
         advanceUntilIdle()
 
-        // Repository should only be called once
+        // リポジトリは1回だけ呼ばれること
         coVerify(exactly = 1) { repository.signup("test@example.com", "password12345678") }
     }
 
@@ -216,7 +216,7 @@ class SignupViewModelTest {
         viewModel.onConfirmPasswordChange("password123")
         coEvery { repository.signup("test@example.com", "password123") } returns SignupResponse("User registered successfully")
 
-        // Collect events before triggering signup
+        // サインアップをトリガーする前にイベントを収集
         var received: SignupUiEvent? = null
         val job: Job = launch {
             received = viewModel.events.first()

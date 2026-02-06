@@ -6,46 +6,46 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 
 /**
- * Interface for obtaining, updating, and clearing access tokens.
+ * アクセストークンの取得・更新・クリアを行うインターフェース。
  */
 interface TokenProvider {
     /**
-     * Retrieves the currently held token.
-     * @return The held token, or null if none exists.
+     * 現在保持しているトークンを取得する。
+     * @return 保持しているトークン。存在しない場合はnull。
      */
     fun getToken(): String?
 
     /**
-     * Updates the token with a new value.
-     * @param token The new token
+     * トークンを新しい値で更新する。
+     * @param token 新しいトークン
      */
     fun update(token: String)
 
     /**
-     * Clears the held token.
+     * 保持しているトークンをクリアする。
      */
     fun clear()
 
     /**
-     * StateFlow indicating whether token restoration from storage is complete.
+     * ストレージからのトークン復元が完了したかを示すStateFlow。
      */
     val isRestorationComplete: StateFlow<Boolean>
 
     /**
-     * Marks token restoration as complete.
-     * Called by Application after restoring token from persistent storage.
+     * トークン復元完了をマークする。
+     * 永続ストレージからトークンを復元した後にApplicationから呼び出される。
      */
     fun markRestorationComplete()
 
     /**
-     * Suspends until token restoration is complete.
+     * トークン復元が完了するまで中断する。
      */
     suspend fun awaitRestoration()
 }
 
 /**
- * TokenProvider implementation that manages tokens only in memory.
- * Uses thread-safe @Volatile variable to hold the token.
+ * メモリ上でのみトークンを管理するTokenProvider実装。
+ * スレッドセーフな@Volatile変数でトークンを保持する。
  */
 class InMemoryTokenProvider : TokenProvider {
     @Volatile
@@ -55,33 +55,33 @@ class InMemoryTokenProvider : TokenProvider {
     override val isRestorationComplete: StateFlow<Boolean> = _isRestorationComplete.asStateFlow()
 
     /**
-     * Returns the held token.
+     * 保持しているトークンを返す。
      */
     override fun getToken(): String? = token
 
     /**
-     * Overwrites the token with a new value.
+     * トークンを新しい値で上書きする。
      */
     override fun update(token: String) {
         this.token = token
     }
 
     /**
-     * Clears the token.
+     * トークンをクリアする。
      */
     override fun clear() {
         this.token = null
     }
 
     /**
-     * Marks token restoration as complete.
+     * トークン復元完了をマークする。
      */
     override fun markRestorationComplete() {
         _isRestorationComplete.value = true
     }
 
     /**
-     * Suspends until token restoration is complete.
+     * トークン復元が完了するまで中断する。
      */
     override suspend fun awaitRestoration() {
         _isRestorationComplete.first { it }

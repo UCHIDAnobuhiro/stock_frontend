@@ -34,15 +34,15 @@ import com.example.stock.core.ui.theme.Thickness
 import com.example.stock.feature.stocklist.viewmodel.SymbolViewModel
 
 /**
- * Symbol list screen with ViewModel.
+ * ViewModelを使用した銘柄リスト画面。
  *
- * Wrapper composable that connects [SymbolViewModel] to [SymbolListScreenContent].
- * Handles state observation and initial data loading.
- * Uses Hilt to automatically inject the SymbolViewModel.
+ * [SymbolViewModel]と[SymbolListScreenContent]を接続するラッパーComposable。
+ * 状態監視と初期データ読み込みを処理する。
+ * HiltによりSymbolViewModelが自動的に注入される。
  *
- * @param onNavigateToChart Callback to navigate to chart screen with symbol name and code
- * @param onLogout Callback invoked when logout button is pressed
- * @param viewModel Symbol list ViewModel (injected by Hilt)
+ * @param onNavigateToChart 銘柄名とコードを持ってチャート画面へ遷移するコールバック
+ * @param onLogout ログアウトボタン押下時に呼び出されるコールバック
+ * @param viewModel 銘柄リストViewModel（Hiltにより注入）
  */
 @Composable
 fun SymbolListScreen(
@@ -52,7 +52,7 @@ fun SymbolListScreen(
 ) {
     val uiState by viewModel.ui.collectAsStateWithLifecycle()
 
-    // Load symbol list on first display
+    // 初回表示時に銘柄リストを読み込む
     LaunchedEffect(viewModel) {
         viewModel.load()
     }
@@ -66,15 +66,15 @@ fun SymbolListScreen(
 }
 
 /**
- * Stateless symbol list screen content.
+ * ステートレスな銘柄リスト画面コンテンツ。
  *
- * Displays a list of symbols fetched from the API.
- * Shows loading indicator, error state with retry button, or empty state as appropriate.
+ * APIから取得した銘柄リストを表示する。
+ * 必要に応じてローディングインジケーター、リトライボタン付きエラー状態、空状態を表示する。
  *
- * @param uiState Current UI state
- * @param onSymbolClick Callback when a symbol item is clicked
- * @param onReload Callback to reload the symbol list
- * @param onLogout Callback when logout button is pressed
+ * @param uiState 現在のUI状態
+ * @param onSymbolClick 銘柄アイテムがクリックされた時のコールバック
+ * @param onReload 銘柄リストを再読み込みするコールバック
+ * @param onLogout ログアウトボタン押下時のコールバック
  */
 @Composable
 fun SymbolListScreenContent(
@@ -97,7 +97,7 @@ fun SymbolListScreenContent(
             .padding(Spacing.Screen)
 
         when {
-            // Loading state
+            // 読み込み中
             uiState.isLoading -> {
                 Box(
                     modifier,
@@ -107,7 +107,7 @@ fun SymbolListScreenContent(
                 }
             }
 
-            // Error state
+            // エラー状態
             uiState.errorResId != null -> {
                 Box(
                     modifier,
@@ -127,7 +127,7 @@ fun SymbolListScreenContent(
                 }
             }
 
-            // Empty state
+            // 空状態
             uiState.symbols.isEmpty() -> {
                 Box(
                     modifier,
@@ -137,7 +137,7 @@ fun SymbolListScreenContent(
                 }
             }
 
-            // Symbol list display
+            // 銘柄リスト表示
             else -> {
                 Column(modifier) {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -148,7 +148,7 @@ fun SymbolListScreenContent(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    // Navigate to chart screen on tap
+                                    // タップでチャート画面へ遷移
                                     .clickable {
                                         onSymbolClick(symbol.name, symbol.code)
                                     }
@@ -156,9 +156,9 @@ fun SymbolListScreenContent(
                                     .padding(vertical = Spacing.ListItemVertical),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                // Symbol name
+                                // 銘柄名
                                 Text(text = symbol.name, style = MaterialTheme.typography.bodyLarge)
-                                // Symbol code
+                                // 銘柄コード
                                 Text(text = symbol.code, style = MaterialTheme.typography.bodyLarge)
                             }
                             if (index < uiState.symbols.lastIndex) {
