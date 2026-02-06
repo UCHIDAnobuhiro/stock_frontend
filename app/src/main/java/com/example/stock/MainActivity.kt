@@ -9,21 +9,21 @@ import com.example.stock.navigation.AppNavGraph
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
- * Activity that serves as the application entry point.
- * Sets up the navigation graph with Hilt-injected ViewModels.
- * Annotated with @AndroidEntryPoint to enable Hilt dependency injection.
+ * アプリケーションのエントリーポイントとなるActivity。
+ * Hilt注入されたViewModelを使用したナビゲーショングラフをセットアップする。
+ * @AndroidEntryPointアノテーションでHilt依存性注入を有効化。
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     /**
-     * Initialization processing when the Activity is created.
-     * Sets up the navigation graph and builds the UI.
+     * Activity作成時の初期化処理。
+     * ナビゲーショングラフをセットアップし、UIを構築する。
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            // Set up the application navigation with Hilt-injected ViewModels
+            // Hilt注入されたViewModelでアプリケーションナビゲーションをセットアップ
             StockTheme {
                 AppNavGraph()
             }

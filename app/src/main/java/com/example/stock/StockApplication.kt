@@ -16,15 +16,15 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /**
- * Application class for the Stock app.
- * Annotated with @HiltAndroidApp to enable Hilt dependency injection.
+ * Stockアプリケーションクラス。
+ * @HiltAndroidAppアノテーションでHilt依存性注入を有効化。
  */
 @HiltAndroidApp
 class StockApplication : Application() {
 
     /**
-     * Hilt entry point for accessing token-related dependencies outside of injected classes.
-     * Used to restore tokens from persistent storage on app startup.
+     * 注入クラス外からトークン関連の依存関係にアクセスするためのHiltエントリーポイント。
+     * アプリ起動時に永続ストレージからトークンを復元するために使用。
      */
     @EntryPoint
     @InstallIn(SingletonComponent::class)
@@ -44,10 +44,10 @@ class StockApplication : Application() {
     }
 
     /**
-     * Restores the JWT token from persistent storage to memory.
-     * This ensures the user remains logged in after app restart.
-     * Marks restoration as complete when done, allowing LoginViewModel
-     * to safely check auth state.
+     * 永続ストレージからメモリにJWTトークンを復元する。
+     * アプリ再起動後もユーザーがログイン状態を維持できるようにする。
+     * 完了時に復元完了をマークし、LoginViewModelが安全に認証状態を
+     * チェックできるようにする。
      */
     private fun restoreToken() {
         applicationScope.launch {
