@@ -4,12 +4,12 @@ import java.util.Locale
 import kotlin.math.pow
 
 /**
- * Formats a number with compact notation (K/M suffixes).
+ * コンパクト表記（K/Mサフィックス）で数値をフォーマットする。
  *
- * Examples: 1,200 → "1.2K", 1,200,000 → "1.2M", 123 → "123"
+ * 例：1,200 → "1.2K"、1,200,000 → "1.2M"、123 → "123"
  *
- * @param value Number to format
- * @return Formatted string with optional K/M suffix
+ * @param value フォーマットする数値
+ * @return オプションのK/Mサフィックス付きのフォーマット済み文字列
  */
 fun formatCompact(value: Float): String = when {
     value >= 1_000_000 -> {
@@ -28,13 +28,13 @@ fun formatCompact(value: Float): String = when {
 }
 
 /**
- * Returns a "nice" step value for axis labels.
+ * 軸ラベル用の"nice"なステップ値を返す。
  *
- * Rounds to one of 1, 2, 2.5, 5 × 10^n for readable intervals.
- * Examples: 7 → 10, 22 → 25, 260 → 500
+ * 読みやすい間隔のため1, 2, 2.5, 5 × 10^nのいずれかに丸める。
+ * 例：7 → 10、22 → 25、260 → 500
  *
- * @param step Raw step value
- * @return Rounded nice step value
+ * @param step 元のステップ値
+ * @return 丸められたniceステップ値
  */
 fun niceStep(step: Float): Float {
     if (step <= 0f) return 1f

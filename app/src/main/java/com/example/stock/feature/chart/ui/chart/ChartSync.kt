@@ -12,15 +12,15 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Synchronizes two charts (candlestick and volume) for coordinated interaction.
+ * 2つのチャート（ローソク足と出来高）を同期して連動操作を実現する。
  *
- * Features:
- * - Bidirectional zoom/scroll synchronization
- * - Bidirectional highlight synchronization
- * - Disabled inertia scrolling to prevent lag
+ * 機能：
+ * - 双方向のズーム/スクロール同期
+ * - 双方向のハイライト同期
+ * - ラグ防止のため慣性スクロールを無効化
  *
- * @param candle Candlestick chart instance
- * @param volume Volume chart instance
+ * @param candle ローソク足チャートインスタンス
+ * @param volume 出来高チャートインスタンス
  */
 fun attachSynchronizedPair(
     candle: CandleStickChart,
@@ -32,11 +32,11 @@ fun attachSynchronizedPair(
     val vpLock = AtomicBoolean(false)
 
     /**
-     * Synchronizes viewport matrix from one chart to another.
-     * Uses [vpLock] to prevent infinite recursion between charts.
+     * 一方のチャートから他方へビューポートマトリックスを同期する。
+     * チャート間の無限再帰を防ぐために[vpLock]を使用する。
      *
-     * @param from Source chart to copy viewport from
-     * @param to Target chart to apply viewport to
+     * @param from ビューポートをコピーする元のチャート
+     * @param to ビューポートを適用する先のチャート
      */
     fun syncViewport(from: Chart<*>, to: Chart<*>) {
         if (!vpLock.compareAndSet(false, true)) return
@@ -98,12 +98,12 @@ fun attachSynchronizedPair(
     val hlLock = AtomicBoolean(false)
 
     /**
-     * Checks if the chart already has a highlight at the same X position.
-     * Used to prevent redundant highlight updates.
+     * チャートが既に同じX位置にハイライトを持っているかを確認する。
+     * 冗長なハイライト更新を防ぐために使用する。
      *
-     * @param chart Chart to check for existing highlight
-     * @param x X coordinate to compare
-     * @return true if the chart already has a highlight at the same X position
+     * @param chart 既存のハイライトを確認するチャート
+     * @param x 比較するX座標
+     * @return チャートが既に同じX位置にハイライトを持っている場合はtrue
      */
     fun sameXHighlighted(chart: Chart<*>?, x: Float): Boolean {
         val cur = chart?.highlighted?.firstOrNull() ?: return false
