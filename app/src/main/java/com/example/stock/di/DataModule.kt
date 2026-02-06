@@ -10,21 +10,21 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 /**
- * Hilt module for providing data layer dependencies.
- * Installed in SingletonComponent to provide app-wide singleton instances.
+ * データ層の依存関係を提供するHiltモジュール。
+ * アプリ全体でシングルトンインスタンスを提供するためSingletonComponentにインストール。
  *
- * Note: AuthRepository, SymbolRepository, and CandleRepository use @Inject constructor
- * and are automatically provided by Hilt.
+ * 注意：AuthRepository、SymbolRepository、CandleRepositoryは@Inject constructorを使用し、
+ * Hiltによって自動的に提供される。
  */
 @Module
 @InstallIn(SingletonComponent::class)
 object DataModule {
 
     /**
-     * Provides a singleton instance of TokenStore.
+     * TokenStoreのシングルトンインスタンスを提供する。
      *
-     * @param context Application context for DataStore initialization
-     * @return TokenStore instance for persistent token storage
+     * @param context DataStore初期化用のアプリケーションコンテキスト
+     * @return 永続トークンストレージ用のTokenStoreインスタンス
      */
     @Provides
     @Singleton

@@ -25,15 +25,15 @@ import retrofit2.Retrofit
 import javax.inject.Singleton
 
 /**
- * Hilt module for providing network-related dependencies.
- * Installed in SingletonComponent to provide app-wide singleton instances.
+ * ネットワーク関連の依存関係を提供するHiltモジュール。
+ * アプリ全体でシングルトンインスタンスを提供するためSingletonComponentにインストール。
  */
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
     /**
-     * Provides a singleton instance of TokenProvider.
+     * TokenProviderのシングルトンインスタンスを提供する。
      */
     @Provides
     @Singleton
@@ -42,8 +42,8 @@ object NetworkModule {
     }
 
     /**
-     * Provides a singleton instance of HttpLoggingInterceptor.
-     * Only logs request/response body in debug builds to prevent token leakage.
+     * HttpLoggingInterceptorのシングルトンインスタンスを提供する。
+     * トークン漏洩を防ぐため、デバッグビルドでのみリクエスト/レスポンスボディをログ出力する。
      */
     @Provides
     @Singleton
@@ -58,13 +58,13 @@ object NetworkModule {
     }
 
     /**
-     * Provides a singleton instance of OkHttpClient.
+     * OkHttpClientのシングルトンインスタンスを提供する。
      *
-     * @param tokenProvider Provider for authentication tokens
-     * @param tokenStore Persistent storage for tokens
-     * @param authEventManager Manager for authentication lifecycle events
-     * @param loggingInterceptor Interceptor for HTTP request/response logging
-     * @return Configured OkHttpClient with authentication and logging
+     * @param tokenProvider 認証トークンのプロバイダー
+     * @param tokenStore トークンの永続ストレージ
+     * @param authEventManager 認証ライフサイクルイベントのマネージャー
+     * @param loggingInterceptor HTTPリクエスト/レスポンスログ用インターセプター
+     * @return 認証とログ機能を設定済みのOkHttpClient
      */
     @Provides
     @Singleton
@@ -82,7 +82,7 @@ object NetworkModule {
     }
 
     /**
-     * Provides a singleton instance of Json configuration.
+     * Json設定のシングルトンインスタンスを提供する。
      */
     @Provides
     @Singleton
@@ -93,11 +93,11 @@ object NetworkModule {
     }
 
     /**
-     * Provides a singleton instance of Retrofit.
+     * Retrofitのシングルトンインスタンスを提供する。
      *
-     * @param okHttpClient HTTP client for network requests
-     * @param json JSON serializer/deserializer configuration
-     * @return Configured Retrofit instance for API calls
+     * @param okHttpClient ネットワークリクエスト用のHTTPクライアント
+     * @param json JSONシリアライザー/デシリアライザー設定
+     * @return API呼び出し用に設定済みのRetrofitインスタンス
      */
     @OptIn(ExperimentalSerializationApi::class)
     @Provides
@@ -114,10 +114,10 @@ object NetworkModule {
     }
 
     /**
-     * Provides a singleton instance of AuthApi.
+     * AuthApiのシングルトンインスタンスを提供する。
      *
-     * @param retrofit Retrofit instance for creating API implementation
-     * @return AuthApi implementation for authentication endpoints
+     * @param retrofit API実装を作成するためのRetrofitインスタンス
+     * @return 認証エンドポイント用のAuthApi実装
      */
     @Provides
     @Singleton
@@ -126,10 +126,10 @@ object NetworkModule {
     }
 
     /**
-     * Provides a singleton instance of SymbolApi.
+     * SymbolApiのシングルトンインスタンスを提供する。
      *
-     * @param retrofit Retrofit instance for creating API implementation
-     * @return SymbolApi implementation for stock symbol endpoints
+     * @param retrofit API実装を作成するためのRetrofitインスタンス
+     * @return 銘柄エンドポイント用のSymbolApi実装
      */
     @Provides
     @Singleton
@@ -138,10 +138,10 @@ object NetworkModule {
     }
 
     /**
-     * Provides a singleton instance of ChartApi.
+     * ChartApiのシングルトンインスタンスを提供する。
      *
-     * @param retrofit Retrofit instance for creating API implementation
-     * @return ChartApi implementation for candlestick chart data endpoints
+     * @param retrofit API実装を作成するためのRetrofitインスタンス
+     * @return ローソク足チャートデータエンドポイント用のChartApi実装
      */
     @Provides
     @Singleton
