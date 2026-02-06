@@ -1,225 +1,224 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this
-repository.
+このファイルは、このリポジトリのコードを扱う際にClaude Code（claude.ai/code）にガイダンスを提供します。
 
-## Project Overview
+## プロジェクト概要
 
-Android stock chart viewer app using Kotlin + Jetpack Compose + MVVM architecture. Displays US stock
-candlestick charts (daily/weekly/monthly) with JWT authentication and a Go backend API.
+Kotlin + Jetpack Compose + MVVMアーキテクチャを使用したAndroid株価チャートビューアアプリ。JWT認証とGoバックエンドAPIで米国株のローソク足チャート（日足/週足/月足）を表示する。
 
-## Common Commands
+## よく使うコマンド
 
-### Build & Run
+### ビルド & 実行
 
 ```bash
-# Build the project
+# プロジェクトをビルド
 ./gradlew build
 
-# Build debug variant
+# デバッグバリアントをビルド
 ./gradlew assembleDebug
 
-# Build staging variant
+# ステージングバリアントをビルド
 ./gradlew assembleStaging
 
-# Build release variant
+# リリースバリアントをビルド
 ./gradlew assembleRelease
 
-# Install on connected device
+# 接続されたデバイスにインストール
 ./gradlew installDebug
 ```
 
-### Testing
+### テスト
 
 ```bash
-# Run all unit tests
+# 全ユニットテストを実行
 ./gradlew testDebugUnitTest
 
-# Run tests for a specific class
+# 特定のクラスのテストを実行
 ./gradlew testDebugUnitTest --tests "com.example.stock.feature.auth.viewmodel.LoginViewModelTest"
 
-# Run tests with coverage
+# カバレッジ付きでテストを実行
 ./gradlew testDebugUnitTest --tests "*.LoginViewModelTest.*"
 
-# Run instrumented tests (requires emulator/device)
+# インストルメンテーションテストを実行（エミュレータ/デバイスが必要）
 ./gradlew connectedAndroidTest
 
-# Run lint checks
+# Lintチェックを実行
 ./gradlew lint
 ```
 
-### Clean & Sync
+### クリーン & 同期
 
 ```bash
-# Clean build artifacts
+# ビルド成果物をクリーン
 ./gradlew clean
 
-# Sync project dependencies
+# プロジェクト依存関係を同期
 ./gradlew --no-daemon --stacktrace help
 ```
 
-## Architecture
+## アーキテクチャ
 
-### MVVM Pattern
+### MVVMパターン
 
-- **UI Layer** (Compose): Screens observe ViewModel state via StateFlow/SharedFlow
-- **ViewModel Layer**: Manages UI state and business logic, exposes UiState classes
-- **Repository Layer**: Coordinates data sources and transforms DTOs to UI models
-- **DataSource Layer**: API calls (Retrofit) and local storage (DataStore)
+- **UIレイヤー**（Compose）: 画面はStateFlow/SharedFlow経由でViewModelの状態を監視
+- **ViewModelレイヤー**: UI状態とビジネスロジックを管理し、UiStateクラスを公開
+- **Repositoryレイヤー**: データソースを調整し、DTOをUIモデルに変換
+- **DataSourceレイヤー**: API呼び出し（Retrofit）とローカルストレージ（DataStore）
 
-### Key Architectural Patterns
+### 主要なアーキテクチャパターン
 
-**UiState Pattern**: ViewModels expose domain models via dedicated UiState classes (not DTOs
-directly). Example: `CandleUiState`, `SymbolUiState`, `LoginUiState`.
+**UiStateパターン**: ViewModelは専用のUiStateクラス経由でドメインモデルを公開する（DTOを直接公開しない）。例: `CandleUiState`、`SymbolUiState`、`LoginUiState`。
 
-**Hilt DI**: ViewModels use Hilt for dependency injection with `@HiltViewModel` and `@Inject constructor`. Dependencies like repositories and `DispatcherProvider` are injected automatically.
+**Hilt DI**: ViewModelは`@HiltViewModel`と`@Inject constructor`でHiltを使用した依存性注入を行う。リポジトリや`DispatcherProvider`などの依存関係は自動的に注入される。
 
-**Token Management**: Dual-layer approach with `InMemoryTokenProvider` (in-memory) + `TokenStore` (
-DataStore persistence). `AuthInterceptor` automatically adds JWT Bearer token to API requests.
+**トークン管理**: `InMemoryTokenProvider`（メモリ上）+ `TokenStore`（DataStore永続化）の二層アプローチ。`AuthInterceptor`がAPIリクエストにJWT Bearerトークンを自動付与する。
 
-### Navigation Flow
+### 画面遷移フロー
 
-1. `LoginScreen` (Routes.LOGIN) → validates email/password → calls `LoginViewModel.login()`
-2. On success → navigates to `StockListScreen` (Routes.STOCK) with back stack cleared
-3. Selecting a stock → navigates to `chart/{name}/{code}` with URL parameters
-4. Logout from any screen → clears tokens → navigates back to login
+1. `LoginScreen`（Routes.LOGIN）→ メール/パスワードを検証 → `LoginViewModel.login()`を呼び出す
+2. 成功時 → バックスタックをクリアして`StockListScreen`（Routes.STOCK）へ遷移
+3. 銘柄を選択 → URLパラメータ付きで`chart/{name}/{code}`へ遷移
+4. どの画面からでもログアウト → トークンをクリア → ログイン画面へ戻る
 
-### Chart Synchronization
+### チャート同期
 
-The app uses MPAndroidChart with custom synchronization between candlestick and volume charts:
+アプリはMPAndroidChartを使用し、ローソク足チャートと出来高チャート間でカスタム同期を実装している：
 
-- `ChartSync.kt` implements bidirectional zoom/scroll/highlight synchronization using
-  `AtomicBoolean` locks to prevent infinite loops
-- Inertia scrolling is disabled (`isDragDecelerationEnabled = false`) to prevent lag
-- See `attachSynchronizedPair()` function in `ui/chart/ChartSync.kt`
+- `ChartSync.kt`は`AtomicBoolean`ロックを使用して無限ループを防ぎながら、双方向のズーム/スクロール/ハイライト同期を実装
+- ラグを防ぐため慣性スクロールを無効化（`isDragDecelerationEnabled = false`）
+- `ui/chart/ChartSync.kt`の`attachSynchronizedPair()`関数を参照
 
-### API Configuration
+### API設定
 
-- **Debug build**: `BASE_URL = "http://10.0.2.2:8080/"` (Android emulator localhost)
-- **Staging build**: `BASE_URL = "https://api.stockviewapp.com/"`
-- **Release build**: `BASE_URL = "https://api.stockviewapp.com/"`
-- BASE_URL is exposed via `BuildConfig.BASE_URL` and accessed through `ApiConfig`
+- **デバッグビルド**: `BASE_URL = "http://10.0.2.2:8080/"`（Androidエミュレータのlocalhost）
+- **ステージングビルド**: `BASE_URL = "https://api.stockviewapp.com/"`
+- **リリースビルド**: `BASE_URL = "https://api.stockviewapp.com/"`
+- BASE_URLは`BuildConfig.BASE_URL`経由で公開され、`ApiConfig`からアクセスする
 
-### Testing Strategy
+### テスト戦略
 
-- Uses `MainDispatcherRule` to replace `Dispatchers.Main` with `StandardTestDispatcher` for
-  deterministic coroutine testing
-- MockK for mocking dependencies (with `relaxed = true` for simple cases)
-- Truth library for assertions (`assertThat()`)
-- Pattern: mock repository → inject into ViewModel → verify state changes via `ui.value`
-- Always call `advanceUntilIdle()` after async operations in tests
+- 決定論的なコルーチンテストのため、`MainDispatcherRule`を使用して`Dispatchers.Main`を`StandardTestDispatcher`に置き換える
+- 依存関係のモックにはMockKを使用（シンプルなケースでは`relaxed = true`）
+- アサーションにはTruthライブラリを使用（`assertThat()`）
+- パターン: リポジトリをモック → ViewModelに注入 → `ui.value`経由で状態変化を検証
+- テストでは非同期操作の後に必ず`advanceUntilIdle()`を呼び出す
 
 ## CI/CD
 
-GitHub Actions runs on pull requests to `main`:
+GitHub Actionsは`main`へのプルリクエスト時に実行される：
 
-- Sets up JDK 17
-- Runs `./gradlew lint`
-- Runs `./gradlew testDebugUnitTest`
-- Uploads test and lint reports as artifacts
+- JDK 17をセットアップ
+- `./gradlew lint`を実行
+- `./gradlew testDebugUnitTest`を実行
+- テストとLintレポートをアーティファクトとしてアップロード
 
-## Package Structure
+## パッケージ構造
 
-This project uses a **feature-based** package structure where related components (data, UI, ViewModel) are grouped by feature rather than by layer. This improves modularity and makes it easier to understand and modify features independently.
+このプロジェクトは**フィーチャーベース**のパッケージ構造を採用しており、関連するコンポーネント（data、UI、ViewModel）はレイヤーごとではなくフィーチャーごとにグループ化されている。これによりモジュール性が向上し、各フィーチャーを独立して理解・修正しやすくなる。
 
 ```
 com.example.stock/
 ├── feature/
-│   ├── auth/                    # Authentication feature
+│   ├── auth/                    # 認証フィーチャー
 │   │   ├── data/
-│   │   │   ├── remote/          # AuthApi (Retrofit), AuthModels (Request/Response DTOs)
+│   │   │   ├── remote/          # AuthApi（Retrofit）、AuthDto（リクエスト/レスポンスDTO）
 │   │   │   └── repository/      # AuthRepository
 │   │   ├── ui/
-│   │   │   ├── login/           # LoginScreen, LoginUiState
-│   │   │   └── signup/          # SignupScreen, SignupUiState
-│   │   └── viewmodel/           # LoginViewModel, LogoutViewModel, SignupViewModel
-│   ├── stocklist/               # Stock list feature
+│   │   │   ├── login/           # LoginScreen、LoginUiState
+│   │   │   └── signup/          # SignupScreen、SignupUiState
+│   │   └── viewmodel/           # LoginViewModel、LogoutViewModel、SignupViewModel、ErrorHandler、InputValidator
+│   ├── stocklist/               # 銘柄リストフィーチャー
 │   │   ├── data/
-│   │   │   ├── remote/          # SymbolApi (Retrofit), SymbolDto
+│   │   │   ├── remote/          # SymbolApi（Retrofit）、SymbolDto
 │   │   │   └── repository/      # SymbolRepository
-│   │   ├── ui/                  # SymbolListScreen, SymbolUiState, SymbolItem
+│   │   ├── domain/model/        # Symbolエンティティ
+│   │   ├── ui/                  # SymbolListScreen、SymbolUiState、SymbolItem
 │   │   └── viewmodel/           # SymbolViewModel
-│   └── chart/                   # Chart display feature
+│   └── chart/                   # チャート表示フィーチャー
 │       ├── data/
-│       │   ├── remote/          # ChartApi (Retrofit), CandleDto
+│       │   ├── remote/          # ChartApi（Retrofit）、CandleDto
 │       │   └── repository/      # CandleRepository
-│       ├── ui/                  # ChartScreen, CandleUiState, CandleItem
-│       │   └── chart/           # CandleChartView, VolumeChartView, ChartSync
+│       ├── domain/model/        # Candleエンティティ
+│       ├── ui/                  # ChartScreen、CandleUiState、CandleItem
+│       │   └── chart/           # CandleChartView、VolumeChartView、ChartSync、ChartStyle、ChartUtils、ChartToken、SyncChartsOnce
 │       └── viewmodel/           # CandlesViewModel
 ├── core/
-│   ├── data/                    # Shared data components
-│   │   ├── auth/                # TokenProvider interface, InMemoryTokenProvider
-│   │   └── local/               # TokenStore (DataStore persistence)
-│   ├── network/                 # AuthInterceptor
+│   ├── data/                    # 共有データコンポーネント
+│   │   ├── auth/                # TokenProviderインターフェース、InMemoryTokenProvider、AuthEventManager
+│   │   └── local/               # TokenStore（DataStore永続化）
+│   ├── network/                 # AuthInterceptor、TokenAuthenticator
 │   ├── ui/
-│   │   ├── component/           # Reusable composables (headers, dropdowns)
-│   │   ├── theme/               # Material3 theme, typography, dimensions
-│   │   └── util/                # ClickGuard for preventing double-clicks
-│   └── util/                    # Shared utilities
-├── config/                      # ApiConfig (BASE_URL from BuildConfig)
-├── di/                          # Hilt modules (DataModule, NetworkModule, DispatcherModule)
-└── navigation/                  # AppNavGraph and Routes
+│   │   ├── component/           # 再利用可能なComposable（ヘッダー、ドロップダウン）
+│   │   ├── theme/               # Material3テーマ、タイポグラフィ、ディメンション
+│   │   └── util/                # ダブルクリック防止用ClickGuard
+│   └── util/                    # 共有ユーティリティ（DispatcherProvider）
+├── config/                      # ApiConfig（BuildConfigからのBASE_URL）
+├── di/                          # Hiltモジュール（DataModule、NetworkModule、DispatcherModule）
+└── navigation/                  # NavGraph
 ```
 
-### Feature Module Organization
+### フィーチャーモジュールの構成
 
-Each feature module (`auth`, `stocklist`, `chart`) follows a consistent structure:
+各フィーチャーモジュール（`auth`、`stocklist`、`chart`）は一貫した構造に従う：
 
-- **data/remote/**: Retrofit API interfaces and DTOs (data transfer objects) for network communication
-- **data/repository/**: Repository classes that coordinate data sources and business logic
-- **ui/**: Composable screens, UI state classes, and feature-specific UI components
-  - May contain subdirectories for specific screens (e.g., `auth/ui/login/`)
-  - May contain subdirectories for reusable UI components (e.g., `chart/ui/chart/`)
-- **viewmodel/**: ViewModel classes with `@HiltViewModel` annotation
+- **data/remote/**: ネットワーク通信用のRetrofit APIインターフェースとDTO（データ転送オブジェクト）
+- **data/repository/**: データソースとビジネスロジックを調整するRepositoryクラス
+- **domain/model/**: ドメインエンティティ（DTOとUI表示モデルの中間層）
+- **ui/**: Composable画面、UI状態クラス、フィーチャー固有のUIコンポーネント
+  - 特定の画面用にサブディレクトリを含む場合がある（例: `auth/ui/login/`）
+  - 再利用可能なUIコンポーネント用にサブディレクトリを含む場合がある（例: `chart/ui/chart/`）
+- **viewmodel/**: `@HiltViewModel`アノテーション付きのViewModelクラス
 
-### Recommended Package Structure Guidelines
+### 推奨パッケージ構造ガイドライン
 
-When adding new features or modifying existing ones, follow these conventions:
+新機能の追加や既存機能の修正時は、以下の規約に従う：
 
-1. **API Interfaces & DTOs** → `feature/*/data/remote/`
-   - Retrofit API interfaces
-   - Request/Response DTOs used for API communication
-   - Serializable data classes
+1. **APIインターフェース & DTO** → `feature/*/data/remote/`
+   - Retrofit APIインターフェース
+   - API通信に使用するリクエスト/レスポンスDTO
+   - シリアライズ可能なデータクラス
 
-2. **Repositories** → `feature/*/data/repository/`
-   - Repository classes that orchestrate data operations
-   - Business logic and data transformation
-   - StateFlow/SharedFlow publishers
+2. **Repository** → `feature/*/data/repository/`
+   - データ操作をオーケストレーションするRepositoryクラス
+   - ビジネスロジックとデータ変換
+   - StateFlow/SharedFlowパブリッシャー
 
-3. **UI State Classes** → `feature/*/ui/`
-   - `*UiState` data classes that represent screen state
-   - Place in the same package as their corresponding screen
+3. **ドメインエンティティ** → `feature/*/domain/model/`
+   - DTOから変換されたドメインモデル
+   - UI表示モデルへの変換元となるエンティティ
 
-4. **Composable Screens** → `feature/*/ui/`
-   - Main screen composables
-   - Screen-specific UI components
-   - Organize into subdirectories by screen name if needed
+4. **UI状態クラス** → `feature/*/ui/`
+   - 画面状態を表す`*UiState`データクラス
+   - 対応する画面と同じパッケージに配置
 
-5. **ViewModels** → `feature/*/viewmodel/`
-   - ViewModel classes with `@HiltViewModel` and `@Inject constructor`
+5. **Composable画面** → `feature/*/ui/`
+   - メイン画面のComposable
+   - 画面固有のUIコンポーネント
+   - 必要に応じて画面名でサブディレクトリに整理
 
-This structure provides:
-- **Clear separation of concerns**: API/DTOs, business logic, and UI are clearly separated
-- **Easy navigation**: All components for a feature are grouped together
-- **Scalability**: New features follow the same pattern
-- **Testability**: Dependencies are clear and easy to mock
+6. **ViewModel** → `feature/*/viewmodel/`
+   - `@HiltViewModel`と`@Inject constructor`を持つViewModelクラス
+   - 共有ユーティリティ（ErrorHandler、InputValidatorなど）も含む
 
-## Key Implementation Notes
+この構造により以下が実現される：
+- **関心の明確な分離**: API/DTO、ビジネスロジック、UIが明確に分離
+- **容易なナビゲーション**: フィーチャーの全コンポーネントがまとめてグループ化
+- **スケーラビリティ**: 新機能も同じパターンに従う
+- **テスト容易性**: 依存関係が明確でモックしやすい
 
-- **Hilt DI**: ViewModels use `@HiltViewModel` and `@Inject constructor` for dependency injection.
-  Use `hiltViewModel()` in Compose screens to obtain ViewModel instances.
-- **Coroutines**: All API calls use `viewModelScope.launch` with IO dispatcher (
-  `withContext(Dispatchers.IO)`)
-- **State Management**: Repositories use `MutableStateFlow` internally and expose `StateFlow`
-  publicly for reactive updates
-- **Error Handling**: ViewModels catch and map exceptions (HttpException → user-friendly messages,
-  IOException → network errors, SerializationException → JSON errors)
+## 主要な実装メモ
 
-## Creating Pull Requests
+- **Hilt DI**: ViewModelは依存性注入に`@HiltViewModel`と`@Inject constructor`を使用。
+  Compose画面では`hiltViewModel()`を使用してViewModelインスタンスを取得する。
+- **コルーチン**: 全てのAPI呼び出しは`viewModelScope.launch`とIOディスパッチャーを使用（`withContext(Dispatchers.IO)`）
+- **状態管理**: Repositoryは内部で`MutableStateFlow`を使用し、リアクティブな更新のために`StateFlow`を公開する
+- **エラーハンドリング**: ViewModelは例外をキャッチしてマッピング（HttpException → ユーザーフレンドリーなメッセージ、IOException → ネットワークエラー、SerializationException → JSONエラー）
 
-When creating pull requests, write clear and concise PR descriptions that include:
+## プルリクエストの作成
 
-1. **Summary**: Brief explanation of what the PR does and why
-2. **Changes**: Bulleted list of main changes
-3. **Testing**: How the changes were tested (unit tests, integration tests, manual testing, etc.)
-4. **Review Points** (optional): Specific areas or aspects that reviewers should focus o
+プルリクエストを作成する際は、以下を含む明確で簡潔なPR説明を記述する：
+
+1. **概要**: PRが何をするか、なぜそれを行うかの簡潔な説明
+2. **変更点**: 主な変更の箇条書きリスト
+3. **テスト**: 変更がどのようにテストされたか（ユニットテスト、統合テスト、手動テストなど）
+4. **レビューポイント**（任意）: レビュアーが注目すべき特定の領域や側面
