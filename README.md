@@ -1,11 +1,10 @@
 # 📈 Stock View App (Kotlin / Jetpack Compose)
 
-## 🧭 Overview
+## 🧭 概要
 
-**A simple and lightweight stock chart application**
-An intuitive app for viewing US stock candlestick charts with daily, weekly, and monthly intervals.
-Built with Kotlin, Jetpack Compose, and MVVM architecture, featuring **login authentication** and *
-*stock price display**.
+**シンプルで軽量な株価チャートアプリケーション**
+日足、週足、月足の期間で米国株のローソク足チャートを閲覧できる直感的なアプリ。
+Kotlin、Jetpack Compose、MVVMアーキテクチャで構築され、**ログイン認証**と**株価表示**機能を搭載。
 
 <p>
   <video src="https://github.com/user-attachments/assets/fd6fcc0c-c268-4e54-8930-1a236458c454" width="70%" controls></video>
@@ -13,292 +12,300 @@ Built with Kotlin, Jetpack Compose, and MVVM architecture, featuring **login aut
 
 ---
 
-## ⚙️ Key Features
+## ⚙️ 主な機能
 
-### 🔐 Authentication
+### 🔐 認証
 
-- Login with Email / Password
-- JWT token-based authentication
-- Token disposal on logout with navigation to login screen
+- メール / パスワードでログイン
+- JWTトークンベースの認証
+- ログアウト時にトークン破棄しログイン画面へ遷移
 
-### 💹 Stock Chart Display
+### 💹 株価チャート表示
 
-- Display US stock candlesticks with daily, weekly, and monthly intervals
-- Synchronized display of volume bars and charts
-- Smooth animations when switching intervals
+- 日足、週足、月足の期間で米国株のローソク足を表示
+- 出来高バーとチャートの同期表示
+- 期間切り替え時のスムーズなアニメーション
 
-### ⚡ Asynchronous Processing
+### ⚡ 非同期処理
 
-- Reactive data handling with Kotlin Coroutines + Flow
-- Asynchronous API response fetching and error handling
+- Kotlin Coroutines + Flowによるリアクティブなデータハンドリング
+- APIレスポンスの非同期取得とエラーハンドリング
 
-### 🧪 Testing
+### 🧪 テスト
 
-- Unit tests for ViewModel / Repository layers
-- Test environment with MockK + CoroutineTestRule
+- ViewModel / Repository層のユニットテスト
+- MockK + CoroutineTestRuleによるテスト環境
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ 技術スタック
 
-### 🧩 Technologies Used
+### 🧩 使用技術
 
-- **Language**: Kotlin
-- **UI Framework**: Jetpack Compose
-- **Architecture**: MVVM (Model-View-ViewModel)
-- **Async Processing**: Kotlin Coroutines / Flow
-- **HTTP Communication**: Retrofit2 + OkHttp3
-- **JSON Serialization**: Kotlinx Serialization
-- **Chart Drawing**: MPAndroidChart
-- **Authentication**: JWT (JSON Web Token)
-- **Testing**: JUnit4 / MockK / CoroutineTestRule
+- **言語**: Kotlin
+- **UIフレームワーク**: Jetpack Compose
+- **アーキテクチャ**: MVVM (Model-View-ViewModel)
+- **非同期処理**: Kotlin Coroutines / Flow
+- **HTTP通信**: Retrofit2 + OkHttp3
+- **JSONシリアライズ**: Kotlinx Serialization
+- **チャート描画**: MPAndroidChart
+- **認証**: JWT (JSON Web Token)
+- **テスト**: JUnit4 / MockK / CoroutineTestRule
 - **DI**: Hilt
-- **Build Management**: Gradle (KTS)
-- **Version Control**: Git / GitHub
+- **ビルド管理**: Gradle (KTS)
+- **バージョン管理**: Git / GitHub
 
 ---
 
-### 🧠 Additional Details
+### 🧠 追加詳細
 
-- **UI Design**: Uses Compose UI components based on Material Design 3
-- **State Management**: Reactive UI updates with ViewModel + State + Flow
-- **Data Layer**: Repository pattern separates API communication and caching
-- **Design Philosophy**: MVVM-based, focusing on simple and testable structure
-- **API Integration**: Communicates with Go (Gin) + Cloud Run backend
-- **Environment Variables**: Switches API Base URL via BuildConfig (debug / release)
-
----
-
-## 🏗️ Architecture
-
-### 🧩 Design Philosophy
-
-- **Architecture Pattern**: MVVM (Model - View - ViewModel)
-- **Dependency Direction**: UI → ViewModel → Repository → DataSource
-- **Purpose**: Separate UI logic and data processing for testability and maintainability
+- **UIデザイン**: Material Design 3ベースのCompose UIコンポーネントを使用
+- **状態管理**: ViewModel + State + Flowによるリアクティブなui更新
+- **データ層**: RepositoryパターンでAPI通信とキャッシュを分離
+- **設計思想**: MVVMベースで、シンプルかつテストしやすい構造を重視
+- **API連携**: Go (Gin) + Cloud Runバックエンドと通信
+- **環境変数**: BuildConfig経由でAPI Base URLを切り替え（debug / release）
 
 ---
 
-### 🧱 Layer Responsibilities
+## 🏗️ アーキテクチャ
 
-#### 🖥️ UI Layer (Jetpack Compose)
+### 🧩 設計思想
 
-- Handles screen rendering and user input
-- Automatically updates UI by observing `State` and `Flow`
-- Notifies `ViewModel` of user operations as events
-
-#### ⚙️ ViewModel Layer
-
-- Manages app state and screen logic
-- Fetches data from `Repository` and converts for UI display
-- Maintains states like loading, success, failure as `UiState`
-
-#### 🗂️ Repository Layer
-
-- Unified intermediary layer for data acquisition
-- Fetches data from `RemoteDataSource` (API communication)
-- Performs DTO → UI Model conversion before returning to ViewModel
-
-#### 🌐 DataSource Layer
-
-- **RemoteDataSource**: API communication via `Retrofit` + `OkHttp`
-  Attaches JWT token in headers to fetch stock data
-- **LocalDataSource (Optional)**: Future expansion with Room for caching
+- **アーキテクチャパターン**: MVVM (Model - View - ViewModel)
+- **依存関係の方向**: UI → ViewModel → Repository → DataSource
+- **目的**: UIロジックとデータ処理を分離し、テスト容易性と保守性を向上
 
 ---
 
-### 🔁 Data Flow (Example: Stock Chart Display)
+### 🧱 レイヤー責務
 
-1. User selects interval (daily / weekly / monthly)
-2. **UI → ViewModel**: Calls `viewModel.load(code, interval, outputsize)`
-3. **ViewModel → Repository**: Executes `repo.fetchCandles(...)` in `viewModelScope.launch`
-4. Repository fetches data via API and converts to UI data
-5. ViewModel updates internal state
-6. UI detects state change and redraws chart
+#### 🖥️ UI層 (Jetpack Compose)
+
+- 画面描画とユーザー入力を担当
+- `State`や`Flow`を監視し、UIを自動更新
+- ユーザー操作を`ViewModel`にイベントとして通知
+
+#### ⚙️ ViewModel層
+
+- アプリの状態と画面ロジックを管理
+- `Repository`からデータを取得し、UI表示用に変換
+- ローディング、成功、失敗などの状態を`UiState`として保持
+
+#### 🗂️ Repository層
+
+- データ取得の統一的な中間層
+- `RemoteDataSource`（API通信）からデータを取得
+- DTO → UIモデルへの変換を行い、ViewModelに返却
+
+#### 🌐 DataSource層
+
+- **RemoteDataSource**: `Retrofit` + `OkHttp`によるAPI通信
+  JWTトークンをヘッダーに付与し、株価データを取得
+- **LocalDataSource（オプション）**: 今後Roomによるキャッシュ機能を拡張予定
 
 ---
 
-### 🔓 Logout Flow
+### 🔁 データフロー（例：株価チャート表示）
+
+1. ユーザーが期間（日足 / 週足 / 月足）を選択
+2. **UI → ViewModel**: `viewModel.load(code, interval, outputsize)`を呼び出し
+3. **ViewModel → Repository**: `viewModelScope.launch`内で`repo.fetchCandles(...)`を実行
+4. RepositoryがAPI経由でデータを取得し、UIデータに変換
+5. ViewModelが内部状態を更新
+6. UIが状態変化を検知し、チャートを再描画
+
+---
+
+### 🔓 ログアウトフロー
 
 ```text
-User taps logout button
+ユーザーがログアウトボタンをタップ
        ↓
 Screen (StockListScreen / ChartScreen)
-       ↓ onLogout callback
+       ↓ onLogout コールバック
 NavGraph
        ↓ logoutViewModel.logout()
 LogoutViewModel
-       ↓ repo.logout() [IO dispatcher]
+       ↓ repo.logout() [IOディスパッチャ]
 AuthRepository
-       ├─ tokenProvider.clear()  ← Clear in-memory token
-       └─ tokenStore.clear()     ← Clear DataStore token
+       ├─ tokenProvider.clear()  ← インメモリトークンをクリア
+       └─ tokenStore.clear()     ← DataStoreトークンをクリア
        ↓
 LogoutViewModel
        ↓ emit(UiEvent.LoggedOut)
 NavGraph (LaunchedEffect)
-       ↓ Collect event
-Navigate to Login Screen (clear back stack)
+       ↓ イベントを収集
+ログイン画面へ遷移（バックスタッククリア）
 ```
 
-**Separation of Concerns:**
+**関心の分離:**
 
-- `LogoutViewModel`: Handles logout business logic
-- `NavGraph`: Handles navigation only (listens for events and navigates)
-- `AuthRepository`: Data layer (token management)
+- `LogoutViewModel`: ログアウトのビジネスロジックを処理
+- `NavGraph`: ナビゲーションのみを担当（イベントをリッスンして遷移）
+- `AuthRepository`: データ層（トークン管理）
 
 ---
 
-### 🚀 Future Improvements
+### 🚀 今後の改善
 
-- Local caching with Room
-- Add UseCase layer for separation of concerns (Clean Architecture)
+- Roomによるローカルキャッシュ
+- UseCaseレイヤーの追加による関心の分離（クリーンアーキテクチャ）
 
-## 📂 Directory Structure
+## 📂 ディレクトリ構成
 
-This project adopts a **feature-based** package structure.
-By grouping related components (data, UI, ViewModel) by feature, modularity and maintainability are
-improved.
+このプロジェクトは**機能ベース**のパッケージ構成を採用。
+関連するコンポーネント（data、UI、ViewModel）を機能ごとにグループ化することで、
+モジュール性と保守性を向上。
 
 ```text
 app/
 └── src/main/java/com/example/stock/
-    ├── feature/                 # Feature modules
-    │   ├── auth/                # Authentication feature
+    ├── feature/                 # 機能モジュール
+    │   ├── auth/                # 認証機能
     │   │   ├── data/
-    │   │   │   ├── remote/      # AuthApi (Retrofit), AuthModels (Request/Response DTOs)
+    │   │   │   ├── remote/      # AuthApi (Retrofit), AuthDto (リクエスト/レスポンスDTO)
     │   │   │   └── repository/  # AuthRepository
     │   │   ├── ui/
     │   │   │   ├── login/       # LoginScreen, LoginUiState
     │   │   │   └── signup/      # SignupScreen, SignupUiState
-    │   │   └── viewmodel/       # LoginViewModel, LogoutViewModel, SignupViewModel
-    │   ├── stocklist/           # Stock list feature
+    │   │   └── viewmodel/       # LoginViewModel, LogoutViewModel, SignupViewModel,
+    │   │                        # InputValidator, ErrorHandler
+    │   ├── stocklist/           # 銘柄一覧機能
     │   │   ├── data/
     │   │   │   ├── remote/      # SymbolApi (Retrofit), SymbolDto
     │   │   │   └── repository/  # SymbolRepository
+    │   │   ├── domain/
+    │   │   │   └── model/       # Symbol (ドメインエンティティ)
     │   │   ├── ui/              # SymbolListScreen, SymbolUiState, SymbolItem
     │   │   └── viewmodel/       # SymbolViewModel
-    │   └── chart/               # Chart display feature
+    │   └── chart/               # チャート表示機能
     │       ├── data/
     │       │   ├── remote/      # ChartApi (Retrofit), CandleDto
     │       │   └── repository/  # CandleRepository
+    │       ├── domain/
+    │       │   └── model/       # Candle (ドメインエンティティ)
     │       ├── ui/              # ChartScreen, CandleUiState, CandleItem
-    │       │   └── chart/       # CandleChartView, VolumeChartView, ChartSync
+    │       │   └── chart/       # CandleChartView, VolumeChartView, ChartSync,
+    │       │                    # SyncChartsOnce, ChartStyle, ChartToken, ChartUtils
     │       └── viewmodel/       # CandlesViewModel
-    ├── core/                    # Core components
-    │   ├── data/                # Shared data components
-    │   │   ├── auth/            # TokenProvider, InMemoryTokenProvider
+    ├── core/                    # コアコンポーネント
+    │   ├── data/                # 共有データコンポーネント
+    │   │   ├── auth/            # TokenProvider, InMemoryTokenProvider, AuthEventManager
     │   │   └── local/           # TokenStore (DataStore)
-    │   ├── network/             # AuthInterceptor
-    │   └── ui/                  # Common UI
-    │       ├── component/       # Reusable Composable
-    │       ├── theme/           # Material3 theme, typography
-    │       └── util/            # Utilities like ClickGuard
-    ├── config/                  # ApiConfig (BASE_URL configuration)
-    ├── di/                      # Hilt modules (DataModule, NetworkModule, DispatcherModule)
+    │   ├── network/             # AuthInterceptor, TokenAuthenticator
+    │   ├── ui/                  # 共通UI
+    │   │   ├── component/       # 再利用可能なComposable
+    │   │   ├── theme/           # Material3テーマ、タイポグラフィ
+    │   │   └── util/            # ClickGuardなどのユーティリティ
+    │   └── util/                # DispatcherProvider
+    ├── config/                  # ApiConfig (BASE_URL設定)
+    ├── di/                      # Hiltモジュール (DataModule, NetworkModule, DispatcherModule)
     └── navigation/              # AppNavGraph, Routes
 ```
 
-### 📦 Feature Module Structure
+### 📦 機能モジュール構成
 
-Each feature module (`auth`, `stocklist`, `chart`) consists of:
+各機能モジュール（`auth`、`stocklist`、`chart`）は以下で構成：
 
-- **data/remote/** - Retrofit API interfaces and DTOs for network communication
-- **data/repository/** - Repository classes that coordinate data operations
-- **ui/** - Composable screens, UI state classes, feature-specific UI components
-- **viewmodel/** - ViewModel classes with `@HiltViewModel` annotation
+- **data/remote/** - ネットワーク通信用のRetrofit APIインターフェースとDTO
+- **data/repository/** - データ操作を調整するRepositoryクラス
+- **domain/model/** - ドメインエンティティ（ビジネスロジック用のモデル）
+- **ui/** - Composable画面、UI状態クラス、機能固有のUIコンポーネント
+- **viewmodel/** - `@HiltViewModel`アノテーション付きのViewModelクラス
 
-This structure provides:
+この構成により：
 
-- Easy understanding of all components related to a specific feature
-- Changes to one feature rarely affect others
-- Easy separation into individual modules in the future
+- 特定機能に関連するすべてのコンポーネントを容易に把握可能
+- ある機能への変更が他の機能に影響しにくい
+- 将来的に個別モジュールへの分離が容易
 
-## ⚙️ Setup
+## ⚙️ セットアップ
 
-### Prerequisites
+### 前提条件
 
-- Android Studio Koala or later
-- JDK 17 or higher
-- Git installed
+- Android Studio Koala以降
+- JDK 17以上
+- Gitがインストール済み
 
-### Steps
+### 手順
 
 ```bash
-# Clone
+# クローン
 git clone https://github.com/UCHIDAnobuhiro/stock_frontend.git
 cd stock_frontend
 
-# Open in Android Studio and run (Build Variant: debug)
-# Select build variant and start
+# Android Studioで開いて実行（Build Variant: debug）
+# ビルドバリアントを選択して起動
 ```
 
-### Build & Run Commands
+### ビルド & 実行コマンド
 
 ```bash
-# Build project
+# プロジェクトをビルド
 ./gradlew build
 
-# Build debug variant
+# デバッグバリアントをビルド
 ./gradlew assembleDebug
 
-# Install debug variant on connected device
+# 接続されたデバイスにデバッグバリアントをインストール
 ./gradlew installDebug
 
-# Build staging variant
+# ステージングバリアントをビルド
 ./gradlew assembleStaging
 
-# Build release variant
+# リリースバリアントをビルド
 ./gradlew assembleRelease
 ```
 
-### Running Tests
+### テストの実行
 
 ```bash
-# Run all unit tests
+# 全ユニットテストを実行
 ./gradlew testDebugUnitTest
 
-# Run specific test class
+# 特定のテストクラスを実行
 ./gradlew testDebugUnitTest --tests "com.example.stock.feature.auth.viewmodel.LoginViewModelTest"
 
-# Run tests with coverage
+# カバレッジ付きでテストを実行
 ./gradlew testDebugUnitTest --tests "*.LoginViewModelTest.*"
 
-# Run lint checks
+# Lintチェックを実行
 ./gradlew lint
 
-# Clean build
+# クリーンビルド
 ./gradlew clean
 ```
 
-### API Endpoint Configuration
+### APIエンドポイント設定
 
-- **Debug build**: `http://10.0.2.2:8080/` (Android emulator localhost)
-- **Staging / Release build**: `https://api.stockviewapp.com/`
+- **デバッグビルド**: `http://10.0.2.2:8080/`（Androidエミュレータのlocalhost）
+- **ステージング / リリースビルド**: `https://api.stockviewapp.com/`
 
-※ `BASE_URL` is retrieved from `BuildConfig.BASE_URL` and switches automatically per build variant.
+※ `BASE_URL`は`BuildConfig.BASE_URL`から取得され、ビルドバリアントごとに自動で切り替わる。
 
-## 🔄 CI / Test Automation
+## 🔄 CI / テスト自動化
 
-This repository uses **GitHub Actions** to automatically run tests when pull requests are created.
-Unit tests for `ViewModel` and `Repository` are targeted,
-and test results are automatically verified.
+このリポジトリでは**GitHub Actions**を使用し、プルリクエスト作成時に自動でテストを実行。
+`ViewModel`と`Repository`のユニットテストが対象で、
+テスト結果が自動的に検証される。
 
-## 🚀 Future Work
+## 🚀 今後の計画
 
-### 💾 Caching with Room
+### 💾 Roomによるキャッシュ
 
-- Introduce `Room` to cache candlestick data locally
-- **Display recent charts offline**
-- Integrate Remote / Local in `Repository` with automatic failover
+- `Room`を導入してローソク足データをローカルにキャッシュ
+- **オフラインで直近のチャートを表示**
+- `Repository`でRemote / Localを統合し、自動フェイルオーバー
 
-### 🔐 Server-side JWT Management (Hybrid Approach)
+### 🔐 サーバーサイドJWT管理（ハイブリッドアプローチ）
 
-- Adopt **short-lived JWT access tokens (5-10 minutes)**
-- Issue **server-managed opaque refresh tokens** per device with rotation (/auth/refresh)
-- Support immediate invalidation per device via `/auth/logout`
-- Store securely on client with EncryptedSharedPreferences + Keystore
+- **短命JWTアクセストークン（5-10分）**を採用
+- デバイスごとに**サーバー管理の不透明なリフレッシュトークン**を発行しローテーション（/auth/refresh）
+- `/auth/logout`経由でデバイスごとの即時無効化をサポート
+- クライアントではEncryptedSharedPreferences + Keystoreで安全に保存
 
-### ⚙️ Improvement Ideas
+### ⚙️ 改善案
 
-- Add UseCase layer (separate screen logic from business logic)
-- Extend theme switching (Light/Dark)
+- UseCaseレイヤーの追加（画面ロジックとビジネスロジックを分離）
+- テーマ切り替えの拡張（ライト/ダーク）
