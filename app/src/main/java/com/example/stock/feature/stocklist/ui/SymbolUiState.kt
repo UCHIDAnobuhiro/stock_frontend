@@ -3,14 +3,14 @@ package com.example.stock.feature.stocklist.ui
 import androidx.annotation.StringRes
 
 /**
- * UI state for the symbol list screen.
+ * 銘柄リスト画面のUI状態。
  *
- * Represents the current state of the symbol list display,
- * including loading status, fetched symbols, and error information.
+ * 読み込み状態、取得した銘柄、エラー情報を含む
+ * 銘柄リスト表示の現在の状態を表す。
  *
- * @property isLoading Whether the symbol list is currently being loaded
- * @property symbols List of symbol items for UI display
- * @property errorResId String resource ID for error message, or null if no error
+ * @property isLoading 銘柄リストを読み込み中かどうか
+ * @property symbols UI表示用の銘柄アイテムリスト
+ * @property errorResId エラーメッセージの文字列リソースID。エラーがない場合はnull
  */
 data class SymbolUiState(
     val isLoading: Boolean = false,
