@@ -22,7 +22,7 @@ interface AuthApi {
      * サインアップAPIエンドポイントを呼び出す。
      *
      * @param body メールアドレスとパスワードを含むサインアップリクエスト
-     * @return トークンを含む認証結果
+     * @return メッセージを含むサインアップ結果
      */
     @POST("v1/signup")
     suspend fun signup(@Body body: SignupRequest): SignupResponse

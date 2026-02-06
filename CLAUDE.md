@@ -36,7 +36,7 @@ Kotlin + Jetpack Compose + MVVMアーキテクチャを使用したAndroid株価
 # 特定のクラスのテストを実行
 ./gradlew testDebugUnitTest --tests "com.example.stock.feature.auth.viewmodel.LoginViewModelTest"
 
-# カバレッジ付きでテストを実行
+# パターンを指定してテストをフィルタ実行
 ./gradlew testDebugUnitTest --tests "*.LoginViewModelTest.*"
 
 # インストルメンテーションテストを実行（エミュレータ/デバイスが必要）
@@ -140,7 +140,7 @@ com.example.stock/
 │       │   └── repository/      # CandleRepository
 │       ├── domain/model/        # Candleエンティティ
 │       ├── ui/                  # ChartScreen、CandleUiState、CandleItem
-│       │   └── chart/           # CandleChartView、VolumeChartView、ChartSync、ChartStyle、ChartUtils、ChartToken、SyncChartsOnce
+│       │   └── chart/           # CandleChartView、VolumeChartView、ChartSync、ChartStyle、ChartUtils、ChartTokens、SyncChartsOnce
 │       └── viewmodel/           # CandlesViewModel
 ├── core/
 │   ├── data/                    # 共有データコンポーネント

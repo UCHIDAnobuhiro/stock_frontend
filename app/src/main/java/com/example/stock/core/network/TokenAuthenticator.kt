@@ -40,7 +40,7 @@ class TokenAuthenticator(
      * @return リトライしない場合はnull、更新された認証情報でリトライする場合は新しいRequest
      */
     override fun authenticate(route: Route?, response: Response): Request? {
-        // 無限リトライループを防止 - 既に認証を試みている場合は諦める
+        // 認証ヘッダーなしのリクエストが401を受けた場合は対処不要
         if (response.request.header("Authorization") == null) {
             return null
         }

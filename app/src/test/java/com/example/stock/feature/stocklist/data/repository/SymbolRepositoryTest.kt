@@ -76,7 +76,7 @@ class SymbolRepositoryTest {
         // 準備
         coEvery { symbolApi.getSymbols() } throws IOException("Network error")
 
-        // 実行 / then
+        // 実行 / 検証
         val result = runCatching { repo.fetchSymbols() }
         assertThat(result.exceptionOrNull()).isInstanceOf(IOException::class.java)
         assertThat(result.exceptionOrNull()).hasMessageThat().isEqualTo("Network error")

@@ -60,7 +60,7 @@ Kotlin、Jetpack Compose、MVVMアーキテクチャで構築され、**ログ�
 ### 🧠 追加詳細
 
 - **UIデザイン**: Material Design 3ベースのCompose UIコンポーネントを使用
-- **状態管理**: ViewModel + State + Flowによるリアクティブなui更新
+- **状態管理**: ViewModel + State + FlowによるリアクティブなUI更新
 - **データ層**: RepositoryパターンでAPI通信とキャッシュを分離
 - **設計思想**: MVVMベースで、シンプルかつテストしやすい構造を重視
 - **API連携**: Go (Gin) + Cloud Runバックエンドと通信
