@@ -18,14 +18,14 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
- * Manages login processing and login screen state for [ViewModel].
+ * ログイン処理とログイン画面状態を管理する[ViewModel]。
  *
- * - Validates input values
- * - Performs login processing using [AuthRepository]
- * - Updates [LoginUiState]
+ * - 入力値のバリデーション
+ * - [AuthRepository]を使用したログイン処理の実行
+ * - [LoginUiState]の更新
  *
- * @param repo Authentication repository responsible for calling the login API.
- * @param dispatcherProvider Provider for coroutine dispatchers, enabling testability.
+ * @param repo ログインAPIを呼び出す認証リポジトリ
+ * @param dispatcherProvider コルーチンディスパッチャーのプロバイダー。テスト容易性を実現。
  */
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -40,36 +40,36 @@ class LoginViewModel @Inject constructor(
     val events = _events.asSharedFlow()
 
     /**
-     * Updates state when email input changes.
-     * @param email The entered email address
+     * メール入力変更時に状態を更新する。
+     * @param email 入力されたメールアドレス
      */
     fun onEmailChange(email: String) {
         _ui.update { it.copy(email = email, errorResId = null) }
     }
 
     /**
-     * Updates state when password input changes.
-     * @param password The entered password
+     * パスワード入力変更時に状態を更新する。
+     * @param password 入力されたパスワード
      */
     fun onPasswordChange(password: String) {
         _ui.update { it.copy(password = password, errorResId = null) }
     }
 
     /**
-     * Toggles password visibility on/off.
+     * パスワードの表示/非表示を切り替える。
      */
     fun togglePassword() {
         _ui.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
     }
 
     /**
-     * Executes the login process.
+     * ログイン処理を実行する。
      *
-     * After validating inputs, performs login via [AuthRepository],
-     * and updates [LoginUiState] based on success/failure.
+     * 入力値をバリデーション後、[AuthRepository]経由でログインを実行し、
+     * 成功/失敗に応じて[LoginUiState]を更新する。
      */
     fun login() {
-        // Prevent multiple rapid clicks
+        // 連打防止
         if (_ui.value.isLoading) return
 
         val (email, password) = _ui.value.let { it.email.trim() to it.password }
@@ -79,7 +79,7 @@ class LoginViewModel @Inject constructor(
             return
         }
 
-        // Perform login asynchronously
+        // 非同期でログインを実行
         viewModelScope.launch(dispatcherProvider.main) {
             _ui.update { it.copy(isLoading = true, errorResId = null) }
             runCatching {
@@ -107,10 +107,10 @@ class LoginViewModel @Inject constructor(
     }
 
     /**
-     * Checks if user is already authenticated.
-     * Waits for token restoration from storage to complete before checking.
-     * If a valid token exists, emits [LoginUiEvent.LoggedIn] to navigate to main screen.
-     * Called on app startup to enable auto-login.
+     * ユーザーが既に認証済みかを確認する。
+     * 確認前にストレージからのトークン復元完了を待機する。
+     * 有効なトークンが存在する場合、メイン画面への遷移のため[LoginUiEvent.LoggedIn]を発行する。
+     * アプリ起動時の自動ログインを有効にするために呼び出される。
      */
     fun checkAuthState() {
         viewModelScope.launch(dispatcherProvider.main) {

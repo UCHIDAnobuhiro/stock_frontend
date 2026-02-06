@@ -4,25 +4,25 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 /**
- * Retrofit interface defining authentication API communication.
+ * 認証API通信を定義するRetrofitインターフェース。
  *
- * Sends login/signup requests and receives responses containing authentication tokens.
+ * ログイン/サインアップリクエストを送信し、認証トークンを含むレスポンスを受信する。
  */
 interface AuthApi {
     /**
-     * Calls the login API endpoint.
+     * ログインAPIエンドポイントを呼び出す。
      *
-     * @param body Login request containing email and password
-     * @return Authentication result containing token
+     * @param body メールアドレスとパスワードを含むログインリクエスト
+     * @return トークンを含む認証結果
      */
     @POST("v1/login")
     suspend fun login(@Body body: LoginRequest): LoginResponse
 
     /**
-     * Calls the signup API endpoint.
+     * サインアップAPIエンドポイントを呼び出す。
      *
-     * @param body Signup request containing email and password
-     * @return Authentication result containing token
+     * @param body メールアドレスとパスワードを含むサインアップリクエスト
+     * @return トークンを含む認証結果
      */
     @POST("v1/signup")
     suspend fun signup(@Body body: SignupRequest): SignupResponse

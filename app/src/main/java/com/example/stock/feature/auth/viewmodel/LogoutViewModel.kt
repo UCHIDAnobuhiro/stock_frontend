@@ -13,13 +13,13 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
- * ViewModel responsible for logout operations.
+ * ログアウト操作を担当するViewModel。
  *
- * Manages the logout process by clearing tokens from both memory and persistent storage.
- * Emits [UiEvent.LoggedOut] upon successful logout to trigger navigation.
+ * メモリと永続ストレージの両方からトークンをクリアしてログアウト処理を管理する。
+ * ログアウト成功時に画面遷移をトリガーするため[UiEvent.LoggedOut]を発行する。
  *
- * Also observes global auth events (e.g., session expiration from 401 responses)
- * and emits [UiEvent.LoggedOut] to trigger navigation to login screen.
+ * また、グローバル認証イベント（401レスポンスによるセッション期限切れなど）を監視し、
+ * ログイン画面への遷移をトリガーするため[UiEvent.LoggedOut]を発行する。
  */
 @HiltViewModel
 class LogoutViewModel @Inject constructor(
@@ -29,10 +29,10 @@ class LogoutViewModel @Inject constructor(
 ) : ViewModel() {
 
     /**
-     * UI events emitted by LogoutViewModel for one-time actions.
+     * LogoutViewModelから発行される一度きりのUIイベント。
      */
     sealed interface UiEvent {
-        /** Emitted when logout completes or session expires. */
+        /** ログアウト完了またはセッション期限切れ時に発行される。 */
         data object LoggedOut : UiEvent
     }
 
@@ -40,7 +40,7 @@ class LogoutViewModel @Inject constructor(
     val events = _events.asSharedFlow()
 
     init {
-        // Observe global auth events (e.g., 401 session expiration)
+        // グローバル認証イベント（401セッション期限切れなど）を監視
         viewModelScope.launch {
             authEventManager.events.collect { event ->
                 when (event) {
@@ -53,10 +53,10 @@ class LogoutViewModel @Inject constructor(
     }
 
     /**
-     * Executes logout processing.
+     * ログアウト処理を実行する。
      *
-     * Clears tokens from memory and persistent storage via [AuthRepository],
-     * then emits [UiEvent.LoggedOut] to trigger navigation to login screen.
+     * [AuthRepository]経由でメモリと永続ストレージからトークンをクリアし、
+     * ログイン画面への遷移をトリガーするため[UiEvent.LoggedOut]を発行する。
      */
     fun logout() {
         viewModelScope.launch(dispatcherProvider.main) {
@@ -65,10 +65,10 @@ class LogoutViewModel @Inject constructor(
                     repo.logout()
                 }
             } catch (e: Exception) {
-                // Log error but continue - user intends to logout regardless of failure
+                // エラーをログ出力するが継続 - 失敗に関係なくユーザーはログアウトを意図している
                 ErrorHandler.logError(e, "Logout")
             }
-            // Always emit LoggedOut to navigate to login screen
+            // 常にLoggedOutを発行してログイン画面へ遷移
             _events.emit(UiEvent.LoggedOut)
         }
     }

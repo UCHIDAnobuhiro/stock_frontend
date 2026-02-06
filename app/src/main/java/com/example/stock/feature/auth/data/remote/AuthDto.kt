@@ -3,17 +3,17 @@ package com.example.stock.feature.auth.data.remote
 import kotlinx.serialization.Serializable
 
 /**
- * Authentication-related data transfer objects (DTOs).
- * Contains request and response models for login and signup operations.
+ * 認証関連のデータ転送オブジェクト（DTO）。
+ * ログインとサインアップ操作のリクエスト・レスポンスモデルを含む。
  */
 
-// ===== Login =====
+// ===== ログイン =====
 
 /**
- * Data class representing a login request.
+ * ログインリクエストを表すデータクラス。
  *
- * @property email User email address
- * @property password User password
+ * @property email ユーザーのメールアドレス
+ * @property password ユーザーのパスワード
  */
 @Serializable
 data class LoginRequest(
@@ -22,22 +22,22 @@ data class LoginRequest(
 )
 
 /**
- * Data class representing a login response.
+ * ログインレスポンスを表すデータクラス。
  *
- * @property token JWT authentication token
+ * @property token JWT認証トークン
  */
 @Serializable
 data class LoginResponse(
     val token: String
 )
 
-// ===== Signup =====
+// ===== サインアップ =====
 
 /**
- * Data class representing a signup request.
+ * サインアップリクエストを表すデータクラス。
  *
- * @property email User email address
- * @property password User password
+ * @property email ユーザーのメールアドレス
+ * @property password ユーザーのパスワード
  */
 @Serializable
 data class SignupRequest(
@@ -46,9 +46,9 @@ data class SignupRequest(
 )
 
 /**
- * Data class representing a signup response.
+ * サインアップレスポンスを表すデータクラス。
  *
- * @property message Response message
+ * @property message レスポンスメッセージ
  */
 @Serializable
 data class SignupResponse(

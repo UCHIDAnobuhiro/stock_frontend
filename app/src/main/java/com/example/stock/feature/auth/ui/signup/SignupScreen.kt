@@ -44,15 +44,15 @@ import com.example.stock.core.ui.theme.Spacing
 import com.example.stock.feature.auth.viewmodel.SignupViewModel
 
 /**
- * Signup screen with ViewModel.
+ * ViewModelを使用したサインアップ画面。
  *
- * Wrapper composable that connects [SignupViewModel] to [SignupScreenContent].
- * Handles event collection and state observation.
- * Uses Hilt to automatically inject the SignupViewModel.
+ * [SignupViewModel]と[SignupScreenContent]を接続するラッパーComposable。
+ * イベント収集と状態監視を処理する。
+ * HiltによりSignupViewModelが自動的に注入される。
  *
- * @param onSignedUp Callback invoked upon successful signup
- * @param onNavigateToLogin Callback to navigate to login screen
- * @param viewModel Signup ViewModel (injected by Hilt)
+ * @param onSignedUp サインアップ成功時に呼び出されるコールバック
+ * @param onNavigateToLogin ログイン画面への遷移コールバック
+ * @param viewModel サインアップViewModel（Hiltにより注入）
  */
 @Composable
 fun SignupScreen(
@@ -62,7 +62,7 @@ fun SignupScreen(
 ) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
 
-    // Navigate on successful signup (only once)
+    // サインアップ成功時に遷移（一度だけ）
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             if (event is SignupUiEvent.SignedUp) {
@@ -84,19 +84,19 @@ fun SignupScreen(
 }
 
 /**
- * Stateless signup screen content.
+ * ステートレスなサインアップ画面コンテンツ。
  *
- * Provides email/password/confirm password input, password visibility toggles,
- * signup button, error display, and progress indicator.
+ * メール/パスワード/確認用パスワード入力、パスワード表示切り替え、
+ * サインアップボタン、エラー表示、プログレスインジケーターを提供する。
  *
- * @param uiState Current UI state
- * @param onEmailChange Callback when email input changes
- * @param onPasswordChange Callback when password input changes
- * @param onTogglePassword Callback to toggle password visibility
- * @param onConfirmPasswordChange Callback when confirm password input changes
- * @param onToggleConfirmPassword Callback to toggle confirm password visibility
- * @param onSignup Callback to execute signup
- * @param onNavigateToLogin Callback to navigate to login screen
+ * @param uiState 現在のUI状態
+ * @param onEmailChange メール入力変更時のコールバック
+ * @param onPasswordChange パスワード入力変更時のコールバック
+ * @param onTogglePassword パスワード表示切り替え時のコールバック
+ * @param onConfirmPasswordChange 確認用パスワード入力変更時のコールバック
+ * @param onToggleConfirmPassword 確認用パスワード表示切り替え時のコールバック
+ * @param onSignup サインアップ実行時のコールバック
+ * @param onNavigateToLogin ログイン画面への遷移コールバック
  */
 @Composable
 fun SignupScreenContent(
@@ -122,11 +122,11 @@ fun SignupScreenContent(
                 .padding(Spacing.ScreenLarge),
             verticalArrangement = Arrangement.Center
         ) {
-            // Title
+            // タイトル
             Text(stringResource(R.string.signup), style = MaterialTheme.typography.headlineMedium)
             Spacer(Modifier.height(Spacing.ScreenLarge))
 
-            // Email input field
+            // メール入力フィールド
             OutlinedTextField(
                 value = uiState.email,
                 onValueChange = onEmailChange,
@@ -143,7 +143,7 @@ fun SignupScreenContent(
             )
             Spacer(Modifier.height(Spacing.GapSm))
 
-            // Password input field (with visibility toggle icon)
+            // パスワード入力フィールド（表示切り替えアイコン付き）
             OutlinedTextField(
                 value = uiState.password,
                 onValueChange = onPasswordChange,
@@ -177,7 +177,7 @@ fun SignupScreenContent(
             )
             Spacer(Modifier.height(Spacing.GapSm))
 
-            // Confirm Password input field (with visibility toggle icon)
+            // 確認用パスワード入力フィールド（表示切り替えアイコン付き）
             OutlinedTextField(
                 value = uiState.confirmPassword,
                 onValueChange = onConfirmPasswordChange,
@@ -213,7 +213,7 @@ fun SignupScreenContent(
                     .focusRequester(confirmPasswordFocusRequester)
             )
 
-            // Error display
+            // エラー表示
             uiState.errorResId?.let { errorResId ->
                 Spacer(Modifier.height(Spacing.GapSm))
                 Text(stringResource(errorResId), color = MaterialTheme.colorScheme.error)
@@ -221,7 +221,7 @@ fun SignupScreenContent(
 
             Spacer(Modifier.height(Spacing.GapMd))
 
-            // Signup button (with progress indicator)
+            // サインアップボタン（プログレスインジケーター付き）
             Button(
                 onClick = onSignup,
                 enabled = !uiState.isLoading,
@@ -236,7 +236,7 @@ fun SignupScreenContent(
 
             Spacer(Modifier.height(Spacing.GapSm))
 
-            // Navigate to login
+            // ログインへ遷移
             TextButton(
                 onClick = onNavigateToLogin,
                 enabled = !uiState.isLoading,

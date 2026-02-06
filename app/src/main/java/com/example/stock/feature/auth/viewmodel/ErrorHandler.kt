@@ -7,18 +7,18 @@ import timber.log.Timber
 import java.io.IOException
 
 /**
- * Utility object for handling authentication-related errors.
+ * 認証関連エラーを処理するユーティリティオブジェクト。
  *
- * Provides common error handling logic for authentication operations,
- * including logging and error message mapping.
+ * ログ出力やエラーメッセージのマッピングを含む、
+ * 認証操作の共通エラー処理ロジックを提供する。
  */
 object ErrorHandler {
 
     /**
-     * Logs the error with a simple message format.
+     * シンプルなメッセージ形式でエラーをログ出力する。
      *
-     * @param exception The exception to log
-     * @param operation A string describing the operation that failed
+     * @param exception ログ出力する例外
+     * @param operation 失敗した操作を説明する文字列
      */
     fun logError(exception: Throwable, operation: String) {
         val logMessage = when (exception) {
@@ -31,12 +31,12 @@ object ErrorHandler {
     }
 
     /**
-     * Maps an exception to a string resource ID based on its type.
+     * 例外をその種類に基づいて文字列リソースIDにマッピングする。
      *
-     * @param exception The exception to map
-     * @param httpErrorMapper A function that maps HTTP status codes to string resource IDs
-     * @param defaultErrorResId The default error resource ID to use if no specific mapping exists
-     * @return String resource ID for the error message
+     * @param exception マッピングする例外
+     * @param httpErrorMapper HTTPステータスコードを文字列リソースIDにマッピングする関数
+     * @param defaultErrorResId 特定のマッピングが存在しない場合に使用するデフォルトのエラーリソースID
+     * @return エラーメッセージの文字列リソースID
      */
     fun mapErrorToResource(
         exception: Throwable,
