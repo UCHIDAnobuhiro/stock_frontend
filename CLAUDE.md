@@ -85,10 +85,10 @@ BASE_URLは`BuildConfig.BASE_URL`経由で公開され、`ApiConfig`からアク
 
 | メソッド | パス | 説明 |
 |---------|------|------|
-| POST | `/auth/login` | ログイン（JWT取得） |
-| POST | `/auth/signup` | ユーザー登録 |
-| GET | `/symbols` | 銘柄一覧取得 |
-| GET | `/candles?code={code}&period={period}` | ローソク足データ取得（period: daily/weekly/monthly） |
+| POST | `v1/login` | ログイン（JWT取得） |
+| POST | `v1/signup` | ユーザー登録 |
+| GET | `v1/symbols` | 銘柄一覧取得 |
+| GET | `v1/candles/{code}?interval={interval}&outputsize={outputsize}` | ローソク足データ取得（interval: デフォルト "1day"、outputsize: デフォルト 200） |
 
 ### エラーハンドリング
 
@@ -163,7 +163,7 @@ com.example.stock/
 
 ## 主要な実装メモ
 
-- **コルーチン**: 全API呼び出しは`viewModelScope.launch`とIOディスパッチャーを使用（`withContext(Dispatchers.IO)`）
+- **コルーチン**: 全API呼び出しは`viewModelScope.launch`と`DispatcherProvider`を使用（`withContext(dispatcherProvider.io)`）。テストでは`TestDispatcherProvider`を注入
 - **状態管理**: Repositoryは内部で`MutableStateFlow`を使用し、リアクティブな更新のために`StateFlow`を公開
 - **コード規約**: Kotlinの標準命名規則に準拠。フォーマットはAndroid Studioのデフォルト設定を使用
 
