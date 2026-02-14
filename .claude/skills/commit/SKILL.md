@@ -20,7 +20,7 @@ description: 変更内容を確認し、日本語でコミットメッセージ�
 - APIキー・トークンのパターン（`sk-`, `ghp_`, `AKIA`, 32文字以上の英数字文字列など）
 - `.env` 以外にハードコードされた秘密情報（パスワード、接続文字列など）
 - conflict marker の残り（`<<<<<<<`, `=======`, `>>>>>>>`）
-- `TODO: remove` や一時的なデバッグコード（`fmt.Println` によるデバッグ出力など）
+- `TODO: remove` や一時的なデバッグコード（`println` によるデバッグ出力、`Log.d` の残り等）
 
 ### Step 3: 分割コミットの判断
 
@@ -46,9 +46,9 @@ amend を選択した場合は、既存メッセージを保持するか更新�
 
 ```text
 変更: <N>ファイル (+<追加行数>, -<削除行数>)
-  M  internal/cache/stock.go       -- TTL付きキャッシュの実装
-  A  internal/cache/stock_test.go  -- キャッシュのユニットテスト
-  M  go.mod                        -- 依存追加
+  M  feature/chart/viewmodel/CandlesViewModel.kt  -- キャッシュロジックを追加
+  A  feature/chart/viewmodel/CandlesViewModelTest.kt  -- キャッシュのユニットテスト
+  M  build.gradle.kts                              -- 依存追加
 
 提案コミット: feat: 株価キャッシュにTTLを導入
 ```
